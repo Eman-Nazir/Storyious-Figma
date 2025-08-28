@@ -11,11 +11,6 @@ export const getAllStories = asyncHandler(async (req, res) => {
   const stories = await Story.find()
     .populate("author", "name shortBio")
     .populate("commentsCount"); 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 99807b729697c0f2d8e9e262fde7b33a6eb15956
 
   res.status(200).json(new ApiResponse(200, stories, "Success"));
 });
@@ -57,18 +52,11 @@ export const addStory = asyncHandler(async (req, res) => {
   const populatedStory = await Story.findById(newStory._id)
     .populate("author", "name shortBio")
     .populate("commentsCount");
-
-  if (populatedStory.comments) delete populatedStory.comments;
-
   res
-    .status(201)
+     .status(201)
     .json(new ApiResponse(201, populatedStory, "Story created successfully"));
 });
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 99807b729697c0f2d8e9e262fde7b33a6eb15956
 //  COMMENTS
 
 export const getAllComments = asyncHandler(async (req, res) => {

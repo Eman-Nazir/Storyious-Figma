@@ -1,24 +1,13 @@
+
+
 import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-    },
-    description: {
-      type: String,
-      trim: true,
-    },
-    stories: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Story",
-      },
-    ],
-   
+    name: { type: String, required: true, unique: true, trim: true },
+    description: { type: String, trim: true },
+    image: { type: String, trim: true }, 
+
   },
   { timestamps: true }
 );

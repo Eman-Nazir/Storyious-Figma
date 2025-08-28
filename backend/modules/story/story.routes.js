@@ -1,5 +1,5 @@
 import express from "express";
-import upload from "../../Middleware/multerMiddleware.js";
+import upload from "../../middleware/multerMiddleware.js";
 import { 
     getAllStories, getStoryById, addStory,
     getAllComments, getCommentById, addComment,

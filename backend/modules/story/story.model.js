@@ -1,6 +1,3 @@
-
-
-
 import mongoose from "mongoose";
 
 const storySchema = new mongoose.Schema(
@@ -9,22 +6,32 @@ const storySchema = new mongoose.Schema(
     introText: { type: String },
     content: { type: String },
     meta: {
-      readTime: { type: String, default: "" },
-      views: { type: Number, default: 0 },
-    },
+  type: {
+    readTime: { type: String, default: "0" },
+    views: { type: Number, default: 0 },
+  },
+  default: {}, 
+},
+
     featuredImage: { type: String, default: "" },
-    category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
 
-  
+    category: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: "Category",
+      required: false  
+    },
 
+    // optional reference to author
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Author",
+      required: false
     },
   },
   { timestamps: true }
 );
 
+//  field for counting comments
 storySchema.virtual("commentsCount", {
   ref: "Comment",
   localField: "_id",

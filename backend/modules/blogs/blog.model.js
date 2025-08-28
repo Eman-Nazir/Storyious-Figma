@@ -2,27 +2,16 @@ import mongoose from "mongoose";
 
 const blogSchema = new mongoose.Schema(
   {
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    introText: {
-      type: String,
-      trim: true,
-    },
-    content: {
-      type: String,
-      trim: true,
-    },
-    
-    author: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Author", 
-      required: true,
-    },
-
-   
+    cards: [
+      {
+        title: { type: String, required: true, trim: true },
+        image: { type: String, trim: true },
+        subtitle: { type: String, trim: true },
+        description: { type: String, trim: true },
+        button_text: { type: String, trim: true },
+        button_link: { type: String, trim: true },
+      },
+    ],
   },
   { timestamps: true }
 );

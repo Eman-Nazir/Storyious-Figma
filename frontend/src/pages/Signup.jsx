@@ -96,16 +96,6 @@ const Signup = () => {
             required
           />
 
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            className="w-full border px-4 py-3 rounded-lg "
-          >
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-            <option value="author">Author</option>
-          </select>
 
           <button
             type="submit"
