@@ -28,7 +28,7 @@ export const createFAQ = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Question and answer are required");
   }
 
-  // Generate slug using reusable utility
+  // Generate slug using slugify 
   const slug = generateSlug(question);
 
   const faq = await FAQ.create({ question, answer, slug });

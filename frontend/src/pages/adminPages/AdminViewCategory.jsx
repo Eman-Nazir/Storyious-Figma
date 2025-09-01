@@ -2,14 +2,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaTrash, FaImage, FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AdminViewCategory = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Fetch categories from backend
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -26,19 +26,17 @@ const AdminViewCategory = () => {
     fetchCategories();
   }, []);
 
-  // Delete category
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this category?")) return;
     try {
       await axios.delete(`http://localhost:8000/api/categories/${id}`);
-      toast.success("Category deleted successfully");
       setCategories(categories.filter((cat) => cat._id !== id));
+      toast.success(" Category deleted successfully");
     } catch (err) {
-      toast.error("Failed to delete category");
+      toast.error(" Failed to delete category");
     }
   };
 
-  // Navigate to edit form
   const handleEdit = (category) => {
     navigate("/admin/story-categories/create", { state: { category } });
   };
@@ -52,7 +50,8 @@ const AdminViewCategory = () => {
 
   return (
     <div className="p-6 bg-white shadow-lg rounded-xl max-w-7xl mx-auto mt-6">
-      {/* Header */}
+      <ToastContainer position="top-right" autoClose={3000} />
+
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold text-[var(--pink-dark)]">Categories</h2>
         <button
@@ -62,7 +61,6 @@ const AdminViewCategory = () => {
           <FaPlus className="mr-2" /> Add New Category
         </button>
       </div>
-      {/* Table */}
       <div className="overflow-x-auto rounded-lg shadow">
         <table className="min-w-full border-collapse">
           <thead>
@@ -163,4 +161,3 @@ const AdminViewCategory = () => {
 };
 
 export default AdminViewCategory;
-

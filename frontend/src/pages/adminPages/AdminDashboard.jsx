@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useContext } from "react";
-import { AdminContext } from "../context/AdminContext";
+import { AdminContext } from "../../context/AdminContext";
 
 const AdminDashboard = () => {
 const { getDashboard, getCategories, getAuthors, admin, getStories,getBlogs  } = useContext(AdminContext);
@@ -68,12 +68,6 @@ useEffect(() => {
 
 
 
-
-
-
-
-  
-  // Render content dynamically
   const renderContent = () => {
     switch (activePage) {
       case "dashboard":

@@ -44,16 +44,16 @@ import HiddenGemsDetailPage from "./pages/HiddenGemsDetailPage";
 import TravelTripDetailPage from "./pages/TravelTripDetailPage";
 
 // Admin imports
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/adminPages/AdminLogin";
+import AdminDashboard from "./pages/adminPages/AdminDashboard";
 import { AdminProvider } from "./context/AdminContext";
 
 import useScrollToTop from "./hooks/useScrollToTop";
-import AdminViewCategory from "./pages/AdminViewCategory";
-import AdminCreateCategory from "./pages/AdminCreateCategory";
+import AdminViewCategory from "./pages/adminPages/AdminViewCategory";
+import AdminCreateCategory from "./pages/adminPages/AdminCreateCategory";
 import AdminLayout from "./components/common/AdminLayout";
-import AdminCreateAuthor from "./pages/AdminCreateAuthor";
-import AdminViewAuthor from "./pages/AdminViewAuthor";
+import AdminCreateAuthor from "./pages/adminPages/AdminCreateAuthor";
+import AdminViewAuthor from "./pages/adminPages/AdminViewAuthor";
 
 function App() {
   useScrollToTop();
@@ -137,37 +137,32 @@ function App() {
           element={<HiddenGemsDetailPage />}
         />
 
-       
-        {/* Admin Routes wrap in AdminProvider */}
-           
-             
-             <Route
-  path="/admin/login"
-  element={
-    <AdminProvider>
-      <AdminLogin />
-    </AdminProvider>
-  }
-/>
+        <Route
+          path="/admin/login"
+          element={
+            <AdminProvider>
+              <AdminLogin />
+            </AdminProvider>
+          }
+        />
 
-<Route
-  path="/admin/*"
-  element={
-    <AdminProvider>
-      <AdminLayout />
-    </AdminProvider>
-  }
->
-  <Route path="dashboard" element={<AdminDashboard />} />
-  <Route path="story-categories" element={<AdminViewCategory />} />
-  <Route path="story-categories/create" element={<AdminCreateCategory />} />
-  <Route path="authors/create" element={<AdminCreateAuthor />} />
-  <Route path="authors" element={<AdminViewAuthor/>} />
-</Route>
-
-
-
-
+        <Route
+          path="/admin/*"
+          element={
+            <AdminProvider>
+              <AdminLayout />
+            </AdminProvider>
+          }
+        >
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="story-categories" element={<AdminViewCategory />} />
+          <Route
+            path="story-categories/create"
+            element={<AdminCreateCategory />}
+          />
+          <Route path="authors/create" element={<AdminCreateAuthor />} />
+          <Route path="authors" element={<AdminViewAuthor />} />
+        </Route>
       </Routes>
       <Footer />
     </>

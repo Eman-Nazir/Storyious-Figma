@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { AdminContext } from "../context/AdminContext";
+import { AdminContext } from "../../context/AdminContext";
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });

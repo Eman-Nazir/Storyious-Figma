@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -15,7 +16,7 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-// Icon map for social links
+// Social icons mapping
 const iconMap = {
   facebook: FaFacebookF,
   twitter: FaTwitter,
@@ -29,6 +30,7 @@ const AdminViewAuthor = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Fetch authors from backend
   const fetchAuthors = async () => {
     try {
       const res = await axios.get("http://localhost:8000/api/authors");
@@ -44,6 +46,7 @@ const AdminViewAuthor = () => {
     fetchAuthors();
   }, []);
 
+  // Delete author
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this author?")) return;
     try {
@@ -55,6 +58,7 @@ const AdminViewAuthor = () => {
     }
   };
 
+  // Navigate to edit page
   const handleEdit = (author) => {
     navigate("/admin/authors/create", { state: { author } });
   };
@@ -72,7 +76,7 @@ const AdminViewAuthor = () => {
         <h2 className="text-3xl font-bold text-[var(--pink-dark)]">Authors</h2>
         <button
           onClick={() => navigate("/admin/authors/create")}
-          className="bg-[var(--pink-dark)] hover: text-white font-medium py-2 px-4 rounded-lg transition-colors"
+          className="bg-[var(--pink-dark)] text-white font-medium py-2 px-4 rounded-lg transition-colors"
         >
           Add New Author
         </button>
@@ -92,17 +96,14 @@ const AdminViewAuthor = () => {
           <tbody className="divide-y divide-gray-200">
             {authors.length > 0 ? (
               authors.map((author) => (
-                <tr
-                  key={author._id}
-                  className="hover:bg-pink-50 transition-colors duration-150"
-                >
+                <tr key={author._id} className="hover:bg-pink-50 transition-colors duration-150">
                   {/* Author Info */}
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-12 w-12">
                         {author.image ? (
                           <img
-                            src={`http://localhost:8000/uploads/${author.image}`}
+                            src={`http://localhost:8000/uploads/${author.image}?v=${author.updatedAt || author.createdAt}`}
                             alt={author.name}
                             className="h-12 w-12 rounded-full object-cover"
                           />
@@ -113,12 +114,8 @@ const AdminViewAuthor = () => {
                         )}
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {author.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {author.email || "No email provided"}
-                        </div>
+                        <div className="text-sm font-medium text-gray-900">{author.name}</div>
+                        <div className="text-sm text-gray-500">{author.email || "No email provided"}</div>
                       </div>
                     </div>
                   </td>
@@ -140,28 +137,25 @@ const AdminViewAuthor = () => {
                     </div>
                   </td>
 
-                  {/* Social Links */}
+                  {/* Social Icons */}
                   <td className="px-6 py-4">
                     <div className="flex justify-center space-x-2">
-                      {author.socials && author.socials.length > 0 ? (
-                        author.socials.map((s) => {
-                          const Icon = iconMap[s.icon.toLowerCase()] || null;
+                      {(author.socials || [])
+                        .filter((s) => s.platform)
+                        .map((s) => {
+                          const platformName = s.platform || "";
+                          const Icon = iconMap[platformName.toLowerCase()] || null;
                           return Icon ? (
-                            <a
-                              key={s._id}
-                              href={s.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-100 text-pink-600 hover:bg-pink-100 hover:text-pink-700 transition-colors"
+                            <div
+                              key={s._id || platformName}
+                              className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-100 text-pink-600 transition-colors"
                             >
                               <Icon className="text-sm" />
-                            </a>
+                            </div>
                           ) : null;
-                        })
-                      ) : (
-                        <span className="text-xs text-gray-400">
-                          No socials
-                        </span>
+                        })}
+                      {(!author.socials || author.socials.length === 0) && (
+                        <span className="text-xs text-gray-400">No socials</span>
                       )}
                     </div>
                   </td>
@@ -198,16 +192,11 @@ const AdminViewAuthor = () => {
               ))
             ) : (
               <tr>
-                <td
-                  colSpan="5"
-                  className="px-6 py-12 text-center text-gray-500"
-                >
+                <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
                   <div className="flex flex-col items-center">
                     <FaUser className="h-12 w-12 text-gray-300 mb-2" />
                     <p className="text-lg font-medium">No authors found</p>
-                    <p className="text-sm mt-1">
-                      Get started by adding your first author
-                    </p>
+                    <p className="text-sm mt-1">Get started by adding your first author</p>
                   </div>
                 </td>
               </tr>
