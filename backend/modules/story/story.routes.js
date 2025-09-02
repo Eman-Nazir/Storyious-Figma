@@ -1,5 +1,5 @@
 import express from "express";
-import Upload from "../../middleware/multerMiddleware.js";
+import Upload from "../../middleware_temp/multerMiddleware.js";
 import { 
     getAllStories, getStoryById, addStory,
     getAllComments, getCommentById, addComment,
@@ -9,28 +9,12 @@ import {
 
 const router = express.Router();
 
-// //  STORIES 
-// router.get("/", getAllStories);
-// router.get("/stories/:id", getStoryById);
-// router.post(
-//     "/create",
-//     upload([
-//         { name: "featuredImage", maxCount: 1 },
-//     ]),
-//     addStory
-// );
 
-
-// 📂 Cloudinary fro stories routes 
-
-// 📂 Cloudinary/stories folder
 const upload = Upload("stories");
 
-// STORIES
 router.get("/", getAllStories);
 router.get("/:id", getStoryById);
 
-// ✅ Add story (upload featuredImage to Cloudinary/stories folder)
 router.post("/create", upload.single("featuredImage"), addStory);
 
 
