@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createAuthorSchema } from "../../schemas/authorSchema.js";
@@ -19,6 +19,8 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const authorToEdit = location.state?.author || null;
+
+  const [previewImage, setPreviewImage] = useState(null);
 
   const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm({
     resolver: zodResolver(createAuthorSchema),
@@ -41,9 +43,19 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
       setValue("fullBio", authorToEdit.fullBio || "");
       setValue("isVerified", authorToEdit.isVerified || false);
       setValue("socials", authorToEdit.socials || []);
-      setValue("image", null); 
+      setPreviewImage(authorToEdit.image || null); // show current image
+    } else {
+      reset({
+        name: "",
+        shortBio: "",
+        fullBio: "",
+        isVerified: false,
+        image: null,
+        socials: [],
+      });
+      setPreviewImage(null);
     }
-  }, [authorToEdit, setValue]);
+  }, [authorToEdit, setValue, reset]);
 
   const toggleSocial = (platformObj) => {
     const socials = watchSocials || [];
@@ -52,6 +64,13 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
       setValue("socials", socials.filter((s) => s.platform !== platformObj.name));
     } else {
       setValue("socials", [...socials, { platform: platformObj.name }]);
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPreviewImage(URL.createObjectURL(file)); 
     }
   };
 
@@ -84,13 +103,18 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
           headers: { "Content-Type": "multipart/form-data" },
         });
         toast.success("Author created successfully!");
-        reset({ name: "", shortBio: "", fullBio: "", isVerified: false, image: null, socials: [] });
-        const fileInput = document.querySelector('input[name="image"]');
-        if (fileInput) fileInput.value = "";
+        reset({
+          name: "",
+          shortBio: "",
+          fullBio: "",
+          isVerified: false,
+          image: null,
+          socials: [],
+        });
+        setPreviewImage(null);
       }
 
       if (refreshAuthors) refreshAuthors();
-
       navigate("/admin/authors");
 
     } catch (err) {
@@ -120,11 +144,18 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
           <label className="text-gray-700">Verified Author</label>
         </div>
 
+        {previewImage && (
+          <div className="mb-2">
+            <img src={previewImage} alt="Preview" className="w-32 h-32 object-cover rounded" />
+          </div>
+        )}
+
         <input
           type="file"
           accept="image/*"
           {...register("image")}
           name="image"
+          onChange={handleImageChange}
           className="border p-2 rounded"
         />
         {errors.image && <p className="text-red-500 text-sm">{errors.image.message}</p>}

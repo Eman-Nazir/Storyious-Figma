@@ -1,21 +1,34 @@
 
 
+
 import express from "express";
-import upload from "../../middleware/multerMiddleware.js";
+import Upload from "../../middleware/multerMiddleware.js";
 import {
   getAllAuthors,
   getAuthorById,
   addAuthor,
-  deleteAuthor,
   updateAuthor,
+  deleteAuthor,
 } from "./author.controller.js";
 
 const router = express.Router();
 
+// Multer with Cloudinary storage
+const upload = Upload("authors"); // all images go to Cloudinary folder "authors"
+
+// ✅ Get all authors
 router.get("/", getAllAuthors);
+
+// ✅ Get author by ID
 router.get("/:id", getAuthorById);
-router.post("/", upload([{ name: "image", maxCount: 1 }]), addAuthor);
-router.put("/:id", upload([{ name: "image", maxCount: 1 }]), updateAuthor);
+
+// ✅ Add a new author (with image upload)
+router.post("/", upload.single("image"), addAuthor);
+
+// ✅ Update author by ID (with optional image upload)
+router.put("/:id", upload.single("image"), updateAuthor);
+
+// ✅ Delete author by ID
 router.delete("/:id", deleteAuthor);
 
 export default router;

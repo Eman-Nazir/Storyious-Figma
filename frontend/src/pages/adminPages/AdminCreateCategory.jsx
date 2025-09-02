@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
@@ -38,37 +39,73 @@ const AdminCreateCategory = () => {
     }
   }, [editCategory, setValue]);
 
+  // const onSubmit = async (data) => {
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("name", data.name);
+  //     formData.append("description", data.description);
+
+  //     if (data.image && data.image.length > 0) {
+  //       formData.append("image", data.image[0]); 
+  //     }
+
+  //     if (editCategory) {
+  //       await axios.put(
+  //         `http://localhost:8000/api/categories/${editCategory._id}`,
+  //         formData,
+  //         { headers: { "Content-Type": "multipart/form-data" } }
+  //       );
+  //       toast.success(" Category updated successfully!");
+  //     } else {
+  //       await axios.post(
+  //         "http://localhost:8000/api/categories/create",
+  //         formData,
+  //         { headers: { "Content-Type": "multipart/form-data" } }
+  //       );
+  //       toast.success(" Category created successfully!");
+  //       reset(); 
+  //     }
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error(" Failed to save category");
+  //   }
+  // };
+
+
+
   const onSubmit = async (data) => {
-    try {
-      const formData = new FormData();
-      formData.append("name", data.name);
-      formData.append("description", data.description);
+  try {
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("description", data.description);
 
-      if (data.image && data.image.length > 0) {
-        formData.append("image", data.image[0]); 
-      }
-
-      if (editCategory) {
-        await axios.put(
-          `http://localhost:8000/api/categories/${editCategory._id}`,
-          formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
-        toast.success(" Category updated successfully!");
-      } else {
-        await axios.post(
-          "http://localhost:8000/api/categories/create",
-          formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
-        toast.success(" Category created successfully!");
-        reset(); 
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error(" Failed to save category");
+    if (data.image && data.image.length > 0) {
+      formData.append("image", data.image[0]); 
     }
-  };
+
+    if (editCategory) {
+      // Wait for update API
+      await axios.put(
+        `http://localhost:8000/api/categories/${editCategory._id}`,
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      toast.success("Category updated successfully!");
+    } else {
+      // Wait for create API
+      await axios.post(
+        "http://localhost:8000/api/categories/create",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+      toast.success("Category created successfully!");
+      reset(); 
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error("Failed to save category");
+  }
+};
 
   return (
     <div className="p-6 bg-white shadow rounded-lg max-w-md mx-auto mt-10">
@@ -116,14 +153,16 @@ const AdminCreateCategory = () => {
             <p className="text-red-500 text-sm">{errors.image.message}</p>
           )}
 
+          {/* ✅ Show existing Cloudinary image if editing */}
           {editCategory?.image && !image?.length && (
             <img
-              src={`http://localhost:8000/uploads/${editCategory.image}`}
+              src={editCategory.image}
               alt={editCategory.name}
               className="h-24 w-24 mt-2 object-cover rounded"
             />
           )}
 
+          {/* ✅ Show new local preview if uploading */}
           {image?.length > 0 && (
             <img
               src={URL.createObjectURL(image[0])}

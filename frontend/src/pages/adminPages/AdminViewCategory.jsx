@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaTrash, FaImage, FaPlus } from "react-icons/fa";
@@ -27,7 +28,8 @@ const AdminViewCategory = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this category?")) return;
+    if (!window.confirm("Are you sure you want to delete this category?"))
+      return;
     try {
       await axios.delete(`http://localhost:8000/api/categories/${id}`);
       setCategories(categories.filter((cat) => cat._id !== id));
@@ -44,7 +46,9 @@ const AdminViewCategory = () => {
   if (loading)
     return (
       <div className="flex justify-center items-center h-64">
-        <p className="text-center text-gray-500 text-lg">Loading categories...</p>
+        <p className="text-center text-gray-500 text-lg">
+          Loading categories...
+        </p>
       </div>
     );
 
@@ -53,7 +57,9 @@ const AdminViewCategory = () => {
       <ToastContainer position="top-right" autoClose={3000} />
 
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-[var(--pink-dark)]">Categories</h2>
+        <h2 className="text-3xl font-bold text-[var(--pink-dark)]">
+          Categories
+        </h2>
         <button
           onClick={() => navigate("/admin/story-categories/create")}
           className="bg-[var(--pink-dark)]  text-white font-medium py-2 px-4 rounded-lg transition-colors flex items-center"
@@ -98,9 +104,12 @@ const AdminViewCategory = () => {
                     <div className="flex justify-center">
                       {category.image ? (
                         <img
-                          src={`http://localhost:8000/uploads/${category.image}`}
+                          src={category.image}
                           alt={category.name}
                           className="h-12 w-12 object-cover rounded-lg"
+                          onLoad={() =>
+                            console.log(`${category.name} image loaded`)
+                          }
                         />
                       ) : (
                         <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center">
@@ -142,7 +151,10 @@ const AdminViewCategory = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                <td
+                  colSpan="5"
+                  className="px-6 py-12 text-center text-gray-500"
+                >
                   <div className="flex flex-col items-center">
                     <FaImage className="h-12 w-12 text-gray-300 mb-2" />
                     <p className="text-lg font-medium">No categories found</p>

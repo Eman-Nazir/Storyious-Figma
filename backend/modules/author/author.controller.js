@@ -1,9 +1,10 @@
 
+
 import mongoose from "mongoose";
+import Author from "./author.model.js";
+import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
-import { asyncHandler } from "../../utils/asyncHandler.js";
-import Author from "./author.model.js";
 import { generateSlug } from "../../utils/slugify.js";
 
 // Get all authors
@@ -15,8 +16,7 @@ export const getAllAuthors = asyncHandler(async (req, res) => {
 // Get author by ID
 export const getAuthorById = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(id))
-    throw new ApiError(400, "Invalid author ID");
+  if (!mongoose.Types.ObjectId.isValid(id)) throw new ApiError(400, "Invalid author ID");
 
   const author = await Author.findById(id);
   if (!author) throw new ApiError(404, "Author not found");
@@ -28,16 +28,19 @@ export const getAuthorById = asyncHandler(async (req, res) => {
 export const addAuthor = asyncHandler(async (req, res) => {
   const { name, shortBio, fullBio, socials, isVerified } = req.body;
 
+  if (!name) throw new ApiError(400, "Author name is required");
+
   let socialsArray = [];
   if (socials) {
     try {
       socialsArray = typeof socials === "string" ? JSON.parse(socials) : socials;
-    } catch (err) {
+    } catch {
       socialsArray = [];
     }
   }
 
-  const image = req.files?.image ? req.files.image[0].filename : "";
+  const image = req.file?.path;
+
   const slug = generateSlug(name);
 
   const newAuthor = await Author.create({
@@ -58,19 +61,18 @@ export const updateAuthor = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { name, shortBio, fullBio, socials, isVerified } = req.body;
 
-  if (!mongoose.Types.ObjectId.isValid(id))
-    throw new ApiError(400, "Invalid author ID");
+  if (!mongoose.Types.ObjectId.isValid(id)) throw new ApiError(400, "Invalid author ID");
 
   let socialsArray = [];
   if (socials) {
     try {
       socialsArray = typeof socials === "string" ? JSON.parse(socials) : socials;
-    } catch (err) {
+    } catch {
       socialsArray = [];
     }
   }
 
-  const image = req.files?.image ? req.files.image[0].filename : undefined;
+  const image = req.file?.path; 
 
   const updatedAuthor = await Author.findByIdAndUpdate(
     id,
@@ -80,7 +82,7 @@ export const updateAuthor = asyncHandler(async (req, res) => {
       fullBio,
       isVerified: isVerified === "true" || isVerified === true,
       socials: socialsArray,
-      ...(image && { image }),
+      ...(image && { image }), 
     },
     { new: true }
   );
@@ -94,8 +96,7 @@ export const updateAuthor = asyncHandler(async (req, res) => {
 export const deleteAuthor = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(id))
-    throw new ApiError(400, "Invalid author ID");
+  if (!mongoose.Types.ObjectId.isValid(id)) throw new ApiError(400, "Invalid author ID");
 
   const author = await Author.findByIdAndDelete(id);
 

@@ -21,7 +21,7 @@ const storySchema = new mongoose.Schema(
       required: false  
     },
 
-    // optional reference to author
+    
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Author",
@@ -31,7 +31,7 @@ const storySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-//  field for counting comments
+
 storySchema.virtual("commentsCount", {
   ref: "Comment",
   localField: "_id",

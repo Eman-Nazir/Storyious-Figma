@@ -54,6 +54,7 @@ import AdminCreateCategory from "./pages/adminPages/AdminCreateCategory";
 import AdminLayout from "./components/common/AdminLayout";
 import AdminCreateAuthor from "./pages/adminPages/AdminCreateAuthor";
 import AdminViewAuthor from "./pages/adminPages/AdminViewAuthor";
+import AdminCreateStory from "./pages/adminPages/AdminCreateStory";
 
 function App() {
   useScrollToTop();
@@ -162,6 +163,8 @@ function App() {
           />
           <Route path="authors/create" element={<AdminCreateAuthor />} />
           <Route path="authors" element={<AdminViewAuthor />} />
+
+          <Route path="stories/create" element={<AdminCreateStory/>}/>
         </Route>
       </Routes>
       <Footer />

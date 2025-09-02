@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -16,7 +15,6 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-// Social icons mapping
 const iconMap = {
   facebook: FaFacebookF,
   twitter: FaTwitter,
@@ -30,7 +28,6 @@ const AdminViewAuthor = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Fetch authors from backend
   const fetchAuthors = async () => {
     try {
       const res = await axios.get("http://localhost:8000/api/authors");
@@ -96,14 +93,17 @@ const AdminViewAuthor = () => {
           <tbody className="divide-y divide-gray-200">
             {authors.length > 0 ? (
               authors.map((author) => (
-                <tr key={author._id} className="hover:bg-pink-50 transition-colors duration-150">
+                <tr
+                  key={author._id}
+                  className="hover:bg-pink-50 transition-colors duration-150"
+                >
                   {/* Author Info */}
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-12 w-12">
                         {author.image ? (
                           <img
-                            src={`http://localhost:8000/uploads/${author.image}?v=${author.updatedAt || author.createdAt}`}
+                            src={author.image}
                             alt={author.name}
                             className="h-12 w-12 rounded-full object-cover"
                           />
@@ -114,8 +114,12 @@ const AdminViewAuthor = () => {
                         )}
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{author.name}</div>
-                        <div className="text-sm text-gray-500">{author.email || "No email provided"}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {author.name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {author.email || "No email provided"}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -144,7 +148,8 @@ const AdminViewAuthor = () => {
                         .filter((s) => s.platform)
                         .map((s) => {
                           const platformName = s.platform || "";
-                          const Icon = iconMap[platformName.toLowerCase()] || null;
+                          const Icon =
+                            iconMap[platformName.toLowerCase()] || null;
                           return Icon ? (
                             <div
                               key={s._id || platformName}
@@ -155,7 +160,9 @@ const AdminViewAuthor = () => {
                           ) : null;
                         })}
                       {(!author.socials || author.socials.length === 0) && (
-                        <span className="text-xs text-gray-400">No socials</span>
+                        <span className="text-xs text-gray-400">
+                          No socials
+                        </span>
                       )}
                     </div>
                   </td>
@@ -192,11 +199,16 @@ const AdminViewAuthor = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                <td
+                  colSpan="5"
+                  className="px-6 py-12 text-center text-gray-500"
+                >
                   <div className="flex flex-col items-center">
                     <FaUser className="h-12 w-12 text-gray-300 mb-2" />
                     <p className="text-lg font-medium">No authors found</p>
-                    <p className="text-sm mt-1">Get started by adding your first author</p>
+                    <p className="text-sm mt-1">
+                      Get started by adding your first author
+                    </p>
                   </div>
                 </td>
               </tr>

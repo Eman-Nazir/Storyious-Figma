@@ -12,7 +12,9 @@
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
     "@tailwindcss/vite": "^4.1.10",
+    "@tinymce/tinymce-react": "^6.3.0",
     "axios": "^1.11.0",
+    "jodit-react": "^5.2.19",
     "lucide": "^0.522.0",
     "lucide-react": "^0.522.0",
     "react": "^19.1.0",
