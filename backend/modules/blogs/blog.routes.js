@@ -16,7 +16,7 @@
 
 import express from "express";
 import { createBlog, getBlogs } from "../blogs/blog.controller.js";
-import Upload from "../../middleware/multerMiddleware.js";
+import Upload from "../../middleware_temp/multerMiddleware.js";
 
 const router = express.Router();
 
