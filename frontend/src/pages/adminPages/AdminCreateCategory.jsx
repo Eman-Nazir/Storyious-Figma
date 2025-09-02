@@ -39,39 +39,6 @@ const AdminCreateCategory = () => {
     }
   }, [editCategory, setValue]);
 
-  // const onSubmit = async (data) => {
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append("name", data.name);
-  //     formData.append("description", data.description);
-
-  //     if (data.image && data.image.length > 0) {
-  //       formData.append("image", data.image[0]); 
-  //     }
-
-  //     if (editCategory) {
-  //       await axios.put(
-  //         `http://localhost:8000/api/categories/${editCategory._id}`,
-  //         formData,
-  //         { headers: { "Content-Type": "multipart/form-data" } }
-  //       );
-  //       toast.success(" Category updated successfully!");
-  //     } else {
-  //       await axios.post(
-  //         "http://localhost:8000/api/categories/create",
-  //         formData,
-  //         { headers: { "Content-Type": "multipart/form-data" } }
-  //       );
-  //       toast.success(" Category created successfully!");
-  //       reset(); 
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //     toast.error(" Failed to save category");
-  //   }
-  // };
-
-
 
   const onSubmit = async (data) => {
   try {
@@ -84,7 +51,6 @@ const AdminCreateCategory = () => {
     }
 
     if (editCategory) {
-      // Wait for update API
       await axios.put(
         `http://localhost:8000/api/categories/${editCategory._id}`,
         formData,
@@ -92,7 +58,6 @@ const AdminCreateCategory = () => {
       );
       toast.success("Category updated successfully!");
     } else {
-      // Wait for create API
       await axios.post(
         "http://localhost:8000/api/categories/create",
         formData,
@@ -153,7 +118,6 @@ const AdminCreateCategory = () => {
             <p className="text-red-500 text-sm">{errors.image.message}</p>
           )}
 
-          {/* ✅ Show existing Cloudinary image if editing */}
           {editCategory?.image && !image?.length && (
             <img
               src={editCategory.image}
@@ -162,7 +126,6 @@ const AdminCreateCategory = () => {
             />
           )}
 
-          {/* ✅ Show new local preview if uploading */}
           {image?.length > 0 && (
             <img
               src={URL.createObjectURL(image[0])}

@@ -43,7 +43,7 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
       setValue("fullBio", authorToEdit.fullBio || "");
       setValue("isVerified", authorToEdit.isVerified || false);
       setValue("socials", authorToEdit.socials || []);
-      setPreviewImage(authorToEdit.image || null); // show current image
+      setPreviewImage(authorToEdit.image || null); 
     } else {
       reset({
         name: "",

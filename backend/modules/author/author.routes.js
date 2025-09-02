@@ -13,22 +13,16 @@ import {
 
 const router = express.Router();
 
-// Multer with Cloudinary storage
-const upload = Upload("authors"); // all images go to Cloudinary folder "authors"
+const upload = Upload("authors"); 
 
-// ✅ Get all authors
 router.get("/", getAllAuthors);
 
-// ✅ Get author by ID
 router.get("/:id", getAuthorById);
 
-// ✅ Add a new author (with image upload)
 router.post("/", upload.single("image"), addAuthor);
 
-// ✅ Update author by ID (with optional image upload)
 router.put("/:id", upload.single("image"), updateAuthor);
 
-// ✅ Delete author by ID
 router.delete("/:id", deleteAuthor);
 
 export default router;

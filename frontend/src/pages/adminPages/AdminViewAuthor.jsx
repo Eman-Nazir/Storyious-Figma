@@ -43,7 +43,6 @@ const AdminViewAuthor = () => {
     fetchAuthors();
   }, []);
 
-  // Delete author
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this author?")) return;
     try {
@@ -55,7 +54,6 @@ const AdminViewAuthor = () => {
     }
   };
 
-  // Navigate to edit page
   const handleEdit = (author) => {
     navigate("/admin/authors/create", { state: { author } });
   };

@@ -9,73 +9,6 @@ import Ads from "../story/ad.model.js";
 import { calculateReadTime } from "../../utils/readTime.js";
 
 
-
-
-// // ✅ GET ALL STORIES
-// export const getAllStories = asyncHandler(async (req, res) => {
-//   const stories = await Story.find()
-//     .populate("author", "name shortBio")
-//     .populate("commentsCount");
-
-//   res.status(200).json(new ApiResponse(200, stories, "Success"));
-// });
-
-// // ✅ GET STORY BY ID (increment views)
-// export const getStoryById = asyncHandler(async (req, res) => {
-//   const { id } = req.params;
-
-//   if (!mongoose.Types.ObjectId.isValid(id))
-//     throw new ApiError(400, "Invalid story ID");
-
-//   // increment views each time story is fetched
-//   const story = await Story.findByIdAndUpdate(
-//     id,
-//     { $inc: { "meta.views": 1 } },
-//     { new: true }
-//   )
-//     .populate("author", "name shortBio")
-//     .populate("commentsCount");
-
-//   if (!story) throw new ApiError(404, "Story not found");
-
-//   res.status(200).json(new ApiResponse(200, story, "Success"));
-// });
-
-// // ✅ ADD STORY (auto calculate readTime)
-// export const addStory = asyncHandler(async (req, res) => {
-//   const { title, introText, content, author, category } = req.body;
-
-//   const featuredImage = req.files?.["featuredImage"]
-//     ? req.files["featuredImage"][0].filename
-//     : "";
-
-//   const readTime = calculateReadTime(content);
-
-//   const newStory = await Story.create({
-//     title,
-//     introText,
-//     content,
-//     featuredImage,
-//     author,
-//     category,
-//     meta: { readTime }, // store readTime
-//   });
-
-//   const populatedStory = await Story.findById(newStory._id)
-//     .populate("author", "name shortBio")
-//     .populate("commentsCount");
-
-//   res
-//     .status(201)
-//     .json(new ApiResponse(201, populatedStory, "Story created successfully"));
-// });
-
-
-
-// CLOUDINARY 
-
-
-// ✅ GET ALL STORIES
 export const getAllStories = asyncHandler(async (req, res) => {
   const stories = await Story.find()
     .populate("author", "name shortBio")
@@ -84,7 +17,6 @@ export const getAllStories = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, stories, "Success"));
 });
 
-// ✅ GET STORY BY ID (increment views)
 export const getStoryById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -104,11 +36,9 @@ export const getStoryById = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, story, "Success"));
 });
 
-// ✅ ADD STORY (auto calculate readTime + Cloudinary image upload)
 export const addStory = asyncHandler(async (req, res) => {
   const { title, introText, content, author, category } = req.body;
 
-  // ✅ Cloudinary gives `req.file.path` as the secure URL
   const featuredImage = req.file?.path || "";
 
   const readTime = calculateReadTime(content);
