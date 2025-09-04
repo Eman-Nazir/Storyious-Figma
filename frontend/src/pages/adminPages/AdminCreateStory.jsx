@@ -107,7 +107,7 @@ const AdminCreateStory = () => {
         </div>
 
         {/* Content */}
-        <div className="prose">
+        <div>
           <label className="block mb-1 font-medium">Content</label>
           <Editor
             apiKey="5ivm8p6aaxaabgeylol7bmbun306lc0v5huip0lrnyiacd3u" 
@@ -145,6 +145,8 @@ const AdminCreateStory = () => {
             }}
             onEditorChange={(newContent) => setContent(newContent)}
           />
+            
+
 
 
         </div>
