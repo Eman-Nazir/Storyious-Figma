@@ -20,11 +20,6 @@ router.post("/create", upload.single("featuredImage"), addStory);
 
 
 
-
-
-
-
-
 //  COMMENTS 
 router.get("/comments", getAllComments);
 router.get("/comments/:id", getCommentById);

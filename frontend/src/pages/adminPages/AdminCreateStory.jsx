@@ -1,7 +1,11 @@
+
+
+
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import JoditEditor from "jodit-react";
+import { Editor } from "@tinymce/tinymce-react";
 
 const AdminCreateStory = () => {
   const [title, setTitle] = useState("");
@@ -9,18 +13,10 @@ const AdminCreateStory = () => {
   const [content, setContent] = useState("");
   const [authorId, setAuthorId] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [featuredImage, setFeaturedImage] = useState(null); 
+  const [featuredImage, setFeaturedImage] = useState(null);
 
   const [authors, setAuthors] = useState([]);
   const [categories, setCategories] = useState([]);
-
-  const config = {
-    readonly: false,
-    placeholder: "Start writing your story...",
-    toolbarSticky: true,
-    showCharsCounter: false,
-    showWordsCounter: false,
-  };
 
   useEffect(() => {
     const fetchAuthors = async () => {
@@ -64,7 +60,7 @@ const AdminCreateStory = () => {
       formData.append("category", categoryId);
 
       if (featuredImage) {
-        formData.append("featuredImage", featuredImage); 
+        formData.append("featuredImage", featuredImage);
       }
 
       await axios.post("http://localhost:8000/api/stories/create", formData, {
@@ -111,13 +107,46 @@ const AdminCreateStory = () => {
         </div>
 
         {/* Content */}
-        <div>
+        <div className="prose">
           <label className="block mb-1 font-medium">Content</label>
-          <JoditEditor
+          <Editor
+            apiKey="5ivm8p6aaxaabgeylol7bmbun306lc0v5huip0lrnyiacd3u" 
             value={content}
-            config={config}
-            onChange={(newContent) => setContent(newContent)}
+            init={{
+              height: 400,
+              menubar: true,
+              plugins:
+                "advlist autolink lists link image charmap preview anchor " +
+                "searchreplace visualblocks code fullscreen " +
+                "insertdatetime media table help wordcount",
+              toolbar:
+                "undo redo | blocks | " +
+                "bold italic underline forecolor backcolor | alignleft aligncenter " +
+                "alignright alignjustify | bullist numlist outdent indent | " +
+                "link image media | removeformat | fullscreen preview",
+              automatic_uploads: true,
+              file_picker_types: "image",
+              file_picker_callback: (cb, value, meta) => {
+                if (meta.filetype === "image") {
+                  const input = document.createElement("input");
+                  input.setAttribute("type", "file");
+                  input.setAttribute("accept", "image/*");
+                  input.onchange = function () {
+                    const file = this.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function () {
+                      cb(reader.result, { title: file.name });
+                    };
+                    reader.readAsDataURL(file);
+                  };
+                  input.click();
+                }
+              },
+            }}
+            onEditorChange={(newContent) => setContent(newContent)}
           />
+
+
         </div>
 
         {/* Author */}
@@ -128,7 +157,7 @@ const AdminCreateStory = () => {
             value={authorId}
             onChange={(e) => setAuthorId(e.target.value)}
           >
-            <option value="">-- Select Author --</option>
+            <option value="">Select Author</option>
             {authors.map((author) => (
               <option key={author._id} value={author._id}>
                 {author.name}
@@ -145,7 +174,7 @@ const AdminCreateStory = () => {
             value={categoryId}
             onChange={(e) => setCategoryId(e.target.value)}
           >
-            <option value="">-- Select Category --</option>
+            <option value="">Select Category</option>
             {categories.map((cat) => (
               <option key={cat._id} value={cat._id}>
                 {cat.name}
@@ -178,3 +207,13 @@ const AdminCreateStory = () => {
 };
 
 export default AdminCreateStory;
+
+
+
+
+
+
+
+
+
+
