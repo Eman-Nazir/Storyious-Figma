@@ -11,8 +11,10 @@ import { calculateReadTime } from "../../utils/readTime.js";
 
 export const getAllStories = asyncHandler(async (req, res) => {
   const stories = await Story.find()
-    .populate("author", "name shortBio")
-    .populate("commentsCount");
+  .populate("author", "name shortBio")
+  .populate("category", "name")   
+  .populate("commentsCount");
+
 
   res.status(200).json(new ApiResponse(200, stories, "Success"));
 });
@@ -29,6 +31,7 @@ export const getStoryById = asyncHandler(async (req, res) => {
     { new: true }
   )
     .populate("author", "name shortBio")
+    .populate("category", "name")
     .populate("commentsCount");
 
   if (!story) throw new ApiError(404, "Story not found");
@@ -55,6 +58,7 @@ export const addStory = asyncHandler(async (req, res) => {
 
   const populatedStory = await Story.findById(newStory._id)
     .populate("author", "name shortBio")
+      .populate("category", "name")
     .populate("commentsCount");
 
   res
@@ -64,6 +68,40 @@ export const addStory = asyncHandler(async (req, res) => {
 
 
 
+export const updateStory = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { title, introText, content, author, category } = req.body;
+  const featuredImage = req.file?.path;
+
+  const story = await Story.findById(id);
+  if (!story) throw new ApiError(404, "Story not found");
+
+  story.title = title;
+  story.introText = introText;
+  story.content = content;
+  story.author = author;
+  story.category = category;
+  story.meta.readTime = calculateReadTime(content);
+  if (featuredImage) story.featuredImage = featuredImage;
+
+  await story.save();
+
+  const populatedStory = await Story.findById(story._id)
+    .populate("author", "name shortBio")
+    .populate("category", "name")
+    .populate("commentsCount");
+
+  res.status(200).json(new ApiResponse(200, populatedStory, "Story updated successfully"));
+});
+
+export const deleteStory = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const story = await Story.findById(id);
+  if (!story) throw new ApiError(404, "Story not found");
+
+  await story.deleteOne();
+  res.status(200).json(new ApiResponse(200, null, "Story deleted successfully"));
+});
 
 
 

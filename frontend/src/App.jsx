@@ -7,15 +7,16 @@ import Navbar from "./components/common/Navbar";
 import Footer from "./components/common/Footer";
 import PageWithoutAds from "./pages/PageWithoutAds";
 import AllStories from "./pages/AllStories";
-import BedtimeDetailedPage from "./pages/BedtimeDetailedPage";
-import MoralStoryDetailedPage from "./pages/MoralStoryDetailedPage";
-import ClassicStoryDetailedPage from "./pages/ClassicStoryDetailedPage";
-import ScaryStoryDetailedPage from "./pages/ScaryStoryDetailedPage";
-import FablesStoryDetailedPage from "./pages/FablesStoryDetailedPage";
-import FairytalesDetailedPage from "./pages/FairytalesDetailedPage";
-import JackStoryDetailPage from "./pages/JackStoryDetailPage";
-import SilentCradleStoryDetailPage from "./pages/SilentCradleDetailPage";
-import ElijahQuestStoryDetailPage from "./pages/ElijahQuestStoryDetailedPage";
+
+// import BedtimeDetailedPage from "./pages/BedtimeDetailedPage";
+// import MoralStoryDetailedPage from "./pages/MoralStoryDetailedPage";
+// import ClassicStoryDetailedPage from "./pages/ClassicStoryDetailedPage";
+// import ScaryStoryDetailedPage from "./pages/ScaryStoryDetailedPage";
+// import FablesStoryDetailedPage from "./pages/FablesStoryDetailedPage";
+// import FairytalesDetailedPage from "./pages/FairytalesDetailedPage";
+// import JackStoryDetailPage from "./pages/JackStoryDetailPage";
+// import SilentCradleStoryDetailPage from "./pages/SilentCradleDetailPage";
+// import ElijahQuestStoryDetailPage from "./pages/ElijahQuestStoryDetailedPage";
 import BlogsPage from "./pages/BlogsPage";
 import BlogOneDetailPage from "./pages/BlogOneDetailPage";
 import BlogTwoDetailPage from "./pages/BlogTwoDetailPage";
@@ -39,9 +40,10 @@ import SilentCradelVideoDetailPage from "./pages/SilentCradelVideoDetailPage";
 import ElijahQuestVideoDetailPage from "./pages/ElijahQuestVideoDetailPage";
 import ContactUsPage from "./pages/ContactUsPage";
 import SearchPage from "./pages/SearchPage";
-import ChasingSunsetDetailPage from "./pages/ChasingSunsetDetailPage";
-import HiddenGemsDetailPage from "./pages/HiddenGemsDetailPage";
-import TravelTripDetailPage from "./pages/TravelTripDetailPage";
+
+// import ChasingSunsetDetailPage from "./pages/ChasingSunsetDetailPage";
+// import HiddenGemsDetailPage from "./pages/HiddenGemsDetailPage";
+// import TravelTripDetailPage from "./pages/TravelTripDetailPage";
 
 // Admin imports
 import AdminLogin from "./pages/adminPages/AdminLogin";
@@ -55,6 +57,16 @@ import AdminLayout from "./components/common/AdminLayout";
 import AdminCreateAuthor from "./pages/adminPages/AdminCreateAuthor";
 import AdminViewAuthor from "./pages/adminPages/AdminViewAuthor";
 import AdminCreateStory from "./pages/adminPages/AdminCreateStory";
+import AdminViewStories from "./pages/adminPages/AdminViewStories";
+import AdminBlogCreate from "./pages/adminPages/AdminBlogCreate";
+import AdminBlogView from "./pages/adminPages/AdminBlogView";
+import AdminCreateFAQ from "./pages/adminPages/AdminCreateFaq";
+import AdminViewFAQs from "./pages/adminPages/AdminViewFaq";
+import Jack1stDay from "./sections/StoryDetailedPage/1stStory/Jack1stDay";
+import CategoryDetailedPage from "./pages/CategoryDetailPage";
+
+
+
 
 function App() {
   useScrollToTop();
@@ -69,8 +81,10 @@ function App() {
         {/* Public Routes */}
         <Route path="/" element={<PageWithoutAds />} />
         <Route path="/allstories" element={<AllStories />} />
-        <Route path="/BedTime-Detailed" element={<BedtimeDetailedPage />} />
-        <Route
+        <Route path="/category/:categoryName" element={<CategoryDetailedPage/>} /> 
+
+        {/* <Route path="/BedTime-Detailed" element={<BedtimeDetailedPage />} /> */}
+        {/* <Route
           path="/MoralStory-Detailed"
           element={<MoralStoryDetailedPage />}
         />
@@ -89,13 +103,14 @@ function App() {
         <Route
           path="/Fairytales-Detailed"
           element={<FairytalesDetailedPage />}
-        />
-        <Route path="/Jack-1st-Day" element={<JackStoryDetailPage />} />
-        <Route
-          path="/Silent-Cradle"
-          element={<SilentCradleStoryDetailPage />}
-        />
-        <Route path="/Elijah-Quest" element={<ElijahQuestStoryDetailPage />} />
+        /> */}
+        <Route path="/story/:id" element={<Jack1stDay/>} />
+
+        {/* <Route path="/Jack-1st-Day" element={<JackStoryDetailPage />} />
+        <Route path="/Silent-Cradle" element={<SilentCradleStoryDetailPage />}/>
+        <Route path="/Elijah-Quest" element={<ElijahQuestStoryDetailPage />} /> */}
+
+
         <Route path="/Blog-Page" element={<BlogsPage />} />
         <Route path="/BlogOne-Page" element={<BlogOneDetailPage />} />
         <Route path="/BlogTwo-Page" element={<BlogTwoDetailPage />} />
@@ -125,7 +140,7 @@ function App() {
         />
         <Route path="/ContactUs" element={<ContactUsPage />} />
         <Route path="/SearchPage" element={<SearchPage />} />
-        <Route
+        {/* <Route
           path="/TravelTipsDetailedPage"
           element={<TravelTripDetailPage />}
         />
@@ -136,7 +151,7 @@ function App() {
         <Route
           path="/HiddenGemsDetailedPage"
           element={<HiddenGemsDetailPage />}
-        />
+        /> */}
 
         <Route
           path="/admin/login"
@@ -165,6 +180,16 @@ function App() {
           <Route path="authors" element={<AdminViewAuthor />} />
 
           <Route path="stories/create" element={<AdminCreateStory/>}/>
+          <Route path="stories" element={<AdminViewStories/>}/>
+          <Route path="blogs/create" element={<AdminBlogCreate/>}/>
+          <Route path="blogs" element={<AdminBlogView/>}/>
+          <Route path="faqs/create" element={<AdminCreateFAQ/>}/>
+          <Route path="faqs" element={<AdminViewFAQs/>}/>
+          
+
+
+
+
         </Route>
       </Routes>
       <Footer />

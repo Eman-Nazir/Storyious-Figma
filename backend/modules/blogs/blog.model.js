@@ -1,7 +1,13 @@
+
+
+
 import mongoose from "mongoose";
 
 const blogSchema = new mongoose.Schema(
   {
+    title: { type: String, required: true, trim: true },
+    introText: { type: String, trim: true },
+
     cards: [
       {
         title: { type: String, required: true, trim: true },
@@ -12,8 +18,28 @@ const blogSchema = new mongoose.Schema(
         button_link: { type: String, trim: true },
       },
     ],
+
+    meta: {
+      type: {
+        readTime: { type: String, default: "0 min" },
+        views: { type: Number, default: 0 },
+      },
+      default: {},
+    },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("Blog", blogSchema);
+//  Virtual for comments count
+blogSchema.virtual("commentsCount", {
+  ref: "Comment",
+  localField: "_id",
+  foreignField: "blogId", 
+  count: true,
+});
+
+blogSchema.set("toObject", { virtuals: true });
+blogSchema.set("toJSON", { virtuals: true });
+
+const Blog = mongoose.model("Blog", blogSchema);
+export default Blog;

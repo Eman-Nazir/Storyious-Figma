@@ -1,8 +1,8 @@
 
 import jwt from "jsonwebtoken";
 
-// Middleware to protect admin routes
 export const adminAuth = (req, res, next) => {
+  
   // Get token from cookie
   const token = req.cookies?.adminToken;
   if (!token) return res.status(401).json({ message: "No token, authorization denied" });

@@ -1,6 +1,15 @@
-export function calculateReadTime(content) {
+
+
+
+export const calculateReadTime = (content) => {
+  if (!content) return "0 min";
+
+  const text = content.replace(/<[^>]+>/g, "").trim();
   const wordsPerMinute = 200;
-  const words = content ? content.trim().split(/\s+/).length : 0;
-  const minutes = Math.ceil(words / wordsPerMinute);
-  return `${minutes || 1} min read`;
-}
+  const wordCount = text.split(/\s+/).filter(Boolean).length;
+
+  if (wordCount === 0) return "0 min";
+
+  const time = wordCount / wordsPerMinute;
+  return `${time.toFixed(1)} min`; // e.g., 0.3 min, 1.5 min
+};

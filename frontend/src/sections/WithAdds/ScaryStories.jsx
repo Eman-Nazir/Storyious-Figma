@@ -1,21 +1,44 @@
 
 
-
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import Card from "../../components/common/Cards/Card";
 import { Link } from "react-router-dom";
-import ReadMore from "../../components/common/ReadMore";
+import Community from "../../components/common/Community";
+import axios from "axios";
 
 const ScaryStories = () => {
-  const [scary, setScary] = useState([]);
+  const [morals, setMorals] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(import.meta.env.VITE_API_URL_SCARY)
-      .then((res) => res.json())
-      .then((data) => setScary(data));
+    const fetchMorals = async () => {
+      try {
+        // Fetch stories from your backend
+        const response = await axios.get("http://localhost:8000/api/stories?populate=category");
+        
+        const stories = response.data.data || response.data || [];
+        
+        // Get only the first 3 stories
+        const firstThreeStories = stories.slice(0, 3);
+        
+        setMorals(Array.isArray(firstThreeStories) ? firstThreeStories : []);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch stories');
+        setLoading(false);
+        console.error("Error fetching stories:", err);
+      }
+    };
+
+    fetchMorals();
   }, []);
+
+  if (loading) return <div className="text-center py-8">Loading stories...</div>;
+  if (error) return <div className="text-center py-8 text-red-500">{error}</div>;
+  if (morals.length === 0) return <div className="text-center py-8">No stories found</div>;
 
   return (
     <>
@@ -40,15 +63,15 @@ const ScaryStories = () => {
 
         {/* Mobile slider */}
         <div className="md:hidden flex flex-col items-center">
-          {scary.length > 0 && (
+          {morals.length > 0 && (
             <div className="w-full max-w-[380px]">
-              <Card story={scary[activeIndex]} /> {/* prop pass to child component Card.jsx */}
+              <Card story={morals[activeIndex]} />
             </div>
           )}
 
           {/* dots */}
           <div className="flex justify-center gap-2 mt-4">
-            {scary.map((_, i) => (
+            {morals.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setActiveIndex(i)}
@@ -57,7 +80,6 @@ const ScaryStories = () => {
                     ? "bg-[var(--dot-active)]"
                     : "bg-[var(--dot-inactive)]"
                 }`}
-               
               />
             ))}
           </div>
@@ -65,13 +87,13 @@ const ScaryStories = () => {
 
         {/* Desktop grid */}
         <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          {scary.map((story) => (
-            <Card key={story.id} story={story} />
+          {morals.map((story) => (
+            <Card key={story._id} story={story} />
           ))}
         </div>
       </div>
 
-      <ReadMore />
+      <Community />
     </>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react'
-import FeaturedStoriesWithoutAds from '../sections/WithoutAdds/FeaturedStoriesWithoutAds'
+import FeaturedStories from '../sections/WithAdds/FeaturedStories'
 import MoralStories from '../sections/WithAdds/MoralStories'
 import ScaryStories from '../sections/WithAdds/ScaryStories'
 import ClassicStories from '../sections/WithAdds/ClassicStories'
@@ -10,7 +10,7 @@ import FAQ from '../sections/WithAdds/FAQ'
 const PageWithoutAds = () => {
   return (
     <div>
-        <FeaturedStoriesWithoutAds/>
+        <FeaturedStories/>
         <MoralStories/>
         <ScaryStories/>
         <ClassicStories/>

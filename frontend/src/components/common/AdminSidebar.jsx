@@ -46,6 +46,14 @@ const AdminSidebar = ({ activePage, setActivePage }) => {
         { name: "Create New", key: "blog-create", path: "/admin/blogs/create" },
       ],
     },
+    {
+      name: "FAQs",
+      key: "faq",
+      children: [
+        { name: "View All", key: "faq-view", path: "/admin/faqs" },
+        { name: "Create New", key: "faq-create", path: "/admin/faqs/create" },
+      ],
+    },
   ];
 
   const toggleDropdown = (key) => {

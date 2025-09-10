@@ -10,7 +10,6 @@ import RelatedStories from '../sections/StoryDetailedPage/1stStory/RelatedStorie
 import Images from '../sections/StoryDetailedPage/1stStory/Images';
 import CommentReply from '../sections/StoryDetailedPage/1stStory/CommentReply';
 
-// Render all the sections of 1st Story here
 
 const JackStoryDetailPage = () => {
   return (

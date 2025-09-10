@@ -1,6 +1,8 @@
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   FaFacebookF,
   FaTwitter,
@@ -67,6 +69,8 @@ const AdminViewAuthor = () => {
 
   return (
     <div className="p-6 bg-white shadow-lg rounded-xl max-w-7xl mx-auto mt-6">
+      <ToastContainer position="top-right" autoClose={2000} />
+
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold text-[var(--pink-dark)]">Authors</h2>
         <button
@@ -114,9 +118,6 @@ const AdminViewAuthor = () => {
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">
                           {author.name}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {author.email || "No email provided"}
                         </div>
                       </div>
                     </div>

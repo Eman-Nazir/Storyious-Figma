@@ -1,30 +1,47 @@
 
-
-
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { Editor } from "@tinymce/tinymce-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { storySchema } from "../../schemas/storySchema";
 
 const AdminCreateStory = () => {
-  const [title, setTitle] = useState("");
-  const [introText, setIntroText] = useState("");
-  const [content, setContent] = useState("");
-  const [authorId, setAuthorId] = useState("");
-  const [categoryId, setCategoryId] = useState("");
-  const [featuredImage, setFeaturedImage] = useState(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const editStory = location.state?.story || null;
 
+  const {
+    register,
+    handleSubmit,
+    control,
+    setValue,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(storySchema),
+    defaultValues: {
+      title: editStory?.title || "",
+      introText: editStory?.introText || "",
+      content: editStory?.content || "",
+      authorId: editStory?.author?._id || "",
+      categoryId: editStory?.category?._id || "",
+      featuredImage: null,
+    },
+  });
+
+  const fileInputRef = useRef(null);
   const [authors, setAuthors] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [previewImage, setPreviewImage] = useState(editStory?.featuredImage || null);
 
   useEffect(() => {
     const fetchAuthors = async () => {
       try {
         const res = await axios.get("http://localhost:8000/api/authors");
         setAuthors(res.data?.data || []);
-      } catch (error) {
-        console.error("Error fetching authors:", error);
+      } catch {
         toast.error("Failed to load authors");
       }
     };
@@ -33,8 +50,7 @@ const AdminCreateStory = () => {
       try {
         const res = await axios.get("http://localhost:8000/api/categories");
         setCategories(res.data?.data || []);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
+      } catch {
         toast.error("Failed to load categories");
       }
     };
@@ -43,56 +59,59 @@ const AdminCreateStory = () => {
     fetchCategories();
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const calculateReadTime = (text) => {
+    const words = text.split(/\s+/).filter(Boolean).length;
+    return Math.ceil(words / 200) + " min read";
+  };
 
-    if (!title || !introText || !content || !authorId || !categoryId) {
-      toast.error("All fields are required!");
-      return;
-    }
-
+  const onSubmit = async (data) => {
     try {
       const formData = new FormData();
-      formData.append("title", title);
-      formData.append("introText", introText);
-      formData.append("content", content);
-      formData.append("author", authorId);
-      formData.append("category", categoryId);
+      formData.append("title", data.title);
+      formData.append("introText", data.introText);
+      formData.append("content", data.content);
+      formData.append("author", data.authorId);
+      formData.append("category", data.categoryId);
+      formData.append("meta[readTime]", calculateReadTime(data.content));
+      formData.append("meta[views]", editStory?.meta?.views || 0);
 
-      if (featuredImage) {
-        formData.append("featuredImage", featuredImage);
+      if (data.featuredImage) formData.append("featuredImage", data.featuredImage);
+
+      if (editStory) {
+        await axios.put(`http://localhost:8000/api/stories/${editStory._id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        toast.success("Story updated successfully!");
+      } else {
+        await axios.post("http://localhost:8000/api/stories/create", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        toast.success("Story created successfully!");
       }
 
-      await axios.post("http://localhost:8000/api/stories/create", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      toast.success("Story created successfully!");
-      setTitle("");
-      setIntroText("");
-      setContent("");
-      setAuthorId("");
-      setCategoryId("");
-      setFeaturedImage(null);
+      navigate("/admin/stories");
     } catch (error) {
-      console.error("Error creating story:", error);
-      toast.error("Failed to create story");
+      toast.error("Failed to save story");
+      console.error(error);
     }
   };
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded">
-      <h2 className="text-2xl font-bold mb-4">Create New Story</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <ToastContainer position="top-right" autoClose={3000} />
+      <h2 className="text-2xl font-bold mb-4">
+        {editStory ? "Edit Story" : "Create New Story"}
+      </h2>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Title */}
         <div>
           <label className="block mb-1 font-medium">Title</label>
           <input
             type="text"
             className="w-full border px-3 py-2 rounded"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            {...register("title")}
           />
+          {errors.title && <p className="text-red-500">{errors.title.message}</p>}
         </div>
 
         {/* Intro Text */}
@@ -101,54 +120,80 @@ const AdminCreateStory = () => {
           <textarea
             className="w-full border px-3 py-2 rounded"
             rows="3"
-            value={introText}
-            onChange={(e) => setIntroText(e.target.value)}
+            {...register("introText")}
           />
+          {errors.introText && <p className="text-red-500">{errors.introText.message}</p>}
         </div>
 
-        {/* Content */}
+        {/* Content Editor */}
         <div>
           <label className="block mb-1 font-medium">Content</label>
-          <Editor
-            apiKey="5ivm8p6aaxaabgeylol7bmbun306lc0v5huip0lrnyiacd3u" 
-            value={content}
-            init={{
-              height: 400,
-              menubar: true,
-              plugins:
-                "advlist autolink lists link image charmap preview anchor " +
-                "searchreplace visualblocks code fullscreen " +
-                "insertdatetime media table help wordcount",
-              toolbar:
-                "undo redo | blocks | " +
-                "bold italic underline forecolor backcolor | alignleft aligncenter " +
-                "alignright alignjustify | bullist numlist outdent indent | " +
-                "link image media | removeformat | fullscreen preview",
-              automatic_uploads: true,
-              file_picker_types: "image",
-              file_picker_callback: (cb, value, meta) => {
-                if (meta.filetype === "image") {
-                  const input = document.createElement("input");
-                  input.setAttribute("type", "file");
-                  input.setAttribute("accept", "image/*");
-                  input.onchange = function () {
-                    const file = this.files[0];
-                    const reader = new FileReader();
-                    reader.onload = function () {
-                      cb(reader.result, { title: file.name });
+          <Controller
+            name="content"
+            control={control}
+            render={({ field }) => (
+              <Editor
+                apiKey="5ivm8p6aaxaabgeylol7bmbun306lc0v5huip0lrnyiacd3u"
+                value={field.value}
+                init={{
+                  height: 400,
+                  menubar: true,
+                  plugins:
+                    "advlist autolink lists link image media charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime table help wordcount",
+                  toolbar:
+                    "undo redo | blocks | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | removeformat | fullscreen preview",
+                  automatic_uploads: true,
+                  file_picker_types: "image media",
+                  file_picker_callback: async function (callback, value, meta) {
+                    const input = document.createElement("input");
+                    input.setAttribute("type", "file");
+                    input.setAttribute(
+                      "accept",
+                      meta.filetype === "image" ? "image/*" : "video/*"
+                    );
+
+                    input.onchange = async function () {
+                      const file = this.files[0];
+                      const formData = new FormData();
+                      formData.append("file", file);
+
+                      try {
+                        const res = await axios.post(
+                          "http://localhost:8000/api/uploads",
+                          formData,
+                          { headers: { "Content-Type": "multipart/form-data" } }
+                        );
+                        callback(res.data.url, { title: file.name });
+                      } catch (err) {
+                        console.error(err);
+                        alert("Upload failed: " + err.message);
+                      }
                     };
-                    reader.readAsDataURL(file);
-                  };
-                  input.click();
-                }
-              },
-            }}
-            onEditorChange={(newContent) => setContent(newContent)}
+
+                    input.click();
+                  },
+                  images_upload_handler: async function (blobInfo, success, failure) {
+                    const formData = new FormData();
+                    formData.append("file", blobInfo.blob());
+
+                    try {
+                      const res = await axios.post(
+                        "http://localhost:8000/api/uploads",
+                        formData,
+                        { headers: { "Content-Type": "multipart/form-data" } }
+                      );
+                      success(res.data.url);
+                    } catch (err) {
+                      console.error(err);
+                      failure("Upload failed: " + err.message);
+                    }
+                  },
+                }}
+                onEditorChange={field.onChange}
+              />
+            )}
           />
-            
-
-
-
+          {errors.content && <p className="text-red-500">{errors.content.message}</p>}
         </div>
 
         {/* Author */}
@@ -156,8 +201,7 @@ const AdminCreateStory = () => {
           <label className="block mb-1 font-medium">Author</label>
           <select
             className="w-full border px-3 py-2 rounded"
-            value={authorId}
-            onChange={(e) => setAuthorId(e.target.value)}
+            {...register("authorId")}
           >
             <option value="">Select Author</option>
             {authors.map((author) => (
@@ -166,6 +210,7 @@ const AdminCreateStory = () => {
               </option>
             ))}
           </select>
+          {errors.authorId && <p className="text-red-500">{errors.authorId.message}</p>}
         </div>
 
         {/* Category */}
@@ -173,8 +218,7 @@ const AdminCreateStory = () => {
           <label className="block mb-1 font-medium">Category</label>
           <select
             className="w-full border px-3 py-2 rounded"
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
+            {...register("categoryId")}
           >
             <option value="">Select Category</option>
             {categories.map((cat) => (
@@ -183,6 +227,7 @@ const AdminCreateStory = () => {
               </option>
             ))}
           </select>
+          {errors.categoryId && <p className="text-red-500">{errors.categoryId.message}</p>}
         </div>
 
         {/* Featured Image */}
@@ -191,9 +236,27 @@ const AdminCreateStory = () => {
           <input
             type="file"
             accept="image/*"
+            ref={fileInputRef}
             className="w-full border px-3 py-2 rounded"
-            onChange={(e) => setFeaturedImage(e.target.files[0])}
+            onChange={(e) => {
+              const file = e.target.files[0];
+              setValue("featuredImage", file);
+              if (file) setPreviewImage(URL.createObjectURL(file));
+            }}
           />
+          {previewImage && (
+            <div className="mt-2">
+              <p className="text-sm mb-1">Preview:</p>
+              <img
+                src={previewImage}
+                alt="Featured Preview"
+                className="h-32 w-32 object-cover rounded-lg border"
+              />
+            </div>
+          )}
+          {errors.featuredImage && (
+            <p className="text-red-500">{errors.featuredImage.message}</p>
+          )}
         </div>
 
         {/* Submit */}
@@ -201,7 +264,7 @@ const AdminCreateStory = () => {
           type="submit"
           className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 transition"
         >
-          Create Story
+          {editStory ? "Update Story" : "Create Story"}
         </button>
       </form>
     </div>
@@ -209,13 +272,3 @@ const AdminCreateStory = () => {
 };
 
 export default AdminCreateStory;
-
-
-
-
-
-
-
-
-
-

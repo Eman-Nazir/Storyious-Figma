@@ -2,6 +2,8 @@ import express from "express";
 import Upload from "../../middleware_temp/multerMiddleware.js";
 import { 
     getAllStories, getStoryById, addStory,
+   updateStory,
+   deleteStory,
     getAllComments, getCommentById, addComment,
     getAllReplies, getReplyById, addReply,
     getAllAds, getAdById, addAd
@@ -16,7 +18,8 @@ router.get("/", getAllStories);
 router.get("/:id", getStoryById);
 
 router.post("/create", upload.single("featuredImage"), addStory);
-
+router.put("/:id", upload.single("featuredImage"), updateStory);
+router.delete("/:id", deleteStory);
 
 
 
