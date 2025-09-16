@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 
 const submissionSchema = new mongoose.Schema({
@@ -13,7 +12,7 @@ const submissionSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   about: { type: String },
   reason: { type: String },
-  file: { type: String },
+  file: { type: String }, 
 }, { timestamps: true });
 
 export default mongoose.model("Submission", submissionSchema);
