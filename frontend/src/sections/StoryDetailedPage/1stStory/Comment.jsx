@@ -1,30 +1,84 @@
 
-
-
 import React, { useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import recaptcha from "../../../assets/images/recaptcha.png";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
-const Comment = () => {
+const Comment = ({ onCommentAdded }) => {
+  const { id } = useParams();
   const [country, setCountry] = useState("pk");
-  const [Number, setNumber] = useState("");
+  const [number, setNumber] = useState("");
   const [showEmail, setShowEmail] = useState(true);
   const [saveDetails, setSaveDetails] = useState(true);
   const [agree, setAgree] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [commentText, setCommentText] = useState("");
+  const [isHuman, setIsHuman] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const isBlogPage = window.location.pathname.includes('/blog/');
+  const isStoryPage = window.location.pathname.includes('/story/');
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted!");
+    setLoading(true);
+
+    try {
+      const commentData = {
+        text: commentText,
+        name,
+        email,
+        showEmail,
+        phoneNumber: number,
+        countryCode: country,
+        saveDetails,
+      };
+
+      if (isBlogPage) {
+        commentData.blogId = id;
+      } else if (isStoryPage) {
+        commentData.storyId = id;
+      }
+
+      await axios.post(
+        "http://localhost:8000/api/comments",
+        commentData,
+        { withCredentials: true }
+      );
+
+      setName("");
+      setEmail("");
+      setCommentText("");
+      setNumber("");
+      setShowEmail(true);
+      setSaveDetails(true);
+      setAgree(false);
+      setIsHuman(false);
+
+      // Notify parent component
+      if (onCommentAdded) onCommentAdded();
+
+      alert("Comment posted successfully!");
+      console.error("Error posting comment:", error);
+      alert("Failed to post comment. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleReset = (e) => {
     e.preventDefault();
+    setName("");
+    setEmail("");
+    setCommentText("");
+    setNumber("");
     setShowEmail(true);
     setSaveDetails(true);
     setAgree(false);
-    setNumber("");
-    console.log("Form reset!");
+    setIsHuman(false);
   };
 
   return (
@@ -46,6 +100,9 @@ const Comment = () => {
             type="text"
             placeholder="Write your name here"
             className="w-full border border-[var(--border-light)] rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--pink-strong)] transition text-sm"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
           />
         </div>
 
@@ -58,11 +115,15 @@ const Comment = () => {
             <PhoneInput
               country={country}
               placeholder="Enter Phone Number"
-              value={Number}
-              onChange={(value) => setNumber(value)}
+              value={number}
+              onChange={(value, countryData) => {
+                setNumber(value);
+                setCountry(countryData.countryCode);
+              }}
               countryCodeEditable={false}
               enableSearch={true}
               inputClass="!w-full border border-[var(--border-light)] rounded px-4 py-2 text-sm"
+              required
             />
             <p className="text-xs text-[var(--text-muted)] mt-1">
               We do not show it on your comment
@@ -77,6 +138,9 @@ const Comment = () => {
               type="email"
               placeholder="Write your email here"
               className="w-full border border-[var(--border-light)] rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--pink-strong)] text-sm transition"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
             />
             <div className="flex items-center mt-1">
               <input
@@ -92,15 +156,18 @@ const Comment = () => {
           </div>
         </div>
 
-        {/* Comments */}
+        {/* Comment Text */}
         <div>
           <label className="block font-medium mb-1 text-[var(--text-dark)]">
-            Comments
+            Comments <span className="text-[var(--pink-dark)]">*</span>
           </label>
           <textarea
             rows={4}
-            placeholder="Write your Comments here"
+            placeholder="Write your comments here"
             className="w-full border border-[var(--border-light)] rounded px-4 py-2 focus:outline-none text-sm transition resize-none"
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            required
           />
         </div>
 
@@ -124,6 +191,7 @@ const Comment = () => {
             checked={agree}
             onChange={() => setAgree(!agree)}
             className="accent-[var(--pink-dark)] mt-1"
+            required
           />
           <label className="text-sm text-[var(--text-dark)] leading-snug">
             By replying, you agree to Howtests'{" "}
@@ -146,7 +214,13 @@ const Comment = () => {
         {/* Fake ReCAPTCHA */}
         <div className="mt-2 border border-[var(--gray-muted)] rounded p-3 w-full sm:w-auto flex flex-col sm:flex-row items-start sm:items-center gap-3">
           <div className="flex items-center">
-            <input type="checkbox" className="accent-[var(--pink-dark)] w-4 h-4 mr-2" />
+            <input 
+              type="checkbox" 
+              className="accent-[var(--pink-dark)] w-4 h-4 mr-2" 
+              checked={isHuman}
+              onChange={() => setIsHuman(!isHuman)}
+              required
+            />
             <span className="text-sm font-medium text-[var(--text-dark)]">
               I'm not a robot
             </span>
@@ -159,14 +233,16 @@ const Comment = () => {
           <button
             onClick={handleReset}
             className="px-6 py-2 rounded bg-[var(--pink-light)] text-[var(--pink-strong)] hover:bg-[var(--pink-hover)] text-sm transition w-full sm:w-auto"
+            disabled={loading}
           >
             Reset
           </button>
           <button
             type="submit"
             className="px-6 py-2 rounded bg-[var(--primary-color)] text-[var(--white)] hover:bg-[var(--primary-hover-color)] text-sm transition w-full sm:w-auto"
+            disabled={loading}
           >
-            Post Comment
+            {loading ? "Posting..." : "Post Comment"}
           </button>
         </div>
       </form>
@@ -175,3 +251,5 @@ const Comment = () => {
 };
 
 export default Comment;
+
+

@@ -10,6 +10,29 @@ const commentSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    name: {
+      type: String,
+      required: true
+    },
+    email: {
+      type: String,
+      required: true
+    },
+    showEmail: {
+      type: Boolean,
+      default: false
+    },
+    phoneNumber: {
+      type: String
+    },
+    countryCode: {
+      type: String,
+      default: "pk"
+    },
+    saveDetails: {
+      type: Boolean,
+      default: false
+    },
     story: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Story",
@@ -17,19 +40,21 @@ const commentSchema = new mongoose.Schema(
     blogId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Blog",
-      required:false
     },
-    replies: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "CommentReply",
-      },
-    ],
+    likes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }],
+    dislikes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }],
+    replies: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "CommentReply",
+    }],
   },
   { timestamps: true }
 );
 
 export default mongoose.model("Comment", commentSchema);
-
-
-

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -6,7 +5,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { storySchema } from "../../schemas/storySchema";
+import { storySchema, updateStorySchema } from "../../schemas/storySchema";
 
 const AdminCreateStory = () => {
   const location = useLocation();
@@ -18,9 +17,10 @@ const AdminCreateStory = () => {
     handleSubmit,
     control,
     setValue,
+    reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(storySchema),
+    resolver: zodResolver(editStory ? updateStorySchema : storySchema),
     defaultValues: {
       title: editStory?.title || "",
       introText: editStory?.introText || "",
@@ -34,7 +34,11 @@ const AdminCreateStory = () => {
   const fileInputRef = useRef(null);
   const [authors, setAuthors] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [previewImage, setPreviewImage] = useState(editStory?.featuredImage || null);
+  const [selectedImageName, setSelectedImageName] = useState(
+    editStory?.featuredImage
+      ? "Current file: " + editStory.featuredImage.split("/").pop()
+      : ""
+  );
 
   useEffect(() => {
     const fetchAuthors = async () => {
@@ -59,9 +63,50 @@ const AdminCreateStory = () => {
     fetchCategories();
   }, []);
 
+  
+
+useEffect(() => {
+  if (editStory && authors.length > 0 && categories.length > 0) {
+    reset({
+      title: editStory.title || "",
+      introText: editStory.introText || "",
+      content: editStory.content || "",
+      authorId: editStory.author?._id || "",
+      categoryId: editStory.category?._id || "",
+      featuredImage: null,
+    });
+
+    if (editStory.featuredImage) {
+      const parts = editStory.featuredImage.split("/");
+      setSelectedImageName("Current file: " + parts[parts.length - 1]);
+    }
+  }
+}, [editStory, authors, categories, reset]);
+
+
+
+
   const calculateReadTime = (text) => {
     const words = text.split(/\s+/).filter(Boolean).length;
     return Math.ceil(words / 200) + " min read";
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setValue("featuredImage", file); 
+      setSelectedImageName(file.name);
+    } else {
+      setSelectedImageName(
+        editStory?.featuredImage
+          ? "Current file: " + editStory.featuredImage.split("/").pop()
+          : ""
+      );
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
   };
 
   const onSubmit = async (data) => {
@@ -75,12 +120,18 @@ const AdminCreateStory = () => {
       formData.append("meta[readTime]", calculateReadTime(data.content));
       formData.append("meta[views]", editStory?.meta?.views || 0);
 
-      if (data.featuredImage) formData.append("featuredImage", data.featuredImage);
+      if (data.featuredImage instanceof File) {
+        formData.append("featuredImage", data.featuredImage);
+      }
 
       if (editStory) {
-        await axios.put(`http://localhost:8000/api/stories/${editStory._id}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await axios.put(
+          `http://localhost:8000/api/stories/${editStory._id}`,
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
         toast.success("Story updated successfully!");
       } else {
         await axios.post("http://localhost:8000/api/stories/create", formData, {
@@ -111,7 +162,9 @@ const AdminCreateStory = () => {
             className="w-full border px-3 py-2 rounded"
             {...register("title")}
           />
-          {errors.title && <p className="text-red-500">{errors.title.message}</p>}
+          {errors.title && (
+            <p className="text-red-500">{errors.title.message}</p>
+          )}
         </div>
 
         {/* Intro Text */}
@@ -122,7 +175,9 @@ const AdminCreateStory = () => {
             rows="3"
             {...register("introText")}
           />
-          {errors.introText && <p className="text-red-500">{errors.introText.message}</p>}
+          {errors.introText && (
+            <p className="text-red-500">{errors.introText.message}</p>
+          )}
         </div>
 
         {/* Content Editor */}
@@ -161,7 +216,9 @@ const AdminCreateStory = () => {
                         const res = await axios.post(
                           "http://localhost:8000/api/uploads",
                           formData,
-                          { headers: { "Content-Type": "multipart/form-data" } }
+                          {
+                            headers: { "Content-Type": "multipart/form-data" },
+                          }
                         );
                         callback(res.data.url, { title: file.name });
                       } catch (err) {
@@ -172,7 +229,11 @@ const AdminCreateStory = () => {
 
                     input.click();
                   },
-                  images_upload_handler: async function (blobInfo, success, failure) {
+                  images_upload_handler: async function (
+                    blobInfo,
+                    success,
+                    failure
+                  ) {
                     const formData = new FormData();
                     formData.append("file", blobInfo.blob());
 
@@ -180,7 +241,9 @@ const AdminCreateStory = () => {
                       const res = await axios.post(
                         "http://localhost:8000/api/uploads",
                         formData,
-                        { headers: { "Content-Type": "multipart/form-data" } }
+                        {
+                          headers: { "Content-Type": "multipart/form-data" },
+                        }
                       );
                       success(res.data.url);
                     } catch (err) {
@@ -193,7 +256,9 @@ const AdminCreateStory = () => {
               />
             )}
           />
-          {errors.content && <p className="text-red-500">{errors.content.message}</p>}
+          {errors.content && (
+            <p className="text-red-500">{errors.content.message}</p>
+          )}
         </div>
 
         {/* Author */}
@@ -210,7 +275,9 @@ const AdminCreateStory = () => {
               </option>
             ))}
           </select>
-          {errors.authorId && <p className="text-red-500">{errors.authorId.message}</p>}
+          {errors.authorId && (
+            <p className="text-red-500">{errors.authorId.message}</p>
+          )}
         </div>
 
         {/* Category */}
@@ -227,33 +294,31 @@ const AdminCreateStory = () => {
               </option>
             ))}
           </select>
-          {errors.categoryId && <p className="text-red-500">{errors.categoryId.message}</p>}
+          {errors.categoryId && (
+            <p className="text-red-500">{errors.categoryId.message}</p>
+          )}
         </div>
 
         {/* Featured Image */}
         <div>
           <label className="block mb-1 font-medium">Featured Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            className="w-full border px-3 py-2 rounded"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              setValue("featuredImage", file);
-              if (file) setPreviewImage(URL.createObjectURL(file));
-            }}
-          />
-          {previewImage && (
-            <div className="mt-2">
-              <p className="text-sm mb-1">Preview:</p>
-              <img
-                src={previewImage}
-                alt="Featured Preview"
-                className="h-32 w-32 object-cover rounded-lg border"
-              />
-            </div>
-          )}
+          <div className="relative">
+            <input
+              type="text"
+              value={selectedImageName || ""}
+              readOnly
+              placeholder="Choose an image..."
+              className="border p-2 rounded w-full cursor-pointer bg-gray-50 text-gray-600"
+              onClick={triggerFileInput}
+            />
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleImageChange}
+            />
+          </div>
           {errors.featuredImage && (
             <p className="text-red-500">{errors.featuredImage.message}</p>
           )}

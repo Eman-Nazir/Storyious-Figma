@@ -1,3 +1,4 @@
+
 import mongoose from "mongoose";
 
 const faqSchema = new mongoose.Schema(
@@ -9,6 +10,20 @@ const faqSchema = new mongoose.Schema(
     answer: {
       type: String,
       required: true,
+    },
+    category: {
+      type: String,
+      required: true,
+      enum: [
+        "general", 
+        "scary", 
+        "moral", 
+        "fairytales", 
+        "fables", 
+        "classic", 
+        "bedtime"
+      ],
+      default: "general"
     },
     slug: {
       type: String,

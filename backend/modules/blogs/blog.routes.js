@@ -1,8 +1,3 @@
-
-
-
-
-
 import express from "express";
 import { 
   createBlog, 
@@ -16,19 +11,19 @@ import Upload from "../../middleware_temp/multerMiddleware.js";
 const router = express.Router();
 const upload = Upload("blogs"); 
 
-// Create a blog
+// CREATE BLOG
 router.post("/", upload.array("images"), createBlog);
 
-// Get all blogs
+// GET ALL BLOGS
 router.get("/", getBlogs);
 
-// Get single blog by ID
+// GET SINGLE BLOG
 router.get("/:id", getSingleBlog);
 
-// Update a blog by ID
+// UPDATE BLOG
 router.put("/:id", upload.array("images"), updateBlog);
 
-// Delete a blog by ID
+// DELETE BLOG
 router.delete("/:id", deleteBlog);
 
 export default router;

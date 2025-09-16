@@ -1,38 +1,80 @@
-import React from "react";
-import { CalendarDays } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+import { Clock7, Eye, CalendarRange } from "lucide-react";
+import { GoComment } from "react-icons/go";
 
 const BlogCard = ({ article }) => {
-  if (!article) return null;
 
-  const contentCard = (
-    <div className="flex flex-row gap-4 md:gap-5 border-b border-[--border-muted] pb-6 mb-4 cursor-pointer">
-      <img
-        src={article.image}
-        alt={article.title}
-        className="w-40 h-auto sm:h-28 object-cover rounded-md flex-shrink-0"
-      />
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
 
-      <div className="flex flex-col justify-between flex-grow">
-        <div>
-          <h2 className="text-sm sm:text-lg md:text-xl font-semibold mb-2 text-[--text-dark] hover:underline">
-            {article.title}
-          </h2>
+  const getFirstImage = () => {
+    if (article.cards && article.cards.length > 0) {
+      const cardWithImage = article.cards.find(card => card.image);
+      return cardWithImage ? formatImageUrl(cardWithImage.image) : '/placeholder-image.jpg';
+    }
+    return '/placeholder-image.jpg';
+  };
 
-          <p className="hidden sm:block text-sm md:text-base text-[--text-muted] sm:line-clamp-2">
-            {article.description}
-          </p>
+  const formatImageUrl = (imagePath) => {
+    if (!imagePath) return '/placeholder-image.jpg';
+    if (imagePath.startsWith('http')) return imagePath;
+    return `http://localhost:8000/${imagePath.replace(/\\/g, '/')}`;
+  };
+
+  const firstImage = getFirstImage();
+
+  return (
+    <div className="border border-[var(--gray-light)] rounded-lg overflow-hidden mb-8 shadow-sm hover:shadow-md transition-shadow duration-300">
+      <Link to={`/blog/${article._id}`} className="flex flex-col sm:flex-row">
+        
+        {firstImage && (
+          <div className="w-full sm:w-1/3 h-48 min-h-[192px]">
+            <img
+              src={firstImage}
+              alt={article.title || 'Blog Image'}
+              className="w-full h-full object-cover"
+              onError={(e) => { e.target.src = '/placeholder-image.jpg'; }}
+            />
+          </div>
+        )}
+        
+        {/* Content Section */}
+        <div className={`p-6 flex flex-col justify-between ${firstImage ? "sm:w-2/3" : "w-full"}`}>
+          <div>
+            <h2 className="text-xl font-bold text-[var(--text-dark)] mb-2 line-clamp-2">
+              {article.title || "Untitled Blog"}
+            </h2>
+            <p className="text-[var(--text-gray)] mb-4 line-clamp-3">
+              {article.introText || "No description available."}
+            </p>
+          </div>
+
+          {/* Meta Info */}
+          <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--text-muted)]">
+            <div className="flex items-center gap-1">
+              <CalendarRange className="w-4 h-4" />
+              <span>{formatDate(article.createdAt)}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock7 className="w-4 h-4" />
+              <span>{article.meta?.readTime || '5 Min'}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Eye className="w-4 h-4" />
+              <span>{article.meta?.views || 0}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <GoComment className="w-4 h-4" />
+              <span>{article.commentsCount || 0}</span>
+            </div>
+          </div>
         </div>
-
-        <div className="flex items-center gap-2 text-xs md:text-sm text-[--text-muted] mt-3">
-          <CalendarDays className="w-4 h-4" />
-          <span>{article.date}</span>
-        </div>
-      </div>
+      </Link>
     </div>
   );
-
-  return article?.path ? <Link to={article.path}>{contentCard}</Link> : contentCard;
 };
 
 export default BlogCard;

@@ -12,11 +12,21 @@ const commentReplySchema = new Schema(
     saveDetails: { type: Boolean, default: true },
     agreeTerms: { type: Boolean, default: false },
     isHuman: { type: Boolean, default: false },
-
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     parentCommentId: { type: Schema.Types.ObjectId, ref: "Comment", required: true },
-
     storyId: { type: Schema.Types.ObjectId, ref: "Story" },
     blogId: { type: Schema.Types.ObjectId, ref: "Blog" },
+    likes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }],
+    dislikes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    }],
   },
   { timestamps: true }
 );

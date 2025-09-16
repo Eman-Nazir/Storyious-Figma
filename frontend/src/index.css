@@ -13,7 +13,7 @@
 
     --text-dark: #1A1A1A;
     --text-muted: #787878;
-    --border-muted: #dfdede99;
+    --border-muted: #a39f9f99;
     --black: #000000;
     --whatsapp-green: #25D366;
     --gradient-start: #F9EDEC;
@@ -43,3 +43,9 @@ body {
 }
 
 
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

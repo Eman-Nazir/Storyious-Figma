@@ -16,12 +16,10 @@ const MoralStories = () => {
   useEffect(() => {
     const fetchMorals = async () => {
       try {
-        // Fetch stories from your backend
         const response = await axios.get("http://localhost:8000/api/stories?populate=category");
         
         const stories = response.data.data || response.data || [];
         
-        // Get only the first 3 stories
         const firstThreeStories = stories.slice(0, 3);
         
         setMorals(Array.isArray(firstThreeStories) ? firstThreeStories : []);
@@ -85,7 +83,6 @@ const MoralStories = () => {
           </div>
         </div>
 
-        {/* Desktop grid */}
         <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
           {morals.map((story) => (
             <Card key={story._id} story={story} />

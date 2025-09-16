@@ -12,6 +12,7 @@ const faqSchema = z.object({
   answer: z
     .string()
     .min(10, { message: "Answer must be at least 10 characters long" }),
+  category: z.string().min(1, { message: "Category is required" }),
 });
 
 const AdminCreateFAQ = ({ onFAQCreated }) => {
@@ -22,6 +23,9 @@ const AdminCreateFAQ = ({ onFAQCreated }) => {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(faqSchema),
+    defaultValues: {
+      category: "general" 
+    }
   });
 
   const onSubmit = async (data) => {
@@ -41,6 +45,28 @@ const AdminCreateFAQ = ({ onFAQCreated }) => {
     <div className="p-4 bg-white shadow rounded">
       <h2 className="text-lg font-bold mb-4">Create FAQ</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+        {/* Category Field */}
+        <div>
+          <label className="block font-medium">Category</label>
+          <select
+            {...register("category")}
+            className="w-full border px-3 py-2 rounded"
+          >
+            <option value="general">General</option>
+            <option value="scary">Scary Stories</option>
+            <option value="moral">Moral Stories</option>
+            <option value="fairytales">Fairytales</option>
+            <option value="fables">Fables</option>
+            <option value="classic">Classic Stories</option>
+            <option value="bedtime">Bedtime Stories</option>
+          </select>
+          {errors.category && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.category.message}
+            </p>
+          )}
+        </div>
+
         {/* Question Field */}
         <div>
           <label className="block font-medium">Question</label>
@@ -64,6 +90,7 @@ const AdminCreateFAQ = ({ onFAQCreated }) => {
             {...register("answer")}
             className="w-full border px-3 py-2 rounded"
             placeholder="Enter answer"
+            rows="4"
           ></textarea>
           {errors.answer && (
             <p className="text-red-500 text-sm mt-1">

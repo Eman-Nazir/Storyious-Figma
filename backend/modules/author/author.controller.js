@@ -1,5 +1,3 @@
-
-
 import mongoose from "mongoose";
 import Author from "./author.model.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
@@ -55,6 +53,18 @@ export const addAuthor = asyncHandler(async (req, res) => {
 
   res.status(201).json(new ApiResponse(201, newAuthor, "Author created successfully"));
 });
+
+export const getAuthorBySlug = asyncHandler(async (req, res) => {
+  const { slug } = req.params;
+  
+  const author = await Author.findOne({ slug });
+  if (!author) throw new ApiError(404, "Author not found");
+
+  res.status(200).json(new ApiResponse(200, author));
+});
+
+
+
 
 // Update author
 export const updateAuthor = asyncHandler(async (req, res) => {

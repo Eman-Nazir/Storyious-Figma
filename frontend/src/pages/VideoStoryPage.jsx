@@ -3,8 +3,6 @@
 import React from 'react';
 import ReadMore from "../components/common/ReadMore";
 import Community from '../components/common/Community';
-import DetailVideoCard1 from '../components/common/Cards/DetailVideoCard1';
-import DetailedVideoCard2 from '../components/common/Cards/DetailVideoCard2';
 
 const VideoStoryPage = () => {
   return (
@@ -18,9 +16,7 @@ const VideoStoryPage = () => {
           </p>
         </div>
       </div>
-      <DetailVideoCard1 />
       <ReadMore />
-      <DetailedVideoCard2 />
       <Community />
     </div>
   );

@@ -4,15 +4,15 @@ import React, { useState, useEffect } from 'react';
 import { Clock7, Eye, CalendarRange } from "lucide-react";
 import { GoComment } from "react-icons/go";
 import { LuCopyCheck } from "react-icons/lu";
-import Share from "../../../assets/icons/Share";
+import Share from "../assets/icons/Share";
 import { FaWhatsapp } from "react-icons/fa";
 import { useParams } from 'react-router-dom';
-import History from '../../../sections/StoryDetailedPage/1stStory/History';
-import DiscoverMore from '../../../sections/StoryDetailedPage/1stStory/DiscoverMore';
+import History from '../sections/StoryDetailedPage/1stStory/History';
+import DiscoverMore from '../sections/StoryDetailedPage/1stStory/DiscoverMore';
 import axios from 'axios';
-import Comment from './Comment';
-import CommentsList from './CommentsList';
-import Ads from './Ads';
+import Comment from '../sections/StoryDetailedPage/1stStory/Comment';
+import CommentsList from '../sections/StoryDetailedPage/1stStory/CommentsList';
+import Ads from '../sections/StoryDetailedPage/1stStory/Ads';
 
 const tabs = [
   "Bedtime Stories",
@@ -23,7 +23,7 @@ const tabs = [
   "Bedtime Stories for Americans",
 ];
 
-const Jack1stDay = () => {
+const   StoryDetailPage = () => {
   const { id } = useParams();
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -189,4 +189,4 @@ const Jack1stDay = () => {
   );
 };
 
-export default Jack1stDay;
+export default  StoryDetailPage;

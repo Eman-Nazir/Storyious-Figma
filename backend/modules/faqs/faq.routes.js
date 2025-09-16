@@ -1,6 +1,7 @@
 import express from "express";
 import { 
   getAllFAQs, 
+  getFAQsByCategory,
   getFAQBySlug, 
   createFAQ, 
   updateFAQ, 
@@ -9,8 +10,9 @@ import {
 
 const router = express.Router();
 
-//  Routes
+// Routes
 router.get("/", getAllFAQs);          
+router.get("/category/:category", getFAQsByCategory);   
 router.get("/:slug", getFAQBySlug);   
 router.post("/", createFAQ);         
 router.put("/:id", updateFAQ);        

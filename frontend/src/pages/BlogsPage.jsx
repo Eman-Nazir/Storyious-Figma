@@ -1,23 +1,39 @@
-
-
-
-
-
 import { useEffect, useState } from 'react';
 import Community from "../components/common/Community";
 import BlogCard from "../components/common/Cards/BlogCard";
 import { RefreshCcwDot } from 'lucide-react';
+import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL_ARTICLES;
+const API_URL = 'http://localhost:8000/api/blogs';
 
 const BlogsPage = () => {
   const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(API_URL)
-      .then((res) => res.json())
-      .then((data) => setArticles(data))
-      .catch((error) => console.error("Error fetching data:", error));
+    const fetchArticles = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(API_URL);
+        const data = res.data;
+
+        if (data.success && data.data?.blogs) {
+          setArticles(data.data.blogs);
+        } else if (data.success && data.blogs) {
+          setArticles(data.blogs);
+        } else {
+          setArticles(data);
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchArticles();
   }, []);
 
   return (
@@ -32,16 +48,23 @@ const BlogsPage = () => {
         </div>
       </div>
 
-      {/* Blog Cards & Button */}
       <div className="w-full px-4 sm:px-6 md:px-8 flex flex-col items-start">
-        {/* Cards Container */}
+        
         <div className="w-full max-w-4xl ml-0 md:ml-8 lg:ml-20">
-          {articles.length > 0 ? (
+          {loading ? (
+            <div className="flex justify-center py-10">
+              <p className="text-gray-500">Loading articles...</p>
+            </div>
+          ) : error ? (
+            <div className="flex justify-center py-10">
+              <p className="text-red-500">Error: {error}</p>
+            </div>
+          ) : articles && articles.length > 0 ? (
             articles.map((article) => (
-              <BlogCard key={article.id} article={article} />
+              <BlogCard key={article._id} article={article} />
             ))
           ) : (
-            <p className="text-center text-gray-500">Loading articles...</p>
+            <p className="text-center text-gray-500">No articles found.</p>
           )}
         </div>
 
@@ -62,4 +85,3 @@ const BlogsPage = () => {
 };
 
 export default BlogsPage;
-

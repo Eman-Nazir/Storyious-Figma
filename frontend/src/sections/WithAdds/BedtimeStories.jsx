@@ -14,12 +14,10 @@ const BedtimeStories = () => {
   useEffect(() => {
     const fetchMorals = async () => {
       try {
-        // Fetch stories from your backend
         const response = await axios.get("http://localhost:8000/api/stories?populate=category");
         
         const stories = response.data.data || response.data || [];
         
-        // Get only the first 3 stories
         const firstThreeStories = stories.slice(0, 3);
         
         setMorals(Array.isArray(firstThreeStories) ? firstThreeStories : []);

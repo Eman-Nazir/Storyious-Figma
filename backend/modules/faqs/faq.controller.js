@@ -4,9 +4,27 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 
-//  GET all FAQs
 export const getAllFAQs = asyncHandler(async (req, res) => {
-  const faqs = await FAQ.find().sort({ createdAt: -1 });
+  const { category } = req.query;
+  
+  let filter = {};
+  if (category && category !== 'all') {
+    filter = { category };
+  }
+  
+  const faqs = await FAQ.find(filter).sort({ createdAt: -1 });
+  res.status(200).json(new ApiResponse(200, faqs, "FAQs retrieved successfully"));
+});
+
+export const getFAQsByCategory = asyncHandler(async (req, res) => {
+  const { category } = req.params;
+  
+  const faqs = await FAQ.find({ category }).sort({ createdAt: -1 });
+  
+  if (!faqs || faqs.length === 0) {
+    throw new ApiError(404, `No FAQs found for category: ${category}`);
+  }
+
   res.status(200).json(new ApiResponse(200, faqs, "FAQs retrieved successfully"));
 });
 
@@ -20,7 +38,7 @@ export const getFAQBySlug = asyncHandler(async (req, res) => {
 });
 
 export const createFAQ = asyncHandler(async (req, res) => {
-  const { question, answer } = req.body;
+  const { question, answer, category } = req.body;
 
   if (!question || !answer) {
     throw new ApiError(400, "Question and answer are required");
@@ -28,7 +46,7 @@ export const createFAQ = asyncHandler(async (req, res) => {
 
   const slug = generateSlug(question);
 
-  const faq = await FAQ.create({ question, answer, slug });
+  const faq = await FAQ.create({ question, answer, category, slug });
   res.status(201).json(new ApiResponse(201, faq, "FAQ created successfully"));
 });
 
@@ -43,7 +61,7 @@ export const deleteFAQ = asyncHandler(async (req, res) => {
 
 export const updateFAQ = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { question, answer } = req.body;
+  const { question, answer, category } = req.body;
 
   if (!question || !answer) throw new ApiError(400, "Question and answer are required");
 
@@ -51,7 +69,7 @@ export const updateFAQ = asyncHandler(async (req, res) => {
 
   const faq = await FAQ.findByIdAndUpdate(
     id,
-    { question, answer, slug },
+    { question, answer, category, slug },
     { new: true }
   );
 

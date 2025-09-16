@@ -1,18 +1,35 @@
 
-
-
 import { useState, useEffect } from 'react';
 import Community from "../../src/components/common/Community";
 import WriterCard from "../../src/components/common/Cards/WriterCard";
 
 const WriterPage = () => {
   const [writers, setWriters] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(import.meta.env.VITE_API_URL_WRITERS)
-      .then((res) => res.json())
-      .then((data) => setWriters(data));
+    const fetchWriters = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/authors');
+        if (!response.ok) {
+          throw new Error('Failed to fetch authors');
+        }
+        const data = await response.json();
+        setWriters(data.data); 
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching authors:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWriters();
   }, []);
+
+  if (loading) return <div className="text-center py-10">Loading authors...</div>;
+  if (error) return <div className="text-center py-10 text-red-500">Error: {error}</div>;
 
   return (
     <div className="bg-[var(--bg-section)] text-[var(--text-dark)]">
@@ -27,7 +44,7 @@ const WriterPage = () => {
 
       <div className="max-w-[1200px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-10 px-4">
         {writers.map((writer) => (
-          <WriterCard key={writer.id} writer={writer} />
+          <WriterCard key={writer._id} writer={writer} />
         ))}
       </div>
 

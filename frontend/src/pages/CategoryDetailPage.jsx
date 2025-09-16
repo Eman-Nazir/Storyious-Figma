@@ -4,6 +4,7 @@ import axios from 'axios';
 import Card from "../components/common/Cards/Card";
 import ReadMore from "../components/common/ReadMore";
 import Community from '../components/common/Community';
+import FAQ from '../sections/WithAdds/FAQ';
 
 const CategoryDetailedPage = () => {
   const { categoryName } = useParams();
@@ -11,6 +12,19 @@ const CategoryDetailedPage = () => {
   const [category, setCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const getFAQCategory = (pageCategory) => {
+    const categoryMap = {
+      "moral-stories": "moral",
+      "scary-stories": "scary",
+      "fairy-tales": "fairytales",
+      "fables": "fables",
+      "classic-stories": "classic",
+      "bedtime-stories": "bedtime"
+    };
+    
+    return categoryMap[pageCategory] || "general";
+  };
 
   useEffect(() => {
     const fetchCategoryData = async () => {
@@ -46,6 +60,7 @@ const CategoryDetailedPage = () => {
 
   const firstThreeStories = stories.slice(0, 3);
   const nextThreeStories = stories.slice(3, 6);
+  const faqCategory = getFAQCategory(categoryName);
 
   if (loading) return <div className="text-center py-8">Loading...</div>;
   if (error) return <div className="text-center py-8 text-red-500">{error}</div>;
@@ -86,10 +101,9 @@ const CategoryDetailedPage = () => {
         ))}
       </div>
 
-      <Community />
+      <FAQ category={faqCategory} />
 
-      {/* FAQ Section */}
-    
+      <Community />
     </div>
   );
 };

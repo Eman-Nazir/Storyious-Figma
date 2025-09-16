@@ -1,5 +1,7 @@
 
 
+
+
 import React from 'react';
 import {
   FaFacebookF,
@@ -19,48 +21,62 @@ const iconMap = {
 };
 
 const WriterCard = ({ writer }) => {
-  const cardContent = 
-    <div className="flex flex-col h-[480px] p-4 sm:mx-4 sm:mt-10 rounded-md shadow-sm bg-[--white]">
+  const socialIcons = writer.socials?.map(social => social.platform) || [];
+
+  return (
+    <div className="flex flex-col h-[480px] p-4 sm:mx-4 sm:mt-10 rounded-md shadow-md bg-[var(--white)]">
+      {/* Writer Image */}
       <img
         src={writer.image}
-        alt={writer.title}
+        alt={writer.name}
         className="rounded-md object-cover h-[200px] w-full mb-3"
       />
 
-      <h2 className="text-xl font-bold text-[--text-dark] line-clamp-2 h-[48px]">
-        {writer.title}
+      {/* Writer Name */}
+      <h2 className="text-xl font-bold text-[var(--text-dark)] line-clamp-2 h-[48px]">
+        {writer.name}
       </h2>
 
-      <p className="text-sm text-[--text-muted] line-clamp-3 h-[60px] mt-1">
-        {writer.description}
+      {/* Short Bio */}
+      <p className="text-sm text-[var(--text-muted)] line-clamp-3 h-[60px] mt-1">
+        {writer.shortBio}
       </p>
 
+      {/* Social Icons */}
       <div className="flex items-center gap-2 mt-2 h-[44px]">
-        {writer.icons?.length > 0 && (
+        {socialIcons.length > 0 && (
           <div className="flex flex-wrap justify-start gap-2">
-            {writer.icons.map((name, i) => {
-              const Icon = iconMap[name];
+            {socialIcons.map((platform, i) => {
+              const Icon = iconMap[platform];
               return Icon ? (
-                <button
+                <a
                   key={i}
-                  className="bg-[--white] border border-[--border-muted] text-[--text-muted] p-2 rounded-md"
+                  href={writer.socials[i]?.url || "#"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2 rounded-md border border-[var(--pink-dark)] text-[var(--pink-dark)]
+                             hover:bg-[var(--pink-dark)] hover:text-[var(--white)] transition-colors duration-200"
                 >
-                  <Icon />
-                </button>
+                  <Icon className="h-4 w-4" />
+                </a>
               ) : null;
             })}
           </div>
         )}
       </div>
 
+      {/* Visit Writer Button */}
       <div className="mt-4 pt-3">
-        <button className="w-full bg-[--white] text-[--pink-dark] border border-[--pink-dark] px-4 py-2 rounded-md hover:bg-[--pink-dark] hover:text-[--white] transition">
-          Visit Writer
-        </button>
+        <Link to={`/writers/${writer.slug}`}>
+          <button className="w-full bg-[var(--pink-dark)] text-[var(--white)] border border-[var(--pink-dark)]
+                             px-4 py-2 rounded-md hover:bg-[var(--white)] hover:text-[var(--pink-dark)]
+                             transition-colors duration-200">
+            Visit Writer
+          </button>
+        </Link>
       </div>
-    </div>;
-
-  return writer?.path ? <Link to={writer.path}>{cardContent}</Link> : cardContent;
+    </div>
+  );
 };
 
 export default WriterCard;

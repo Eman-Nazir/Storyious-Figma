@@ -1,6 +1,3 @@
-
-
-
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -33,12 +30,13 @@ import categoryRoutes from "./modules/category/category.routes.js";
 import blogRoutes from "./modules/blogs/blog.routes.js";
 import faqRoutes from "./modules/faqs/faq.routes.js";
 import submissionRoute from "./modules/submission/submission.routes.js";
-import adminRoutes from "./modules/admin/admin.routes.js";
 import uploadRoutes from "./routes/upload.route.js";
+import commentRoutes from './modules/story/commnet.route.js';
 
 
 // API Routes
 app.use("/api/stories", storyRoutes);
+app.use('/api/comments', commentRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/authors", authorRoutes);
 app.use("/api/categories", categoryRoutes);
@@ -48,11 +46,10 @@ app.use("/api/submissions", submissionRoute);
 app.use("/api/uploads", uploadRoutes);
 
 
-// Admin Routes
-app.use("/admin", adminRoutes);
+
 
 app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
+  res.send("Backend is running ");
 });
 
 if (process.env.NODE_ENV !== "production") {

@@ -11,9 +11,9 @@ export const blogSchema = z.object({
         description: z.string().optional(),
         button_text: z.string().optional(),
         button_link: z.string().optional(),
-        image: z
-          .any()
-          .refine((file) => file instanceof File, "Image is required"),
+        image: z.any().optional(), 
+        oldImage: z.string().optional(), 
+        fileName: z.string().optional(), 
       })
     )
     .min(1, "At least one card is required"),

@@ -7,6 +7,7 @@ import Fables from '../sections/WithAdds/Fables'
 import BedtimeStories from '../sections/WithAdds/BedtimeStories'
 import FairytalesStories from '../sections/WithAdds/FairytalesStories'
 import FAQ from '../sections/WithAdds/FAQ'
+
 const PageWithoutAds = () => {
   return (
     <div>
@@ -17,10 +18,10 @@ const PageWithoutAds = () => {
         <Fables/>
         <BedtimeStories/>
         <FairytalesStories/>
-        <FAQ/>
-                
+        <FAQ category="general" />
     </div>
   )
 }
 
 export default PageWithoutAds
+

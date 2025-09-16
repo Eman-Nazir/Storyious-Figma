@@ -1,42 +1,34 @@
 import express from "express";
 import Upload from "../../middleware_temp/multerMiddleware.js";
-import { 
-    getAllStories, getStoryById, addStory,
-   updateStory,
-   deleteStory,
-    getAllComments, getCommentById, addComment,
-    getAllReplies, getReplyById, addReply,
-    getAllAds, getAdById, addAd
+import {
+  getAllStories,
+  getStoryById,
+  addStory,
+  updateStory,
+  deleteStory,
+  getAllAds,
+  getAdById,
+  addAd,
+  updateAd,
+  deleteAd
 } from "../story/story.controller.js";
 
 const router = express.Router();
 
+const uploadStories = Upload("stories");
+const uploadAds = Upload("ads");
 
-const upload = Upload("stories");
+router.get("/ads", getAllAds);                     
+router.get("/ads/:id", getAdById);                 
+router.post("/ads", uploadAds.single("image"), addAd); 
+router.put("/ads/:id", uploadAds.single("image"), updateAd);
+router.delete("/ads/:id", deleteAd);
 
-router.get("/", getAllStories);
-router.get("/:id", getStoryById);
-
-router.post("/create", upload.single("featuredImage"), addStory);
-router.put("/:id", upload.single("featuredImage"), updateStory);
-router.delete("/:id", deleteStory);
-
-
-
-//  COMMENTS 
-router.get("/comments", getAllComments);
-router.get("/comments/:id", getCommentById);
-router.post("/comments", addComment);
-
-
-//  COMMENT REPLIES 
-router.get("/replies", getAllReplies);
-router.get("/replies/:id", getReplyById);
-router.post("/replies", addReply);
-
-//  ADS 
-router.get("/ads", getAllAds);
-router.get("/ads/:id", getAdById);
-router.post("/ads", addAd);
+//  STORY ROUTES 
+router.get("/", getAllStories);                                             
+router.post("/create", uploadStories.single("featuredImage"), addStory);     
+router.get("/:id", getStoryById);                                           
+router.put("/:id", uploadStories.single("featuredImage"), updateStory);     
+router.delete("/:id", deleteStory);                                        
 
 export default router;

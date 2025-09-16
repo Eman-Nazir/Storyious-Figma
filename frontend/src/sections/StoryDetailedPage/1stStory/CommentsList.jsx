@@ -1,54 +1,66 @@
-import React from 'react';
-import CommentCard from '../../../components/common/Cards/CommentCard';
 
-const CommentsList = () => {
-  const comments = [
-    {
-      name: 'Ralph Edwards',
-      email: 'ralphedwards@gmail.com',
-      comment: 'In mauris porttitor tincidunt mauris massa sit lorem sed scelerisque. Fringilla pharetra vel massa enim sollicitudin cras.',
-      date: 'Aug 19, 2021'
-    },
-    {
-      name: 'Ralph Edwards',
-      comment: 'In mauris porttitor tincidunt mauris massa sit lorem sed scelerisque. Fringilla pharetra vel massa enim sollicitudin cras.',
-      date: 'Aug 19, 2021'
-    },
-    {
-      name: 'John E. Konrad',
-      comment: 'Fringilla pharetra vel massa enim sollicitudin cras. At pulvinar eget sociis adipiscing eget donec ultrices nibh tristique.',
-      date: 'Aug 18, 2021'
-    },
-    {
-      name: 'Ralph Edwards',
-      comment: 'In mauris porttitor tincidunt mauris massa sit lorem sed scelerisque. Fringilla pharetra vel massa enim sollicitudin cras.',
-      date: 'Aug 19, 2021'
-    },
-    {
-      name: 'John E. Konrad',
-      comment: 'Fringilla pharetra vel massa enim sollicitudin cras. At pulvinar eget sociis adipiscing eget donec ultrices nibh tristique.',
-      date: 'Aug 18, 2021'
+import React, { useState, useEffect } from 'react';
+import CommentCard from '../../../components/common/Cards/CommentCard.jsx';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+
+const CommentsList = ({ refresh }) => {
+  const { id } = useParams();
+  const [comments, setComments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const isBlogPage = window.location.pathname.includes('/blog/');
+  const isStoryPage = window.location.pathname.includes('/story/');
+
+  useEffect(() => {
+    fetchComments();
+  }, [id, refresh]);
+
+  const fetchComments = async () => {
+    setLoading(true);
+    try {
+      let url = `http://localhost:8000/api/comments?`;
+      
+      if (isBlogPage) {
+        url += `blogId=${id}`;
+      } else if (isStoryPage) {
+        url += `storyId=${id}`;
+      }
+
+      const response = await axios.get(url, { withCredentials: true });
+      setComments(response.data.data);
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  if (loading) return <div className="text-center py-6">Loading comments...</div>;
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-4">
-      {comments.map((item, index) => (
-        <CommentCard
-          key={index}
-          name={item.name}
-          email={item.email}
-          comment={item.comment}
-          date={item.date}
-          showActions={index !== 3}  
-          marginLeft={index === 3 ? 'sm:ml-8' : ''}
-        />
-      ))}
+      {comments.length === 0 ? (
+        <p className="text-center text-gray-500 py-6">No comments yet. Be the first to comment!</p>
+      ) : (
+        comments.map((comment) => (
+          <CommentCard
+            key={comment._id}
+            commentId={comment._id}
+            name={comment.name}
+            email={comment.showEmail ? comment.email : null}
+            comment={comment.text}
+            date={new Date(comment.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
+            likes={comment.likes.length}
+            dislikes={comment.dislikes.length}
+            replies={comment.replies}
+            userId={comment.user?._id}
+            onAction={fetchComments}
+          />
+        ))
+      )}
     </div>
   );
 };
 
 export default CommentsList;
-
-
-

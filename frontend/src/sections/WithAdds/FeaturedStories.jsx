@@ -140,7 +140,6 @@ const FeaturedStories = () => {
 
       {/* Desktop View */}
       <div className="hidden lg:flex gap-6 mt-6">
-        {/* Left Card - Show first story */}
         <div className="w-[45%]">
           <Link to={formattedStories[0].link} className="block h-full">
             <div className="bg-white rounded-xl shadow-md overflow-hidden h-full">
@@ -173,7 +172,6 @@ const FeaturedStories = () => {
           </Link>
         </div>
 
-        {/* Right 3 Cards - Show stories 1, 2, and 3 */}
         <div className="flex flex-col gap-6 w-[55%]">
           {formattedStories.slice(1, 4).map((story, index) => (
             <Link

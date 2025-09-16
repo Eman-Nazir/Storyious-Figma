@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaTrash, FaImage, FaPlus } from "react-icons/fa";
@@ -55,7 +53,8 @@ const AdminViewStories = () => {
     );
 
   return (
-    <div className="p-4 sm:p-6 bg-white shadow-lg rounded-xl max-w-full mx-auto mt-6">
+   <div className="sm:p-6 bg-white shadow-lg rounded-xl  mx-auto mt-6">
+
       <ToastContainer position="top-right" autoClose={3000} />
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -77,7 +76,7 @@ const AdminViewStories = () => {
               <th className="px-4 py-3 text-left font-semibold hidden md:table-cell">Intro</th>
               <th className="px-4 py-3 text-left font-semibold">Author</th>
               <th className="px-4 py-3 text-left font-semibold hidden lg:table-cell">Category</th>
-              <th className="px-4 py-3 text-center font-semibold">Image</th>
+              <th className="px-4 py-3 text-left font-semibold">Featured Image</th>
               <th className="px-4 py-3 text-center font-semibold hidden sm:table-cell">Views</th>
               <th className="px-4 py-3 text-center font-semibold hidden sm:table-cell">Read Time</th>
               <th className="px-4 py-3 text-center font-semibold hidden md:table-cell">Comments</th>
@@ -92,37 +91,47 @@ const AdminViewStories = () => {
                   key={story._id}
                   className="hover:bg-pink-50 transition-colors duration-150"
                 >
-                  <td className="px-4 py-2">{index + 1}</td>
-                  <td className="px-4 py-2 font-medium text-gray-900">{story.title}</td>
-                  <td className="px-4 py-2 max-w-xs text-gray-500 truncate hidden md:table-cell">
+                  <td className="px-4 py-3 align-top">{index + 1}</td>
+                  <td className="px-4 py-3 font-medium text-gray-900 align-top max-w-xs">
+                    <div className="line-clamp-2">{story.title}</div>
+                  </td>
+                  <td className="px-4 py-3 text-gray-500 align-top max-w-xs truncate hidden md:table-cell">
                     {story.introText || "No intro"}
                   </td>
-                  <td className="px-4 py-2 text-gray-700">{story.author?.name || "N/A"}</td>
-                  <td className="px-4 py-2 text-gray-700 hidden lg:table-cell">{story.category?.name || "N/A"}</td>
-                  <td className="px-4 py-2 flex justify-center">
+                  <td className="px-4 py-3 text-gray-700 align-top">
+                    {story.author?.name || "N/A"}
+                  </td>
+                  <td className="px-4 py-3 text-gray-700 align-top hidden lg:table-cell">
+                    {story.category?.name || "N/A"}
+                  </td>
+                  <td className="px-4 py-3 text-gray-700 align-top">
                     {story.featuredImage ? (
                       <img
                         src={story.featuredImage}
                         alt={story.title}
-                        className="h-10 w-10 sm:h-12 sm:w-12 object-cover rounded-lg"
+                        className="h-12 w-12 object-cover rounded"
                       />
                     ) : (
-                      <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-lg bg-gray-100 flex items-center justify-center">
-                        <FaImage className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400" />
-                      </div>
+                      "N/A"
                     )}
                   </td>
-                  <td className="px-4 py-2 text-center text-gray-700 hidden sm:table-cell">{story.meta?.views || 0}</td>
-                  <td className="px-4 py-2 text-center text-gray-700 hidden sm:table-cell">{story.meta?.readTime || "N/A"}</td>
-                  <td className="px-4 py-2 text-center text-gray-700 hidden md:table-cell">{story.commentsCount || 0}</td>
-                  <td className="px-4 py-2 text-gray-500 hidden lg:table-cell">
+                  <td className="px-4 py-3 text-center text-gray-700 align-top hidden sm:table-cell">
+                    {story.meta?.views || 0}
+                  </td>
+                  <td className="px-4 py-3 text-center text-gray-700 align-top hidden sm:table-cell">
+                    {story.meta?.readTime || "N/A"}
+                  </td>
+                  <td className="px-4 py-3 text-center text-gray-700 align-top hidden md:table-cell">
+                    {story.commentsCount || 0}
+                  </td>
+                  <td className="px-4 py-3 text-gray-500 align-top hidden lg:table-cell">
                     {new Date(story.createdAt).toLocaleDateString("en-GB", {
                       day: "2-digit",
                       month: "short",
                       year: "numeric",
                     })}
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-3 align-top">
                     <div className="flex justify-center space-x-2">
                       <button
                         onClick={() => handleEdit(story)}
