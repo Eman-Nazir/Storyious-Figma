@@ -2,9 +2,9 @@
 import React, { useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import recaptcha from "../../../assets/images/recaptcha.png";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const CommentReply = ({ parentCommentId, onReplyAdded, onCancel }) => {
   const { id } = useParams();
@@ -16,7 +16,6 @@ const CommentReply = ({ parentCommentId, onReplyAdded, onCancel }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [replyText, setReplyText] = useState("");
-  const [isHuman, setIsHuman] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -33,7 +32,6 @@ const CommentReply = ({ parentCommentId, onReplyAdded, onCancel }) => {
         replyText,
         saveDetails,
         agreeTerms: agree,
-        isHuman,
         parentCommentId,
         storyId: id,
       };
@@ -51,13 +49,12 @@ const CommentReply = ({ parentCommentId, onReplyAdded, onCancel }) => {
       setShowEmail(true);
       setSaveDetails(true);
       setAgree(false);
-      setIsHuman(false);
 
       if (onReplyAdded) onReplyAdded();
-      alert("Reply posted successfully!");
+      toast.success("Reply posted successfully ");
     } catch (error) {
       console.error("Error posting reply:", error);
-      alert("Failed to post reply. Please login.");
+      toast.error("Failed to post reply. Please login.");
     } finally {
       setLoading(false);
     }
@@ -98,17 +95,13 @@ const CommentReply = ({ parentCommentId, onReplyAdded, onCancel }) => {
         required
       />
       <div className="flex items-center gap-2">
-        <input type="checkbox" checked={isHuman} onChange={() => setIsHuman(!isHuman)} />
-        <img src={recaptcha} alt="recaptcha" className="h-6" />
-      </div>
-      <div className="flex items-center gap-2">
-        <input type="checkbox" checked={agree} onChange={() => setAgree(!agree)} />
+        <input type="checkbox" checked={agree} onChange={() => setAgree(!agree)} required />
         <span>I agree to terms and conditions</span>
       </div>
       <div className="flex gap-2">
         <button
           type="submit"
-          disabled={loading || !isHuman || !agree}
+          disabled={loading || !agree}
           className="p-2 bg-pink-500 text-white rounded disabled:opacity-50"
         >
           {loading ? "Posting..." : "Post Reply"}
@@ -126,5 +119,3 @@ const CommentReply = ({ parentCommentId, onReplyAdded, onCancel }) => {
 };
 
 export default CommentReply;
-
-

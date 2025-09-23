@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
@@ -27,6 +26,7 @@ const AdminCreateCategory = () => {
       name: "",
       description: "",
       image: null,
+      status: "active",
     },
   });
 
@@ -36,41 +36,42 @@ const AdminCreateCategory = () => {
     if (editCategory) {
       setValue("name", editCategory.name || "");
       setValue("description", editCategory.description || "");
+      setValue("status", editCategory.status || "active");
     }
   }, [editCategory, setValue]);
 
-
   const onSubmit = async (data) => {
-  try {
-    const formData = new FormData();
-    formData.append("name", data.name);
-    formData.append("description", data.description);
+    try {
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("description", data.description);
+      formData.append("status", data.status);
 
-    if (data.image && data.image.length > 0) {
-      formData.append("image", data.image[0]); 
-    }
+      if (data.image && data.image.length > 0) {
+        formData.append("image", data.image[0]); 
+      }
 
-    if (editCategory) {
-      await axios.put(
-        `http://localhost:8000/api/categories/${editCategory._id}`,
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-      toast.success("Category updated successfully!");
-    } else {
-      await axios.post(
-        "http://localhost:8000/api/categories/create",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
-      toast.success("Category created successfully!");
-      reset(); 
+      if (editCategory) {
+        await axios.put(
+          `http://localhost:8000/api/categories/${editCategory._id}`,
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+        toast.success("Category updated successfully!");
+      } else {
+        await axios.post(
+          "http://localhost:8000/api/categories/create",
+          formData,
+          { headers: { "Content-Type": "multipart/form-data" } }
+        );
+        toast.success("Category created successfully!");
+        reset(); 
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to save category");
     }
-  } catch (err) {
-    console.error(err);
-    toast.error("Failed to save category");
-  }
-};
+  };
 
   return (
     <div className="p-6 bg-white shadow rounded-lg max-w-md mx-auto mt-10">
@@ -93,7 +94,6 @@ const AdminCreateCategory = () => {
           )}
         </div>
 
-        {/* Description */}
         <div>
           <label className="block font-medium mb-1">Description</label>
           <textarea
@@ -105,7 +105,20 @@ const AdminCreateCategory = () => {
           )}
         </div>
 
-        {/* Image */}
+        <div>
+          <label className="block font-medium mb-1">Status</label>
+          <select
+            {...register("status")}
+            className="w-full border p-2 rounded"
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          {errors.status && (
+            <p className="text-red-500 text-sm">{errors.status.message}</p>
+          )}
+        </div>
+
         <div>
           <label className="block font-medium mb-1">Image</label>
           <input

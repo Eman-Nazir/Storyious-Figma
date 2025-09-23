@@ -6,15 +6,25 @@ import Story from "../story/story.model.js";
 import Ads from "../story/ad.model.js";
 import { calculateReadTime } from "../../utils/readTime.js";
 
+
+// GET ALL STORIES
 export const getAllStories = asyncHandler(async (req, res) => {
-  const stories = await Story.find()
-    .populate("author", "name shortBio")
-    .populate("category", "name")
+  const { status } = req.query;
+  const filter = {};
+  
+  if (status) {
+    filter.status = status;
+  }
+  
+  const stories = await Story.find(filter)
+    .populate("author", "name shortBio image slug")   
+    .populate("categories", "name")
     .populate("commentsCount");
 
   res.status(200).json(new ApiResponse(200, stories, "Success"));
 });
 
+// GET STORY BY ID
 export const getStoryById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -26,8 +36,8 @@ export const getStoryById = asyncHandler(async (req, res) => {
     { $inc: { "meta.views": 1 } },
     { new: true }
   )
-    .populate("author", "name shortBio")
-    .populate("category", "name")
+    .populate("author", "name shortBio image slug")   
+    .populate("categories", "name")
     .populate("commentsCount");
 
   if (!story) throw new ApiError(404, "Story not found");
@@ -35,10 +45,12 @@ export const getStoryById = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, story, "Success"));
 });
 
+// ADD STORY
 export const addStory = asyncHandler(async (req, res) => {
-  const { title, introText, content, author, category } = req.body;
+  const { title, introText, content, author, categories, type, videoUrl, status } = req.body;
 
-  const featuredImage = req.file?.path || "";
+  const featuredImage = req.files?.featuredImage?.[0]?.path || "";
+  const videoFile = req.files?.videoFile?.[0]?.path || "";
 
   const readTime = calculateReadTime(content);
 
@@ -48,13 +60,17 @@ export const addStory = asyncHandler(async (req, res) => {
     content,
     featuredImage,
     author,
-    category,
+    categories: categories ? JSON.parse(categories) : [],
+    type: type || "written",
+    videoFile,
+    videoUrl,
+    status: status || 'active',
     meta: { readTime },
   });
 
   const populatedStory = await Story.findById(newStory._id)
-    .populate("author", "name shortBio")
-    .populate("category", "name")
+    .populate("author", "name shortBio image slug")   
+    .populate("categories", "name")
     .populate("commentsCount");
 
   res
@@ -62,10 +78,10 @@ export const addStory = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, populatedStory, "Story created successfully"));
 });
 
+// UPDATE STORY
 export const updateStory = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { title, introText, content, author, category } = req.body;
-  const featuredImage = req.file?.path;
+  const { title, introText, content, author, categories, type, videoUrl, status } = req.body;
 
   const story = await Story.findById(id);
   if (!story) throw new ApiError(404, "Story not found");
@@ -74,15 +90,26 @@ export const updateStory = asyncHandler(async (req, res) => {
   story.introText = introText;
   story.content = content;
   story.author = author;
-  story.category = category;
+  story.categories = categories ? JSON.parse(categories) : [];
+  story.type = type || "written";
+  story.videoUrl = videoUrl || "";
+  story.status = status || story.status;
+
+  if (req.files?.featuredImage?.[0]) {
+    story.featuredImage = req.files.featuredImage[0].path;
+  }
+
+  if (req.files?.videoFile?.[0]) {
+    story.videoFile = req.files.videoFile[0].path;
+  }
+
   story.meta.readTime = calculateReadTime(content);
-  if (featuredImage) story.featuredImage = featuredImage;
 
   await story.save();
 
   const populatedStory = await Story.findById(story._id)
-    .populate("author", "name shortBio")
-    .populate("category", "name")
+    .populate("author", "name shortBio image slug")   
+    .populate("categories", "name")
     .populate("commentsCount");
 
   res
@@ -90,6 +117,7 @@ export const updateStory = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, populatedStory, "Story updated successfully"));
 });
 
+// DELETE STORY
 export const deleteStory = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const story = await Story.findById(id);
@@ -100,6 +128,7 @@ export const deleteStory = asyncHandler(async (req, res) => {
 });
 
 
+// ADS SECTION //
 
 // Create Ad
 export const addAd = async (req, res) => {

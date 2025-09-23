@@ -1,14 +1,14 @@
+
 import { z } from "zod";
 
 export const createAuthorSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  shortBio: z.string().min(1, "Short bio is required"),
-  fullBio: z.string().min(1, "Full bio is required"),
-  isVerified: z.boolean(),
-  image: z.any().optional(), 
-  socials: z.array(
-    z.object({
-      platform: z.string(),
-    })
-  ),
+  name: z.string().min(1, "Author name is required"),
+  shortBio: z.string().optional(),
+  fullBio: z.string().optional(),
+  isVerified: z.union([z.boolean(), z.string()]).optional().default(false),
+  image: z.any().optional(),
+  socials: z.array(z.object({
+    platform: z.string(),
+    url: z.string().url().optional().or(z.literal(''))
+  })).optional().default([])
 });

@@ -27,7 +27,6 @@ const BlogDetailPage = () => {
     setCommentsCount(prev => prev + 1);
   };
 
-  // Fetch blog from backend
   useEffect(() => {
     const fetchBlog = async () => {
       try {
@@ -55,7 +54,6 @@ const BlogDetailPage = () => {
     fetchBlog();
   }, [id]);
 
-  // Fetch ad from backend
   useEffect(() => {
     const fetchAd = async () => {
       try {

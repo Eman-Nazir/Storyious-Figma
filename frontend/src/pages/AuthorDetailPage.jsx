@@ -44,6 +44,10 @@ const AuthorDetailPage = () => {
     fetchAuthor();
   }, [slug]);
 
+  const validSocials = author && author.socials ? author.socials.filter(social => 
+    social && social.platform && social.url && social.url.trim() !== "" && social.url !== "undefined"
+  ) : [];
+
   if (loading) return <div className="text-center py-10">Loading author...</div>;
   if (error) return <div className="text-center py-10 text-red-500">Error: {error}</div>;
   if (!author) return <div className="text-center py-10">Author not found</div>;
@@ -69,18 +73,24 @@ const AuthorDetailPage = () => {
           </p>
 
           <div className="flex justify-center md:justify-start flex-wrap gap-2 pt-2">
-            {author.socials?.map((social, index) => {
-              const Icon = iconMap[social.platform];
-              return Icon ? (
-                <a
-                  key={index}
-                  href="#"
-                  className="bg-[var(--white)] border border-[var(--pink-dark)] text-[var(--pink-dark)] p-2 rounded-md"
-                >
-                  <Icon />
-                </a>
-              ) : null;
-            })}
+            {validSocials.length > 0 ? (
+              validSocials.map((social, index) => {
+                const Icon = iconMap[social.platform];
+                return Icon ? (
+                  <a
+                    key={index}
+                    href={social.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[var(--white)] border border-[var(--pink-dark)] text-[var(--pink-dark)] p-2 rounded-md hover:bg-[var(--pink-dark)] hover:text-[var(--white)] transition-colors duration-200"
+                  >
+                    <Icon />
+                  </a>
+                ) : null;
+              })
+            ) : (
+              <span className="text-sm text-gray-500">No social links available</span>
+            )}
           </div>
         </div>
       </div>
@@ -93,7 +103,6 @@ const AuthorDetailPage = () => {
           {author.fullBio}
         </p>
 
-        {/* Mobile toggle bio */}
         <div className='block md:hidden'>
           <p className='text-justify text-sm text-[var(--text-gray)]'>
             {showFullBio ? author.fullBio : author.shortBio}

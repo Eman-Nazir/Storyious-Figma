@@ -1,9 +1,11 @@
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
 const AdminViewFAQs = () => {
   const [faqs, setFaqs] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editId, setEditId] = useState(null);
   const [editQuestion, setEditQuestion] = useState("");
@@ -21,8 +23,18 @@ const AdminViewFAQs = () => {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/api/faqs/categories");
+      setCategories(response.data?.data || []);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Error fetching categories");
+    }
+  };
+
   useEffect(() => {
     fetchFAQs();
+    fetchCategories();
   }, []);
 
   const handleDelete = async (id) => {
@@ -67,17 +79,7 @@ const AdminViewFAQs = () => {
   };
 
   const getCategoryLabel = (category) => {
-    const categories = {
-      general: "General",
-      scary: "Scary Stories",
-      moral: "Moral Stories",
-      fairytales: "Fairytales",
-      fables: "Fables",
-      classic: "Classic Stories",
-      bedtime: "Bedtime Stories"
-    };
-    
-    return categories[category] || category;
+    return category.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase());
   };
 
   return (
@@ -98,26 +100,27 @@ const AdminViewFAQs = () => {
                     onChange={(e) => setEditCategory(e.target.value)}
                     className="w-full border px-2 py-1 rounded mb-2"
                   >
-                    <option value="general">General</option>
-                    <option value="scary">Scary Stories</option>
-                    <option value="moral">Moral Stories</option>
-                    <option value="fairytales">Fairytales</option>
-                    <option value="fables">Fables</option>
-                    <option value="classic">Classic Stories</option>
-                    <option value="bedtime">Bedtime Stories</option>
+                    {categories.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {getCategoryLabel(cat)}
+                      </option>
+                    ))}
                   </select>
+
                   <input
                     type="text"
                     value={editQuestion}
                     onChange={(e) => setEditQuestion(e.target.value)}
                     className="w-full border px-2 py-1 rounded mb-2"
                   />
+
                   <textarea
                     value={editAnswer}
                     onChange={(e) => setEditAnswer(e.target.value)}
                     className="w-full border px-2 py-1 rounded mb-2"
                     rows="3"
                   />
+
                   <button
                     onClick={() => handleEditSave(faq._id)}
                     className="bg-green-500 text-white px-3 py-1 rounded mr-2"

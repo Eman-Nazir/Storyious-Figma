@@ -1,72 +1,120 @@
-
 import React, { useEffect, useState, useContext } from "react";
 import { AdminContext } from "../../context/AdminContext";
 
 const AdminDashboard = () => {
-const { getDashboard, getCategories, getAuthors, admin, getStories,getBlogs  } = useContext(AdminContext);
+  const {
+    getDashboard,
+    getCategories,
+    getAuthors,
+    admin,
+    getStories,
+    getBlogs,
+    getFAQs,
+    getSubscribers,
+    getAds,
+  } = useContext(AdminContext);
 
   const [message, setMessage] = useState("Loading...");
   const [activePage, setActivePage] = useState("dashboard");
   const [categoryCount, setCategoryCount] = useState(0);
   const [authorCount, setAuthorCount] = useState(0);
   const [storyCount, setStoryCount] = useState(0);
-const [blogCount, setBlogCount] = useState(0);
+  const [blogCount, setBlogCount] = useState(0);
+  const [faqCount, setFaqCount] = useState(0);
+  const [subscriberCount, setSubscriberCount] = useState(0);
+  const [adsCount, setAdsCount] = useState(0);
 
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const data = await getDashboard();
+        setMessage(data.message || "Welcome to your Admin Dashboard");
+      } catch {
+        setMessage("Error loading data");
+      }
+    };
 
-useEffect(() => {
-  const fetchDashboard = async () => {
-    try {
-      const data = await getDashboard();
-      setMessage(data.message || "Welcome to your Admin Dashboard");
-    } catch {
-      setMessage("Error loading data");
-    }
-  };
+    const fetchCategories = async () => {
+      try {
+        const categories = await getCategories();
+        setCategoryCount(categories.length);
+      } catch {
+        setCategoryCount(0);
+      }
+    };
 
-  const fetchCategories = async () => {
-    try {
-      const categories = await getCategories();
-      setCategoryCount(categories.length);
-    } catch {
-      setCategoryCount(0);
-    }
-  };
+    const fetchAuthors = async () => {
+      try {
+        const authors = await getAuthors();
+        setAuthorCount(authors.length);
+      } catch {
+        setAuthorCount(0);
+      }
+    };
 
-  const fetchAuthors = async () => {
-    try {
-      const authors = await getAuthors();
-      setAuthorCount(authors.length);
-    } catch {
-      setAuthorCount(0);
-    }
-  };
+    const fetchStories = async () => {
+      try {
+        const stories = await getStories();
+        setStoryCount(stories.length);
+      } catch {
+        setStoryCount(0);
+      }
+    };
 
-  const fetchStories = async () => {
-    try {
-      const stories = await getStories();
-      setStoryCount(stories.length);
-    } catch {
-      setStoryCount(0);
-    }
-  };
+    const fetchBlogs = async () => {
+      try {
+        const blogs = await getBlogs();
+        setBlogCount(blogs.length);
+      } catch {
+        setBlogCount(0);
+      }
+    };
 
-  const fetchBlogs = async () => {
-  try {
-    const blogs = await getBlogs();
-    setBlogCount(blogs.length);
-  } catch {
-    setBlogCount(0);
-  }
-};
+    const fetchFAQs = async () => {
+      try {
+        const faqs = await getFAQs();
+        setFaqCount(faqs.length);
+      } catch {
+        setFaqCount(0);
+      }
+    };
 
-  fetchDashboard();
-  fetchCategories();
-  fetchAuthors();
-  fetchStories();
-   fetchBlogs();
-}, [getDashboard, getCategories, getAuthors, getStories,getBlogs]);
+    const fetchSubscribers = async () => {
+      try {
+        const subscribers = await getSubscribers();
+        setSubscriberCount(subscribers.length);
+      } catch {
+        setSubscriberCount(0);
+      }
+    };
 
+    const fetchAds = async () => {
+      try {
+        const ads = await getAds();
+        setAdsCount(ads.length);
+      } catch {
+        setAdsCount(0);
+      }
+    };
 
+    fetchDashboard();
+    fetchCategories();
+    fetchAuthors();
+    fetchStories();
+    fetchBlogs();
+    fetchFAQs();
+    fetchSubscribers();  
+    fetchAds();          
+  }, [
+    getDashboard,
+    getCategories,
+    getAuthors,
+    getStories,
+    getBlogs,
+    getFAQs,
+    getSubscribers,
+    getAds,
+  ]);
 
   const renderContent = () => {
     switch (activePage) {
@@ -81,15 +129,27 @@ useEffect(() => {
               </div>
               <div className="bg-white shadow rounded-xl p-6 text-center">
                 <h3 className="text-lg font-semibold">Authors</h3>
-               <p className="text-2xl font-bold">{authorCount}</p>
+                <p className="text-2xl font-bold">{authorCount}</p>
               </div>
               <div className="bg-white shadow rounded-xl p-6 text-center">
                 <h3 className="text-lg font-semibold">Stories</h3>
-                  <p className="text-2xl font-bold">{storyCount}</p>
+                <p className="text-2xl font-bold">{storyCount}</p>
               </div>
               <div className="bg-white shadow rounded-xl p-6 text-center">
                 <h3 className="text-lg font-semibold">Blogs</h3>
                 <p className="text-2xl font-bold">{blogCount}</p>
+              </div>
+              <div className="bg-white shadow rounded-xl p-6 text-center">
+                <h3 className="text-lg font-semibold">FAQs</h3>
+                <p className="text-2xl font-bold">{faqCount}</p>
+              </div>
+              <div className="bg-white shadow rounded-xl p-6 text-center">
+                <h3 className="text-lg font-semibold">Ads</h3>
+                <p className="text-2xl font-bold">{adsCount}</p>
+              </div>
+              <div className="bg-white shadow rounded-xl p-6 text-center">
+                <h3 className="text-lg font-semibold">Subscribers</h3>
+                <p className="text-2xl font-bold">{subscriberCount}</p>
               </div>
             </div>
           </div>
@@ -102,7 +162,6 @@ useEffect(() => {
 
   return (
     <div className="flex min-h-screen bg-gray-100">
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}

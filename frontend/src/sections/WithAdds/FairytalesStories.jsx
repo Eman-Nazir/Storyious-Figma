@@ -43,7 +43,7 @@ const FairytalesStories = () => {
       <div className="py-10 px-4 md:px-12 lg:px-24 max-w-[1200px] mx-auto">
         {/* Heading */}
         <div className="flex justify-between items-center mb-4">
-          <h1 className="font-bold text-2xl text-[var(--text-dark)]">Fairttales Stories</h1>
+          <h1 className="font-bold text-2xl text-[var(--text-dark)]">FairyTales Stories</h1>
           <Link
             to="/allstories"
             className="flex gap-2 text-sm text-[var(--text-gray)] hover:underline"

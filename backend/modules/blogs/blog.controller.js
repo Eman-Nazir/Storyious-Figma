@@ -29,6 +29,7 @@ export const createBlog = asyncHandler(async (req, res) => {
     introText: req.body.introText,
     cards,
     meta: { readTime, views: 0 },
+    status: req.body.status || 'active'
   });
 
   await blog.save();
@@ -38,7 +39,14 @@ export const createBlog = asyncHandler(async (req, res) => {
 
 // GET ALL BLOGS
 export const getBlogs = asyncHandler(async (req, res) => {
-  const blogs = await Blog.find().populate("commentsCount");
+  const { status } = req.query;
+  const filter = {};
+  
+  if (status) {
+    filter.status = status;
+  }
+  
+  const blogs = await Blog.find(filter).populate("commentsCount");
   res.status(200).json(new ApiResponse(200, { blogs, success: true }));
 });
 
@@ -86,6 +94,7 @@ export const updateBlog = asyncHandler(async (req, res) => {
   blog.introText = req.body.introText || blog.introText;
   blog.cards = cards.length > 0 ? cards : blog.cards;
   blog.meta.readTime = readTime;
+  blog.status = req.body.status || blog.status;
 
   await blog.save();
 

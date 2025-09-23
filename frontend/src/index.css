@@ -1,8 +1,6 @@
 @import "tailwindcss";
 
 
-
-
 @layer base {
   :root {
     --white: #ffffff;
@@ -10,7 +8,6 @@
     --pink-dark: #c12664;
     --yellow-soft: #f9da66;
     --blue-primary: #008bd2;
-
     --text-dark: #1A1A1A;
     --text-muted: #787878;
     --border-muted: #a39f9f99;
@@ -26,12 +23,12 @@
     --dot-active: #1F2937;
     --dot-inactive: #D1D5DB;
     --gray-muted: #a3a3a3; 
-     --border-light: #E3E6ED;
+    --border-light: #E3E6ED;
     --pink-light: #fce7f3;
     --pink-hover: #fbcfe8;
     --pink-strong: #ec4899;
-     --text-gray-opacity: #4F4F4F66;
-     --gray-mid: #8F8F8F;
+    --text-gray-opacity: #4F4F4F66;
+    --gray-mid: #8F8F8F;
     --border-light-gray: #e5e7eb;
     --text-light-muted: #8F8F8F;
   }
@@ -42,10 +39,68 @@ body {
   overflow-x: hidden;
 }
 
-
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.editor-content h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin: 1rem 0;
+}
+
+.editor-content h2 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  margin: 0.75rem 0;
+}
+
+.editor-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+.editor-content p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.editor-content ul {
+  list-style: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.editor-content ol {
+  list-style: decimal;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.editor-content blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 1rem;
+  color: #4b5563;
+  font-style: italic;
+  margin: 1rem 0;
+}
+
+.editor-content video,
+.editor-content iframe {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
+  border-radius: 0.5rem;
+  display: block;
+  margin: 1rem 0;
+}
+
+.editor-content .mce-content-body video,
+.editor-content .mce-content-body iframe {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
 }

@@ -1,6 +1,3 @@
-
-
-
 import { useEffect, useState } from "react";
 import axios from "axios";
 import StartQuiz from "../../../components/common/StartQuiz";
@@ -55,7 +52,7 @@ const Ads = () => {
               <button
                 key={index}
                 type="button"
-                 class="w-10 h-10 flex items-center justify-center border border-[var(--border-muted)] text-[var(--text-muted)] rounded-md transition-colors duration-200 hover:bg-pink-600 hover:text-white"
+                 className="w-10 h-10 flex items-center justify-center border border-[var(--border-muted)] text-[var(--text-muted)] rounded-md transition-colors duration-200 hover:bg-pink-600 hover:text-white"
 
               >
                 <Icon size={18} />

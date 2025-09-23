@@ -9,20 +9,13 @@ import recaptcha from '../../assets/images/recaptcha.png';
 
 const SubmissionForm = () => {
   const initialData = {
-    name: '',
-    age: '',
-    city: '',
-    country: '',
-    qualification: '',
-    institution: '',
-    profession: '',
-    email: '',
-    phone: '',
-    about: '',
-    reason: '',
+    name: '', age: '', city: '', country: '',
+    qualification: '', institution: '', profession: '',
+    email: '', phone: '', about: '', reason: '',
   };
 
   const [formData, setFormData] = useState(initialData);
+  const [file, setFile] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,24 +24,53 @@ const SubmissionForm = () => {
 
   const handleReset = () => {
     setFormData(initialData);
+    setFile(null);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form submitted:', formData);
-    setFormData(initialData);
-  };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const formDataToSend = new FormData();
+    Object.keys(formData).forEach((key) => {
+      formDataToSend.append(key, formData[key]);
+    });
+    if (file) {
+      formDataToSend.append("file", file);
+    }
+
+    const response = await fetch("http://localhost:8000/api/submissions/create", {
+      method: "POST",
+      body: formDataToSend,
+    });
+
+    let data;
+    try {
+      data = await response.json();
+    } catch {
+      const text = await response.text();
+      throw new Error(`Server did not return JSON: ${text}`);
+    }
+
+    if (!response.ok) {
+      throw new Error(data.message || "Something went wrong");
+    }
+
+    console.log("✅ Submission success:", data);
+    alert("Form submitted successfully!");
+
+  } catch (err) {
+    console.error("❌ Error submitting form:", err.message);
+    alert(`Error: ${err.message}`);
+  }
+};
+
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-[1200px] mx-auto bg-white border border-[var(--border-gray)] rounded-lg my-10 md:mx-12 shadow-sm p-6 lg:mx-22"
-    >
-      <h2 className="text-2xl font-bold mb-2 text-center text-[var(--text-dark)]">
-        Submission Form
-      </h2>
+    <form onSubmit={handleSubmit} className="max-w-[1200px] mx-auto bg-white border border-[var(--border-gray)] rounded-lg my-10 md:mx-12 shadow-sm p-6 lg:mx-22">
+      <h2 className="text-2xl font-bold mb-2 text-center text-[var(--text-dark)]">Submission Form</h2>
       <p className="text-center text-[var(--text-muted)] mb-6">
-        Please fill in the required fields below and upload your article as a Word (.doc or .docx) file. Once completed, click “Submit” to send your article for review.
+        Please fill in the required fields and upload your article (.doc or .docx).
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -63,9 +85,7 @@ const SubmissionForm = () => {
           { label: 'Institution', name: 'institution', placeholder: 'Your University or College' },
         ].map(({ label, name, placeholder }) => (
           <div key={name}>
-            <label className="block font-semibold mb-1 text-[var(--text-dark)]">
-              {label} *
-            </label>
+            <label className="block font-semibold mb-1 text-[var(--text-dark)]">{label} *</label>
             <input
               name={name}
               value={formData[name]}
@@ -74,9 +94,7 @@ const SubmissionForm = () => {
               className="w-full border border-[var(--border-gray)] p-2 rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-pink)]"
             />
             {name !== 'name' && name !== 'age' && (
-              <p className="text-sm text-[var(--text-muted)] mt-1">
-                We do not show it on your profile
-              </p>
+              <p className="text-sm text-[var(--text-muted)] mt-1">We do not show it on your profile</p>
             )}
           </div>
         ))}
@@ -87,13 +105,10 @@ const SubmissionForm = () => {
           <PhoneInput
             country={'pk'}
             value={formData.phone}
-            onChange={(phone) => setFormData((prev) => ({ ...prev, phone }))}
+            onChange={(phone) => setFormData(prev => ({ ...prev, phone }))}
             countryCodeEditable={false}
             enableSearch={true}
-            inputProps={{
-              name: 'phone',
-              required: true,
-            }}
+            inputProps={{ name: 'phone', required: true }}
             inputClass="!w-full border border-[var(--border-gray)] rounded px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--color-pink)]"
           />
           <p className="text-sm text-[var(--text-muted)] mt-1">We do not show it on your profile</p>
@@ -116,9 +131,7 @@ const SubmissionForm = () => {
 
       {/* Reason */}
       <div className="mt-4">
-        <label className="block font-semibold mb-1 text-[var(--text-dark)]">
-          Why do you want to become a story writer? *
-        </label>
+        <label className="block font-semibold mb-1 text-[var(--text-dark)]">Why do you want to become a story writer? *</label>
         <textarea
           name="reason"
           value={formData.reason}
@@ -131,13 +144,22 @@ const SubmissionForm = () => {
       </div>
 
       {/* File Upload */}
-      <div className="mt-8 border-2 border-dashed p-6 text-center bg-[var(--bg-light)] rounded-md cursor-pointer hover:bg-[var(--bg-hover)] transition-colors duration-200">
+      <div
+        className="mt-8 border-2 border-dashed p-6 text-center bg-[var(--bg-light)] rounded-md cursor-pointer hover:bg-[var(--bg-hover)] transition-colors duration-200"
+        onClick={() => document.getElementById("fileInput").click()}
+      >
         <FaCloudUploadAlt className="text-4xl mx-auto text-[var(--color-pink)]" />
         <p className="mt-2 font-medium text-[var(--text-dark)]">
-          Drag & drop Word file or{' '}
-          <span className="text-[var(--color-pink)] underline cursor-pointer">Browse</span>
+          Drag & drop Word file or <span className="text-[var(--color-pink)] underline cursor-pointer">Browse</span>
         </p>
-        <input type="file" accept=".doc,.docx" className="hidden" />
+        <input
+          id="fileInput"
+          type="file"
+          accept=".doc,.docx"
+          className="hidden"
+          onChange={(e) => setFile(e.target.files[0])}
+        />
+        {file && <p className="mt-2 text-green-600">{file.name} selected</p>}
       </div>
 
       {/* Fake ReCAPTCHA */}
@@ -151,26 +173,11 @@ const SubmissionForm = () => {
 
       {/* Buttons */}
       <div className="flex justify-between mt-6">
-        <button
-          type="button"
-          onClick={handleReset}
-          className="bg-[var(--bg-gray)] hover:bg-[var(--bg-gray-hover)] px-4 py-2 rounded transition-colors duration-200"
-        >
-          Reset
-        </button>
-
-        <button
-          type="submit"
-          className="bg-[var(--color-pink)] hover:bg-[var(--color-pink-dark)] text-white px-6 py-2 rounded transition-colors duration-200"
-        >
-          Submit
-        </button>
+        <button type="button" onClick={handleReset} className="bg-[var(--bg-gray)] hover:bg-[var(--bg-gray-hover)] px-4 py-2 rounded transition-colors duration-200">Reset</button>
+        <button type="submit" className="bg-[var(--color-pink)] hover:bg-[var(--color-pink-dark)]  px-6 py-2 rounded transition-colors duration-200">Submit</button>
       </div>
     </form>
   );
 };
 
 export default SubmissionForm;
-
-
-

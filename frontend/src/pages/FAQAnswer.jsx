@@ -1,14 +1,31 @@
 
-
-
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { faqData } from '../data/faqData';
-import { ArrowLeft, Facebook, X, Linkedin, Instagram } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { ArrowLeft, Facebook, X, Linkedin, Instagram } from "lucide-react";
+import axios from "axios";
 
 const FAQAnswer = () => {
   const { slug } = useParams();
-  const faq = faqData.find(item => item.slug === slug);
+  const [faq, setFaq] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFAQ = async () => {
+      try {
+        const res = await axios.get(`http://localhost:8000/api/faqs/${slug}`);
+        setFaq(res.data.data);
+      } catch (error) {
+        console.error("Error fetching FAQ", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFAQ();
+  }, [slug]);
+
+  if (loading) {
+    return <p className="p-6 text-center">Loading FAQ...</p>;
+  }
 
   if (!faq) {
     return (
@@ -44,7 +61,9 @@ const FAQAnswer = () => {
 
       {/* Share Bar */}
       <div className="flex flex-col sm:flex-row justify-between items-center bg-[var(--primary-color)] text-white px-4 py-4 rounded-lg">
-        <span className="mb-3 sm:mb-0 text-sm sm:text-base">Found Helpful? Share it</span>
+        <span className="mb-3 sm:mb-0 text-sm sm:text-base">
+          Found Helpful? Share it
+        </span>
         <div className="flex space-x-4">
           <a href="#" aria-label="Facebook">
             <Facebook className="h-5 w-5 hover:scale-110 transition" />

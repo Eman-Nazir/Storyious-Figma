@@ -5,13 +5,15 @@ import {
   getFAQBySlug, 
   createFAQ, 
   updateFAQ, 
-  deleteFAQ 
+  deleteFAQ,
+  getFAQCategories,   
 } from "./faq.controller.js";
 
 const router = express.Router();
 
 // Routes
 router.get("/", getAllFAQs);          
+router.get("/categories", getFAQCategories); 
 router.get("/category/:category", getFAQsByCategory);   
 router.get("/:slug", getFAQBySlug);   
 router.post("/", createFAQ);         

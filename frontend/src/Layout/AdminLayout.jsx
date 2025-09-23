@@ -1,13 +1,12 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import AdminSidebar from "../common/AdminSidebar"; 
+import AdminSidebar from "../components/common/AdminSidebar";
 
 const AdminLayout = () => {
   return (
     <div className="flex min-h-screen bg-gray-100">
       <AdminSidebar />
 
-      {/* Main content area */}
       <div className="flex-1 flex flex-col">
         <main className="flex-1 p-6">
           <Outlet />
@@ -18,6 +17,3 @@ const AdminLayout = () => {
 };
 
 export default AdminLayout;
-
-
-

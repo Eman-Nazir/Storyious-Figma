@@ -1,4 +1,3 @@
-
 import mongoose from "mongoose";
 
 const faqSchema = new mongoose.Schema(
@@ -21,7 +20,8 @@ const faqSchema = new mongoose.Schema(
         "fairytales", 
         "fables", 
         "classic", 
-        "bedtime"
+        "bedtime",
+        "competitive-exams"   
       ],
       default: "general"
     },

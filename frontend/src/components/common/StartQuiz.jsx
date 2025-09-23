@@ -1,7 +1,3 @@
-
-
-
-
 import React from 'react';
 import { X } from "lucide-react";
 import Annoucement from '../../assets/icons/Annoucement';

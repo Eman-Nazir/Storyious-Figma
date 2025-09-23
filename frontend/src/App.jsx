@@ -3,14 +3,17 @@ import { Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import Navbar from "./components/common/Navbar";
-import Footer from "./components/common/Footer";
+import useScrollToTop from "./hooks/useScrollToTop";
+
+// Layouts
+import PublicLayout from "./Layout/PublicLayout";
+import AdminLayout from "./Layout/AdminLayout";
+
+// Public pages
 import PageWithoutAds from "./pages/PageWithoutAds";
 import AllStories from "./pages/AllStories";
-
 import BlogsPage from "./pages/BlogsPage";
-import WriterPage from "./pages/WriterPage";
-
+import AuthorPage from "./pages/AuthorPage";
 import FAQList from "./pages/FAQList";
 import CPFRules from "./pages/CPFRules";
 import FAQAnswer from "./pages/FAQAnswer";
@@ -19,23 +22,18 @@ import Login from "./pages/Login";
 import WriteForUsPage from "./pages/WriteForUsPage";
 import AboutUs from "./pages/AboutUs";
 import VideoStoryPage from "./pages/VideoStoryPage";
-import Jack1stDayVideoDetailPage from "./pages/Jack1stDayVideoDetailPage";
-import SilentCradelVideoDetailPage from "./pages/SilentCradelVideoDetailPage";
-import ElijahQuestVideoDetailPage from "./pages/ElijahQuestVideoDetailPage";
 import ContactUsPage from "./pages/ContactUsPage";
-import SearchPage from "./pages/SearchPage";
+import CategoryDetailedPage from "./pages/CategoryDetailPage";
+import AuthorDetailPage from "./pages/AuthorDetailPage";
+import FAQ from "./sections/WithAdds/FAQ";
+import BlogDetailPage from "./pages/BlogDetailPage";
+import StoryDetailPage from "./pages/StoryDetailedPage";
 
-
-
-// Admin imports
-import AdminDashboard from "./pages/adminPages/AdminDashboard";
+// Admin
 import { AdminProvider } from "./context/AdminContext";
-
-
-import useScrollToTop from "./hooks/useScrollToTop";
+import AdminDashboard from "./pages/adminPages/AdminDashboard";
 import AdminViewCategory from "./pages/adminPages/AdminViewCategory";
 import AdminCreateCategory from "./pages/adminPages/AdminCreateCategory";
-import AdminLayout from "./components/common/AdminLayout";
 import AdminCreateAuthor from "./pages/adminPages/AdminCreateAuthor";
 import AdminViewAuthor from "./pages/adminPages/AdminViewAuthor";
 import AdminCreateStory from "./pages/adminPages/AdminCreateStory";
@@ -44,16 +42,10 @@ import AdminBlogCreate from "./pages/adminPages/AdminBlogCreate";
 import AdminBlogView from "./pages/adminPages/AdminBlogView";
 import AdminCreateFAQ from "./pages/adminPages/AdminCreateFaq";
 import AdminViewFAQs from "./pages/adminPages/AdminViewFaq";
-import CategoryDetailedPage from "./pages/CategoryDetailPage";
-import AuthorDetailPage from "./pages/AuthorDetailPage";
-import FAQ from "./sections/WithAdds/FAQ";
-import BlogDetailPage from "./pages/BlogDetailPage";
 import AdminCreateAd from "./pages/adminPages/AdminCreateAd";
 import AdminViewAd from "./pages/adminPages/AdminViewAd";
-import StoryDetailPage from "./pages/StoryDetailedPage";
-
-
-
+import AdminNewsletterView from "./pages/adminPages/AdminNewsLetterView";
+// import SearchResults from "./pages/SearchResultPage";
 
 function App() {
   useScrollToTop();
@@ -62,45 +54,32 @@ function App() {
     <>
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <Navbar />
-
       <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<PageWithoutAds />} />
-        <Route path="/allstories" element={<AllStories />} />
-        <Route path="/category/:categoryName" element={<CategoryDetailedPage/>} /> 
-        <Route path="/story/:id" element={<StoryDetailPage/>} />
-        <Route path="/Blog-Page" element={<BlogsPage />} />
-        <Route path="/blog/:id" element={<BlogDetailPage/>} />
+        {/* Public layout */}
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<PageWithoutAds />} />
+          <Route path="/allstories" element={<AllStories />} />
+          <Route path="/category/:categoryName" element={<CategoryDetailedPage />} /> 
+          <Route path="/story/:id" element={<StoryDetailPage />} />
+          <Route path="/Blog-Page" element={<BlogsPage />} />
+          <Route path="/blog/:id" element={<BlogDetailPage />} />
+          <Route path="/writers/:slug" element={<AuthorDetailPage />} />
+          <Route path="/author-Page" element={<AuthorPage />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/faq/:category" element={<FAQ />} />
+          <Route path="/CPF-Rules" element={<CPFRules />} />
+          <Route path="/faqs" element={<FAQList />} />
+          <Route path="/faqs/:slug" element={<FAQAnswer />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/WriteFor-Us" element={<WriteForUsPage />} />
+          <Route path="/About-Us" element={<AboutUs />} />
+          <Route path="/Video-Page" element={<VideoStoryPage />} />
+          <Route path="/ContactUs" element={<ContactUsPage />} />
+          {/* <Route path="/search" element={<SearchResults/>} /> */}
+        </Route>
 
-
-         <Route path="/writers/:slug" element={<AuthorDetailPage/>} />
-        <Route path="/Writer-Page" element={<WriterPage />} />
-        <Route path="/faq" element={<FAQ/>} />
-        <Route path="/faq/:category" element={<FAQ />} />
-        <Route path="/CPF-Rules" element={<CPFRules />} />
-        <Route path="/faqs" element={<FAQList />} />
-        <Route path="/faqs/:slug" element={<FAQAnswer />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/WriteFor-Us" element={<WriteForUsPage />} />
-        <Route path="/About-Us" element={<AboutUs />} />
-        <Route path="/Video-Page" element={<VideoStoryPage />} />
-        <Route path="/Jack1stVideo" element={<Jack1stDayVideoDetailPage />} />
-        <Route
-          path="/SilentCradleVideo"
-          element={<SilentCradelVideoDetailPage />}
-        />
-        <Route
-          path="/ElijahQuestVideo"
-          element={<ElijahQuestVideoDetailPage />}
-        />
-        <Route path="/ContactUs" element={<ContactUsPage />} />
-        <Route path="/SearchPage" element={<SearchPage />} />
-     
-
-        
-
+        {/* Admin layout */}
         <Route
           path="/admin/*"
           element={
@@ -111,34 +90,26 @@ function App() {
         >
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="story-categories" element={<AdminViewCategory />} />
-          <Route
-            path="story-categories/create"
-            element={<AdminCreateCategory />}
-          />
+          <Route path="story-categories/create" element={<AdminCreateCategory />} />
           <Route path="authors/create" element={<AdminCreateAuthor />} />
           <Route path="authors" element={<AdminViewAuthor />} />
-
-          <Route path="stories/create" element={<AdminCreateStory/>}/>
-          <Route path="stories" element={<AdminViewStories/>}/>
-          <Route path="blogs/create" element={<AdminBlogCreate/>}/>
-          <Route path="blogs" element={<AdminBlogView/>}/>
-          <Route path="faqs/create" element={<AdminCreateFAQ/>}/>
-          <Route path="faqs" element={<AdminViewFAQs/>}/>
-          <Route path="ad/create" element={<AdminCreateAd/>}/>
-          <Route path="ad" element={<AdminViewAd/>}/>
-
-          
-
-
-
+          <Route path="stories/create" element={<AdminCreateStory />} />
+          <Route path="stories" element={<AdminViewStories />} />
+          <Route path="blogs/create" element={<AdminBlogCreate />} />
+          <Route path="blogs" element={<AdminBlogView />} />
+          <Route path="faqs/create" element={<AdminCreateFAQ />} />
+          <Route path="faqs" element={<AdminViewFAQs />} />
+          <Route path="ad/create" element={<AdminCreateAd />} />
+          <Route path="ad" element={<AdminViewAd />} />
+          <Route path="newsLetter" element={<AdminNewsletterView />} />
 
         </Route>
       </Routes>
-      <Footer />
     </>
   );
 }
 
 export default App;
+
 
 

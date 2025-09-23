@@ -1,13 +1,11 @@
-                  
 
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import storyiousLogo from "../../assets/images/storyiousLogo.png";
 import Subscribe from '../../components/common/Subscribe';
 import StartQuiz from '../../components/common/StartQuiz';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ChevronDown, Menu, Search, ArrowRight, X, ArrowLeft
+  ChevronDown, Menu, Search, ArrowRight, X, ArrowLeft, Loader
 } from 'lucide-react';
 import {
   Facebook,
@@ -17,13 +15,19 @@ import {
   MessageCircle
 } from 'lucide-react';
 
+const API_BASE_URL = 'http://localhost:8000/api';
+
 const storyCategories = [
-  'Moral Stories', 'Fairytales', 'Scary Stories', 'Bedtime Stories',
-  'Classic Stories', 'Fables'
+  { name: 'Moral Stories', path: '/category/moral-stories' },
+  { name: 'Fairytales', path: '/category/fairytales' },
+  { name: 'Scary Stories', path: '/category/scary-stories' },
+  { name: 'Bedtime Stories', path: '/category/bedtime-stories' },
+  { name: 'Classic Stories', path: '/category/classic-stories' },
+  { name: 'Fables', path: '/category/fables' }
 ];
 
 const otherPages = [
-  { label: 'All Authors', path: '/Writer-Page' },
+  { label: 'All Authors', path: '/author-Page' },
   { label: 'Write For Us', path: '/WriteFor-Us' },
   { label: 'Writing Rules', path: '/CPF-Rules' },
   { label: 'About Us', path: '/About-Us' },
@@ -43,6 +47,10 @@ const Navbar = () => {
   const [quizpopup, setquizpopup] = useState(false);
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState('');
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -57,27 +65,203 @@ const Navbar = () => {
     setExploreOpen(false);
     setIsOpen(false);
     setActive(''); 
+    setShowResults(false);
   };
 
-  const submitSearch = () => {
-    if (searchInput.trim()) {
-      navigate(`/SearchPage?term=${encodeURIComponent(searchInput.trim())}`);
-      setSearchInput('');
-      setShowSearch(false);
-      setIsOpen(false);
+  const submitSearch = async (searchTerm = searchInput) => {
+    if (!searchTerm.trim()) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    setIsSearching(true);
+    setSearchError('');
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/search?q=${encodeURIComponent(searchTerm)}&limit=5`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Search failed');
+      }
+
+      const data = await response.json();
+      
+      if (data.data && data.data.results) {
+        const allResults = [];
+        
+        Object.keys(data.data.results).forEach(type => {
+          if (data.data.results[type] && Array.isArray(data.data.results[type])) {
+            data.data.results[type].forEach(item => {
+              allResults.push({ ...item, resultType: type });
+            });
+          }
+        });
+
+        setSearchResults(allResults.slice(0, 8));
+        setShowResults(true);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchError('Search failed. Please try again.');
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
     }
   };
-  
+
+  const handleQuickSearch = async (term) => {
+    if (term.length < 2) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/search/quick?q=${encodeURIComponent(term)}`
+      );
+      
+      
+    } catch (error) {
+      console.error('Quick search error:', error);
+      submitSearch(term);
+    }
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchInput.trim()) {
+        handleQuickSearch(searchInput);
+      } else {
+        setSearchResults([]);
+        setShowResults(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  const handleSearchItemClick = (item) => {
+    switch (item.type) {
+      case 'story':
+        navigate(`/story/${item.id}`, { 
+          state: { 
+            story: item,
+            fromSearch: true 
+          }
+        });
+        break;
+      
+      case 'blog':
+        navigate(`/blog/${item.id}`, { 
+          state: { 
+            blog: item,
+            fromSearch: true 
+          }
+        });
+        break;
+      
+      case 'author':
+        if (item.slug) {
+          navigate(`/author/${item.slug}`, { 
+            state: { 
+              author: item,
+              fromSearch: true 
+            }
+          });
+        } else {
+          navigate(`/author/${item.id}`, { 
+            state: { 
+              author: item,
+              fromSearch: true 
+            }
+          });
+        }
+        break;
+      
+      case 'category':
+        navigate(`/category/${item.id}`, { 
+          state: { 
+            category: item,
+            fromSearch: true 
+          }
+        });
+        break;
+      
+      case 'faq':
+        navigate(`/faq/${item.slug || item.id}`, { 
+          state: { 
+            faq: item,
+            fromSearch: true 
+          }
+        });
+        break;
+      
+      default:
+        navigate(`/search?q=${encodeURIComponent(searchInput)}`);
+    }
+
+    setSearchInput('');
+    setShowResults(false);
+    setShowSearch(false);
+  };
+
+  const handleFullSearch = () => {
+    if (searchInput.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchInput)}`);
+      setSearchInput('');
+      setShowResults(false);
+      setShowSearch(false);
+    }
+  };
+
+  const handleCategoryClick = (path) => {
+    navigate(path);
+    setExploreOpen(false);
+    setIsOpen(false);
+    setActive('');
+  };
+
+  const getResultIcon = (type) => {
+    switch (type) {
+      case 'story': return '';
+      case 'blog': return '';
+      case 'author': return '';
+      case 'category': return '';
+      case 'faq': return '';
+      default: return '';
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showResults) {
+        setShowResults(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [showResults]);
+
   return (
-    <div className='relative bg-[var(--white)] shadow-sm' >
+    <div className='relative bg-[var(--white)] shadow-sm'>
       {/* Top Navbar */}
       <nav className='py-2 max-w-[1200px] mx-auto flex flex-wrap justify-between items-center px-4 md:px-6'>
         <div className='flex items-center gap-3 flex-1 relative'>
-          <img className='w-[36px] h-[45px]' src={storyiousLogo} alt="Logo" />
+          <Link to="/">
+            <img className='w-[36px] h-[45px] cursor-pointer' src={storyiousLogo} alt="Logo" />
+          </Link>
 
           <div className='relative hidden md:block'>
             <div
               onClick={toggleExplore}
+              onMouseEnter={() => setExploreOpen(true)}
               className='flex items-center gap-1 font-semibold cursor-pointer'
             >
               <span>Explore</span>
@@ -87,22 +271,71 @@ const Navbar = () => {
             </div>
           </div>
 
-          <div className='hidden md:flex ml-2 rounded-lg border border-[var(--gray-light)]'>
+          {/* Search Bar - Desktop */}
+          <div className='hidden md:flex ml-2 rounded-lg border border-[var(--gray-light)] relative'>
             <input
               type='text'
-              placeholder='What you are looking for'
+              placeholder='Search stories, authors, blogs...'
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && submitSearch()}
-              className='px-2 py-1 pr-24 bg-transparent outline-none text-sm'
+              onKeyDown={(e) => e.key === 'Enter' && handleFullSearch()}
+              onFocus={() => searchInput && setShowResults(true)}
+              onClick={(e) => e.stopPropagation()}
+              className='px-4 py-2 pr-24 bg-transparent outline-none text-sm w-80'
             />
-            <button onClick={submitSearch}>
-              <Search className='text-[var(--white)] rounded-md w-11 h-11 p-2 bg-[var(--pink-dark)]' />
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                handleFullSearch();
+              }}
+              className='absolute right-0 top-0 bottom-0 flex items-center justify-center'
+            >
+              {isSearching ? (
+                <Loader className='text-[var(--white)] rounded-md w-11 h-11 p-2 bg-[var(--pink-dark)] animate-spin' />
+              ) : (
+                <Search className='text-[var(--white)] rounded-md w-11 h-11 p-2 bg-[var(--pink-dark)]' />
+              )}
             </button>
+
+            {/* Search Results Dropdown */}
+            {showResults && searchResults.length > 0 && (
+              <div 
+                className='absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-50 mt-1 max-h-80 overflow-y-auto'
+                onClick={(e) => e.stopPropagation()}
+              >
+                {searchResults.map((item, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleSearchItemClick(item)}
+                    className='p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0'
+                  >
+                    <div className='flex items-center gap-3'>
+                      <span className='text-lg'>{getResultIcon(item.type)}</span>
+                      <div className='flex-1'>
+                        <div className='font-medium text-sm'>{item.title}</div>
+                        <div className='text-xs text-gray-600 mt-1'>
+                          {item.description || item.author || item.category || ''}
+                        </div>
+                        <div className='text-xs text-gray-400 capitalize'>{item.type}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <div 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleFullSearch();
+                  }}
+                  className='p-3 bg-gray-50 hover:bg-gray-100 cursor-pointer text-center font-medium text-sm text-[var(--pink-dark)]'
+                >
+                  View all results for "{searchInput}"
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Desktop  */}
+        {/* Desktop Buttons */}
         <div className='hidden md:flex gap-3'>
           <button
             onClick={() => setquizpopup(true)}
@@ -140,43 +373,73 @@ const Navbar = () => {
         </div>
       </nav>
       
+      {/* Mobile Search Bar */}
       {showSearch && (
-        <div className='md:hidden px-4 py-2 bg-[var(--white)] shadow-sm flex gap-2'>
+        <div className='md:hidden px-4 py-2 bg-[var(--white)] shadow-sm flex gap-2 relative'>
           <input
             type='text'
-            placeholder='Search...'
+            placeholder='Search stories, authors, blogs...'
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && submitSearch()}
+            onKeyDown={(e) => e.key === 'Enter' && handleFullSearch()}
             className='flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm outline-none'
           />
-          <button onClick={submitSearch} className='bg-[var(--pink-dark)] text-[var(--white)] px-4 py-2 rounded-md'>
+          <button 
+            onClick={handleFullSearch}
+            className='bg-[var(--pink-dark)] text-[var(--white)] px-4 py-2 rounded-md flex items-center gap-2'
+          >
+            {isSearching ? <Loader className='w-4 h-4 animate-spin' /> : <Search className='w-4 h-4' />}
             Search
           </button>
+
+          {/* Mobile Search Results */}
+          {showResults && searchResults.length > 0 && (
+            <div className='absolute top-full left-4 right-4 bg-white border border-gray-200 rounded-lg shadow-lg z-50 mt-1 max-h-64 overflow-y-auto'>
+              {searchResults.map((item, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleSearchItemClick(item)}
+                  className='p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0'
+                >
+                  <div className='flex items-center gap-3'>
+                    <span className='text-lg'>{getResultIcon(item.type)}</span>
+                    <div className='flex-1'>
+                      <div className='font-medium text-sm'>{item.title}</div>
+                      <div className='text-xs text-gray-600'>{item.type}</div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <div 
+                onClick={handleFullSearch}
+                className='p-3 bg-gray-50 hover:bg-gray-100 cursor-pointer text-center font-medium text-sm text-[var(--pink-dark)]'
+              >
+                View all results
+              </div>
+            </div>
+          )}
         </div>
       )}
       
+      {/* Yellow Banner */}
       <div
         className="bg-[var(--yellow-soft)] w-full"
         style={{ boxShadow: "0 -2px 4px rgba(0, 0, 0, 0.1)" }}
       >
         <div className="px-6 py-3 hidden md:flex items-center justify-between">
-          {/* Centered Text & Button */}
           <div className="flex-1 flex justify-center items-center gap-3">
             <h1 className="text-sm md:text-base">Want to read more stories?</h1>
             <button className="bg-[var(--blue-primary)] text-[var(--white)] px-3 py-1.5 rounded-md">
               Read Now!
             </button>
           </div>
-
-          {/* X Icon on Far Right */}
           <X className="text-gray-500 cursor-pointer" />
         </div>
       </div>
 
       {/* Mobile Dropdown Menu */}
       {isOpen && (
-        <div className='md:hidden bg-[var(--white)] shadow-md px-4 py-6 space-y-3 h-[605px]'>
+        <div className='md:hidden bg-[var(--white)] shadow-md px-4 py-6 space-y-3 min-h-[605px]'>
           {!active && (
             <>
               <button onClick={() => setquizpopup(true)} className='w-full bg-[var(--pink-dark)] text-[var(--white)] py-2 rounded-md font-medium'>Start Quiz</button>
@@ -228,8 +491,21 @@ const Navbar = () => {
               </div>
               <h3 className='text-base font-bold mb-2'>Story Categories</h3>
               <div className='flex flex-col gap-2'>
-                <Link to="/allstories" onClick={handleNavigate} className='text-[var(--pink-dark)] text-sm'>Written Stories</Link>
-                <Link to="/Video-Page" onClick={handleNavigate} className='text-[var(--pink-dark)] text-sm'>Video Stories</Link>
+                <Link to="/allstories" onClick={handleNavigate} className='text-[var(--pink-dark)] text-sm font-medium'>Written Stories</Link>
+                <Link to="/Video-Page" onClick={handleNavigate} className='text-[var(--pink-dark)] text-sm font-medium'>Video Stories</Link>
+                <div className='border-t border-gray-200 my-2 pt-2'>
+                  <h4 className='text-sm font-semibold text-gray-600 mb-1'>Story Categories</h4>
+                  {storyCategories.map((category, index) => (
+                    <Link 
+                      key={index} 
+                      to={category.path} 
+                      onClick={handleNavigate} 
+                      className='text-sm text-gray-700 block py-1'
+                    >
+                      {category.name}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           )}
@@ -254,52 +530,69 @@ const Navbar = () => {
 
       {/* Desktop Explore Dropdown */}
       {exploreOpen && (
-        <div className='hidden md:flex fixed left-0 top-[60px] w-screen h-[420px] bg-[var(--white)] shadow-lg z-50 gap-12 px-10 py-8'>
-          <div className='flex flex-col gap-3 min-w-[200px]'>
+        <div 
+          className='hidden md:flex fixed left-0 top-[60px] w-screen h-[320px] bg-[var(--white)] shadow-lg z-50 gap-8 px-8 py-6'
+          onMouseLeave={() => setExploreOpen(false)}
+        >
+          <div className='flex flex-col gap-3 min-w-[180px]'>
             <h2 className='text-lg font-bold mb-2'>Explore</h2>
-            <a href='#' onClick={() => setActive('stories')} className='text-md hover:text-[var(--pink-dark)] hover:font-bold'>Story Categories</a>
-            <a href='#' onClick={() => setActive('pages')} className='text-md hover:text-[var(--pink-dark)] hover:font-bold'>Other Pages</a>
+            <button onClick={() => setActive('stories')} className='text-md hover:text-[var(--pink-dark)] hover:font-bold text-left'>Story Categories</button>
+            <button onClick={() => setActive('pages')} className='text-md hover:text-[var(--pink-dark)] hover:font-bold text-left'>Other Pages</button>
           </div>
 
           {active === 'stories' && (
-            <div className='w-[1000px]'>
-              <div className="flex justify-between items-center mb-2 flex-wrap ">
-                <h4 className='text-lg font-semibold'>Story Category</h4>
-                <div className='flex gap-4'>
-                  <Link to="/allstories" onClick={handleNavigate} className="text-[var(--pink-dark)] text-sm font-medium inline-flex items-center gap-1 ">
-                    Written Stories <ArrowRight className='w-5 h-5 ' />
-                  </Link>
-                  <Link to="/Video-Page" onClick={handleNavigate} className="text-[var(--pink-dark)] text-sm font-medium inline-flex items-center gap-1 ">
-                    Video Stories <ArrowRight className='w-5 h-5 ' />
-                  </Link>
-                </div>
-              </div>
-              <div className="flex gap-28">
-                <div className="flex flex-col gap-1">
-                  {storyCategories.map((item, index) => (
-                    <a key={index} href="#" onClick={handleNavigate} className="text-black p-2 text-md block">
-                      {item}
-                    </a>
+            <div className='flex-1'>
+              <h4 className='text-lg font-semibold mb-3'>Story Categories</h4>
+              <div className="flex gap-40">
+                <div className="flex flex-col gap-3">
+                  {storyCategories.map((category, index) => (
+                    <button 
+                      key={index} 
+                      onClick={() => handleCategoryClick(category.path)}
+                      className="text-black p-1 text-sm block text-left hover:text-[var(--pink-dark)] hover:font-medium"
+                    >
+                      {category.name}
+                    </button>
                   ))}
+                </div>
+                
+                <div className="flex flex-col gap-3">
+                  <Link to="/allstories" onClick={handleNavigate} className="text-black p-1 text-sm block text-left hover:text-[var(--pink-dark)] hover:font-medium">
+                    Written Stories
+                  </Link>
+                  <Link to="/Video-Page" onClick={handleNavigate} className="text-black p-1 text-sm block text-left hover:text-[var(--pink-dark)] hover:font-medium">
+                    Video Stories
+                  </Link>
                 </div>
               </div>
             </div>
           )}
 
           {active === 'pages' && (
-            <div>
-              <h4 className='text-lg font-semibold mb-2'>Other Pages</h4>
-              <div className="flex gap-28">
-                <div className="flex flex-col gap-1">
-                  {otherPages.slice(0, 6).map((item, index) => (
-                    <Link key={index} to={item.path} onClick={handleNavigate} className="text-black p-2 text-md block">
+            <div className='flex-1'>
+              <h4 className='text-lg font-semibold mb-3'>Other Pages</h4>
+              <div className="grid grid-cols-2 gap-8">
+                <div className="flex flex-col gap-3">
+                  {otherPages.slice(0, 5).map((item, index) => (
+                    <Link 
+                      key={index} 
+                      to={item.path} 
+                      onClick={handleNavigate} 
+                      className="text-black p-1 text-sm block hover:text-[var(--pink-dark)] hover:font-medium"
+                    >
                       {item.label}
                     </Link>
                   ))}
                 </div>
-                <div className="flex flex-col gap-1">
-                  {otherPages.slice(6).map((item, index) => (
-                    <Link key={index} to={item.path} onClick={handleNavigate} className="text-black p-2 text-md block">
+                
+                <div className="flex flex-col gap-3">
+                  {otherPages.slice(5).map((item, index) => (
+                    <Link 
+                      key={index} 
+                      to={item.path} 
+                      onClick={handleNavigate} 
+                      className="text-black p-1 text-sm block hover:text-[var(--pink-dark)] hover:font-medium"
+                    >
                       {item.label}
                     </Link>
                   ))}

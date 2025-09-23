@@ -1,10 +1,10 @@
-
 import React, { useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import recaptcha from "../../../assets/images/recaptcha.png";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Comment = ({ onCommentAdded }) => {
   const { id } = useParams();
@@ -16,11 +16,10 @@ const Comment = ({ onCommentAdded }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [commentText, setCommentText] = useState("");
-  const [isHuman, setIsHuman] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const isBlogPage = window.location.pathname.includes('/blog/');
-  const isStoryPage = window.location.pathname.includes('/story/');
+  const isBlogPage = window.location.pathname.includes("/blog/");
+  const isStoryPage = window.location.pathname.includes("/story/");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,11 +42,9 @@ const Comment = ({ onCommentAdded }) => {
         commentData.storyId = id;
       }
 
-      await axios.post(
-        "http://localhost:8000/api/comments",
-        commentData,
-        { withCredentials: true }
-      );
+      await axios.post("http://localhost:8000/api/comments", commentData, {
+        withCredentials: true,
+      });
 
       setName("");
       setEmail("");
@@ -56,14 +53,13 @@ const Comment = ({ onCommentAdded }) => {
       setShowEmail(true);
       setSaveDetails(true);
       setAgree(false);
-      setIsHuman(false);
 
-      // Notify parent component
       if (onCommentAdded) onCommentAdded();
 
-      alert("Comment posted successfully!");
+      toast.success("Comment posted successfully!");
+    } catch (error) {
       console.error("Error posting comment:", error);
-      alert("Failed to post comment. Please try again.");
+      toast.error("Failed to post comment. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -78,7 +74,6 @@ const Comment = ({ onCommentAdded }) => {
     setShowEmail(true);
     setSaveDetails(true);
     setAgree(false);
-    setIsHuman(false);
   };
 
   return (
@@ -211,23 +206,6 @@ const Comment = ({ onCommentAdded }) => {
           </label>
         </div>
 
-        {/* Fake ReCAPTCHA */}
-        <div className="mt-2 border border-[var(--gray-muted)] rounded p-3 w-full sm:w-auto flex flex-col sm:flex-row items-start sm:items-center gap-3">
-          <div className="flex items-center">
-            <input 
-              type="checkbox" 
-              className="accent-[var(--pink-dark)] w-4 h-4 mr-2" 
-              checked={isHuman}
-              onChange={() => setIsHuman(!isHuman)}
-              required
-            />
-            <span className="text-sm font-medium text-[var(--text-dark)]">
-              I'm not a robot
-            </span>
-          </div>
-          <img src={recaptcha} alt="reCAPTCHA" className="w-10 h-10" />
-        </div>
-
         {/* Buttons */}
         <div className="flex flex-col sm:flex-row justify-end gap-3 pt-2">
           <button
@@ -246,10 +224,9 @@ const Comment = ({ onCommentAdded }) => {
           </button>
         </div>
       </form>
+      <ToastContainer />
     </div>
   );
 };
 
 export default Comment;
-
-

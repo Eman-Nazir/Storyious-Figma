@@ -28,6 +28,7 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
   const authorToEdit = location.state?.author || null;
 
   const [selectedImageName, setSelectedImageName] = useState("");
+  const [socialInputs, setSocialInputs] = useState({});
 
   const {
     register,
@@ -48,15 +49,22 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
     },
   });
 
-  const watchSocials = watch("socials");
-
   useEffect(() => {
     if (authorToEdit) {
       setValue("name", authorToEdit.name || "");
       setValue("shortBio", authorToEdit.shortBio || "");
       setValue("fullBio", authorToEdit.fullBio || "");
       setValue("isVerified", authorToEdit.isVerified || false);
-      setValue("socials", authorToEdit.socials || []);
+
+      const initialSocials = {};
+      if (authorToEdit.socials) {
+        authorToEdit.socials.forEach(social => {
+          if (social.platform) {
+            initialSocials[social.platform] = social.url || "";
+          }
+        });
+      }
+      setSocialInputs(initialSocials);
 
       if (authorToEdit.image) {
         const parts = authorToEdit.image.split("/");
@@ -72,27 +80,19 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
         socials: [],
       });
       setSelectedImageName("");
+      setSocialInputs({});
     }
   }, [authorToEdit, setValue, reset]);
-
-  const toggleSocial = (platformObj) => {
-    const socials = watchSocials || [];
-    const exists = socials.find((s) => s.platform === platformObj.name);
-    if (exists) {
-      setValue(
-        "socials",
-        socials.filter((s) => s.platform !== platformObj.name)
-      );
-    } else {
-      setValue("socials", [...socials, { platform: platformObj.name }]);
-    }
-  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setSelectedImageName(file.name);
     }
+  };
+
+  const handleSocialChange = (platform, url) => {
+    setSocialInputs(prev => ({ ...prev, [platform]: url }));
   };
 
   const onSubmit = async (data) => {
@@ -103,14 +103,16 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
       formData.append("fullBio", data.fullBio);
       formData.append("isVerified", data.isVerified);
 
+      const socialsWithUrls = platforms.map(platform => ({
+        platform: platform.name,
+        url: socialInputs[platform.name] || ""
+      }));
+      formData.append("socials", JSON.stringify(socialsWithUrls));
+
       const fileInput = document.querySelector('input[name="image"]');
       if (fileInput && fileInput.files[0]) {
         formData.append("image", fileInput.files[0]);
       }
-
-      (data.socials || []).forEach((social, i) => {
-        formData.append(`socials[${i}][platform]`, social.platform);
-      });
 
       if (authorToEdit) {
         await axios.put(
@@ -130,9 +132,9 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
           fullBio: "",
           isVerified: false,
           image: null,
-          socials: [],
         });
         setSelectedImageName("");
+        setSocialInputs({});
       }
 
       if (refreshAuthors) refreshAuthors();
@@ -222,29 +224,30 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
           )}
         </div>
 
+        {/* Social Links with URLs */}
         <div>
           <label className="font-semibold text-[var(--pink-dark)]">
-            Social Icons
+            Social Links
           </label>
-          <div className="flex gap-3 mt-2">
+          <div className="flex flex-col gap-3 mt-2">
             {platforms.map((platformObj) => {
-              const selected = (watchSocials || []).find(
-                (s) => s.platform === platformObj.name
-              );
               const Icon = platformObj.icon;
+              const urlValue = socialInputs[platformObj.name] || "";
+
               return (
-                <button
-                  type="button"
+                <div
                   key={platformObj.name}
-                  onClick={() => toggleSocial(platformObj)}
-                  className={`p-2 rounded border text-xl transition-all duration-150 ${
-                    selected
-                      ? "bg-[var(--pink-dark)] text-white border-[var(--pink-dark)] scale-110 shadow-lg"
-                      : "bg-white text-gray-700 border-gray-300 hover:scale-105 hover:shadow-md"
-                  }`}
+                  className="flex items-center gap-3 border p-2 rounded"
                 >
-                  <Icon />
-                </button>
+                  <Icon className="text-xl text-[var(--pink-dark)]" />
+                  <input
+                    type="url"
+                    placeholder={`Enter ${platformObj.name} link`}
+                    value={urlValue}
+                    onChange={(e) => handleSocialChange(platformObj.name, e.target.value)}
+                    className="flex-1 border rounded px-2 py-1"
+                  />
+                </div>
               );
             })}
           </div>

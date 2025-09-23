@@ -5,12 +5,12 @@ import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 
 export const createCategory = asyncHandler(async (req, res) => {
-  const { name, description } = req.body;
+  const { name, description, status } = req.body;
   if (!name) throw new ApiError(400, "Category name is required");
 
   const image = req.file?.path || null;
 
-  const category = new Category({ name, description, image });
+  const category = new Category({ name, description, image, status });
   const savedCategory = await category.save();
 
   res
@@ -19,7 +19,13 @@ export const createCategory = asyncHandler(async (req, res) => {
 });
 
 export const getCategories = asyncHandler(async (req, res) => {
-  const categories = await Category.find();
+  const { status } = req.query;
+  const filter = {};
+  if (status) {
+    filter.status = status;
+  }
+  
+  const categories = await Category.find(filter);
   res
     .status(200)
     .json(new ApiResponse(200, categories, "Categories retrieved successfully"));
@@ -35,14 +41,13 @@ export const deleteCategory = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, null, "Category deleted successfully"));
 });
 
-// UPDATE category by ID
 export const updateCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { name, description } = req.body;
+  const { name, description, status } = req.body;
 
   if (!name) throw new ApiError(400, "Category name is required");
 
-  const updatedData = { name, description };
+  const updatedData = { name, description, status };
   if (req.file?.path) {
     updatedData.image = req.file.path; 
   }
@@ -59,3 +64,5 @@ export const updateCategory = asyncHandler(async (req, res) => {
       new ApiResponse(200, updatedCategory, "Category updated successfully")
     );
 });
+
+export default Category;

@@ -4,11 +4,28 @@ import { asyncHandler } from "../../utils/asyncHandler.js";
 import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 
+const FAQ_CATEGORIES = [
+  "general", 
+  "scary", 
+  "moral", 
+  "fairytales", 
+  "fables", 
+  "classic", 
+  "bedtime",
+  "competitive-exams"
+];
+
+// Get all categories
+export const getFAQCategories = asyncHandler(async (req, res) => {
+  res.status(200).json(new ApiResponse(200, FAQ_CATEGORIES, "Categories retrieved successfully"));
+});
+
+// Get all FAQs
 export const getAllFAQs = asyncHandler(async (req, res) => {
   const { category } = req.query;
   
   let filter = {};
-  if (category && category !== 'all') {
+  if (category && category !== "all") {
     filter = { category };
   }
   
@@ -16,6 +33,7 @@ export const getAllFAQs = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, faqs, "FAQs retrieved successfully"));
 });
 
+// Get FAQs by category
 export const getFAQsByCategory = asyncHandler(async (req, res) => {
   const { category } = req.params;
   
@@ -28,6 +46,7 @@ export const getFAQsByCategory = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, faqs, "FAQs retrieved successfully"));
 });
 
+// Get FAQ by slug
 export const getFAQBySlug = asyncHandler(async (req, res) => {
   const { slug } = req.params;
   const faq = await FAQ.findOne({ slug });
@@ -37,6 +56,7 @@ export const getFAQBySlug = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, faq, "FAQ retrieved successfully"));
 });
 
+// Create FAQ
 export const createFAQ = asyncHandler(async (req, res) => {
   const { question, answer, category } = req.body;
 
@@ -50,6 +70,7 @@ export const createFAQ = asyncHandler(async (req, res) => {
   res.status(201).json(new ApiResponse(201, faq, "FAQ created successfully"));
 });
 
+// Delete FAQ
 export const deleteFAQ = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const faq = await FAQ.findByIdAndDelete(id);
@@ -59,6 +80,7 @@ export const deleteFAQ = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, null, "FAQ deleted successfully"));
 });
 
+// Update FAQ
 export const updateFAQ = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { question, answer, category } = req.body;

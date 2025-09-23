@@ -26,6 +26,7 @@ const AdminBlogCreate = () => {
     defaultValues: {
       title: "",
       introText: "",
+      status: "active",
       cards: [
         { title: "", subtitle: "", description: "", button_text: "", button_link: "", image: null },
       ],
@@ -41,6 +42,7 @@ const AdminBlogCreate = () => {
     if (editingBlog) {
       setValue("title", editingBlog.title || "");
       setValue("introText", editingBlog.introText || "");
+      setValue("status", editingBlog.status || "active");
       setValue(
         "cards",
         editingBlog.cards.length > 0
@@ -78,6 +80,7 @@ const AdminBlogCreate = () => {
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("introText", data.introText);
+      formData.append("status", data.status);
 
       const cardsData = data.cards.map((card) => ({
         title: card.title,
@@ -154,6 +157,18 @@ const AdminBlogCreate = () => {
           />
         </div>
 
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <select
+            {...register("status")}
+            className="w-full border p-2 rounded"
+          >
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status.message}</p>}
+        </div>
+
         {fields.map((card, index) => (
           <div key={card.id} className="border p-4 rounded-lg shadow-sm bg-gray-50">
             <div className="flex justify-between items-center mb-2">
@@ -226,41 +241,37 @@ const AdminBlogCreate = () => {
               </div>
             </div>
 
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
+              
+              <div className="flex items-center">
+                <input
+                  type="text"
+                  value={
+                    cards[index].image
+                      ? cards[index].image.name
+                      : cards[index].fileName || "No file chosen"
+                  }
+                  readOnly
+                  className="flex-1 border rounded-l px-3 py-2 text-sm text-gray-600 bg-gray-50"
+                />
 
-          <div className="mt-4">
-  <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
-  
-  <div className="flex items-center">
-    <input
-      type="text"
-      value={
-        cards[index].image
-          ? cards[index].image.name
-          : cards[index].fileName || "No file chosen"
-      }
-      readOnly
-      className="flex-1 border rounded-l px-3 py-2 text-sm text-gray-600 bg-gray-50"
-    />
+                <input
+                  type="file"
+                  id={`file-${index}`}
+                  style={{ display: "none" }}
+                  accept="image/*"
+                  onChange={(e) => handleFileChange(index, e.target.files[0])}
+                />
 
-    <input
-      type="file"
-      id={`file-${index}`}
-      style={{ display: "none" }}
-      accept="image/*"
-      onChange={(e) => handleFileChange(index, e.target.files[0])}
-    />
-
-    <label
-      htmlFor={`file-${index}`}
-      className="px-4 py-2 bg-gray-200 border border-l-0 rounded-r cursor-pointer text-sm text-gray-700 hover:bg-gray-300"
-    >
-      Choose File
-    </label>
-  </div>
-</div>
-
-
-            
+                <label
+                  htmlFor={`file-${index}`}
+                  className="px-4 py-2 bg-gray-200 border border-l-0 rounded-r cursor-pointer text-sm text-gray-700 hover:bg-gray-300"
+                >
+                  Choose File
+                </label>
+              </div>
+            </div>
           </div>
         ))}
 
@@ -279,7 +290,6 @@ const AdminBlogCreate = () => {
           >
             {isSubmitting ? "Saving..." : editingBlog ? "Update Blog" : "Create Blog"}
           </button>
-          
         </div>
       </form>
     </div>
@@ -287,13 +297,3 @@ const AdminBlogCreate = () => {
 };
 
 export default AdminBlogCreate;
-
-
-
-
-
-
-
-
-
-

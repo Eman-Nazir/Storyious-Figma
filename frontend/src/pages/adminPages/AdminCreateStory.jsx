@@ -1,186 +1,153 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
-import { Editor } from "@tinymce/tinymce-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { storySchema, updateStorySchema } from "../../schemas/storySchema";
+import { Editor } from "@tinymce/tinymce-react";
 
 const AdminCreateStory = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const editStory = location.state?.story || null;
+  const editingStory = location.state?.story || null;
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    setValue,
-    reset,
-    formState: { errors },
-  } = useForm({
-    resolver: zodResolver(editStory ? updateStorySchema : storySchema),
-    defaultValues: {
-      title: editStory?.title || "",
-      introText: editStory?.introText || "",
-      content: editStory?.content || "",
-      authorId: editStory?.author?._id || "",
-      categoryId: editStory?.category?._id || "",
-      featuredImage: null,
-    },
-  });
-
-  const fileInputRef = useRef(null);
+  const [title, setTitle] = useState(editingStory?.title || "");
+  const [introText, setIntroText] = useState(editingStory?.introText || "");
+  const [content, setContent] = useState(editingStory?.content || "");
+  const [author, setAuthor] = useState(editingStory?.author?._id || "");
   const [authors, setAuthors] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [selectedImageName, setSelectedImageName] = useState(
-    editStory?.featuredImage
-      ? "Current file: " + editStory.featuredImage.split("/").pop()
-      : ""
+  const [selectedCategories, setSelectedCategories] = useState(
+    editingStory?.categories?.map((c) => c._id) || []
   );
+  const [status, setStatus] = useState(editingStory?.status || "active");
+  const [type, setType] = useState(editingStory?.type || "written");
+  const [videoFile, setVideoFile] = useState(null);
+  const [videoUrl, setVideoUrl] = useState(editingStory?.videoUrl || "");
+  const [featuredImage, setFeaturedImage] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+
+  const {
+    control,
+    formState: { errors },
+  } = useForm({
+    defaultValues: { content: editingStory?.content || "" },
+  });
 
   useEffect(() => {
-    const fetchAuthors = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/authors");
-        setAuthors(res.data?.data || []);
-      } catch {
-        toast.error("Failed to load authors");
+        const [authorsRes, categoriesRes] = await Promise.all([
+          axios.get("http://localhost:8000/api/authors"),
+          axios.get("http://localhost:8000/api/categories"),
+        ]);
+        setAuthors(authorsRes.data?.data || []);
+        setCategories(categoriesRes.data?.data || []);
+      } catch (err) {
+        console.error("Error fetching authors/categories", err);
+        toast.error("Failed to load authors or categories");
       }
     };
-
-    const fetchCategories = async () => {
-      try {
-        const res = await axios.get("http://localhost:8000/api/categories");
-        setCategories(res.data?.data || []);
-      } catch {
-        toast.error("Failed to load categories");
-      }
-    };
-
-    fetchAuthors();
-    fetchCategories();
+    fetchData();
   }, []);
 
-  
-
-useEffect(() => {
-  if (editStory && authors.length > 0 && categories.length > 0) {
-    reset({
-      title: editStory.title || "",
-      introText: editStory.introText || "",
-      content: editStory.content || "",
-      authorId: editStory.author?._id || "",
-      categoryId: editStory.category?._id || "",
-      featuredImage: null,
-    });
-
-    if (editStory.featuredImage) {
-      const parts = editStory.featuredImage.split("/");
-      setSelectedImageName("Current file: " + parts[parts.length - 1]);
-    }
-  }
-}, [editStory, authors, categories, reset]);
-
-
-
-
-  const calculateReadTime = (text) => {
-    const words = text.split(/\s+/).filter(Boolean).length;
-    return Math.ceil(words / 200) + " min read";
+  const handleCategoryChange = (id) => {
+    setSelectedCategories((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+    );
   };
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setValue("featuredImage", file); 
-      setSelectedImageName(file.name);
-    } else {
-      setSelectedImageName(
-        editStory?.featuredImage
-          ? "Current file: " + editStory.featuredImage.split("/").pop()
-          : ""
-      );
-    }
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-
-  const onSubmit = async (data) => {
     try {
       const formData = new FormData();
-      formData.append("title", data.title);
-      formData.append("introText", data.introText);
-      formData.append("content", data.content);
-      formData.append("author", data.authorId);
-      formData.append("category", data.categoryId);
-      formData.append("meta[readTime]", calculateReadTime(data.content));
-      formData.append("meta[views]", editStory?.meta?.views || 0);
+      formData.append("title", title);
+      formData.append("introText", introText);
+      formData.append("content", content);
+      formData.append("author", author);
+      formData.append("categories", JSON.stringify(selectedCategories));
+      formData.append("type", type);
+      formData.append("videoUrl", videoUrl);
+      formData.append("status", status);
 
-      if (data.featuredImage instanceof File) {
-        formData.append("featuredImage", data.featuredImage);
+      if (featuredImage) {
+        formData.append("featuredImage", featuredImage);
+      }
+      if (videoFile) {
+        formData.append("videoFile", videoFile);
       }
 
-      if (editStory) {
+      if (editingStory) {
         await axios.put(
-          `http://localhost:8000/api/stories/${editStory._id}`,
+          `http://localhost:8000/api/stories/${editingStory._id}`,
           formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-          }
+          { headers: { "Content-Type": "multipart/form-data" } }
         );
-        toast.success("Story updated successfully!");
+        toast.success("Story updated successfully");
       } else {
         await axios.post("http://localhost:8000/api/stories/create", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        toast.success("Story created successfully!");
+        toast.success("Story created successfully");
       }
 
-      navigate("/admin/stories");
-    } catch (error) {
+      setTimeout(() => navigate("/admin/stories"), 1000);
+    } catch (err) {
+      console.error("Error saving story", err);
       toast.error("Failed to save story");
-      console.error(error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white shadow rounded">
+    <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-6 mt-6">
       <ToastContainer position="top-right" autoClose={3000} />
-      <h2 className="text-2xl font-bold mb-4">
-        {editStory ? "Edit Story" : "Create New Story"}
+      <h2 className="text-2xl font-bold text-pink-600 mb-6">
+        {editingStory ? "Edit Story" : "Create Story"}
       </h2>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+
+      <form onSubmit={handleSubmit} className="space-y-6">
         {/* Title */}
         <div>
-          <label className="block mb-1 font-medium">Title</label>
+          <label className="block text-lg font-semibold mb-2 text-gray-700">
+            Story Title
+          </label>
           <input
             type="text"
-            className="w-full border px-3 py-2 rounded"
-            {...register("title")}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            maxLength={100}
+            className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 
+                       text-lg font-medium placeholder-gray-400
+                       focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400
+                       transition duration-200"
+            placeholder="Enter a catchy story title..."
           />
-          {errors.title && (
-            <p className="text-red-500">{errors.title.message}</p>
-          )}
+          <div className="flex justify-between mt-1">
+            <p className="text-sm text-gray-500">
+              Keep it short and engaging — max 100 characters
+            </p>
+            <span className="text-sm text-gray-400">{title.length}/100</span>
+          </div>
         </div>
 
         {/* Intro Text */}
         <div>
-          <label className="block mb-1 font-medium">Intro Text</label>
+          <label className="block font-medium mb-1">Intro Text</label>
           <textarea
-            className="w-full border px-3 py-2 rounded"
-            rows="3"
-            {...register("introText")}
+            value={introText}
+            onChange={(e) => setIntroText(e.target.value)}
+            rows="2"
+            className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-pink-300"
           />
-          {errors.introText && (
-            <p className="text-red-500">{errors.introText.message}</p>
-          )}
         </div>
 
-        {/* Content Editor */}
+        {/* Content with Editor */}
         <div>
           <label className="block mb-1 font-medium">Content</label>
           <Controller
@@ -252,7 +219,10 @@ useEffect(() => {
                     }
                   },
                 }}
-                onEditorChange={field.onChange}
+                onEditorChange={(newValue) => {
+                  field.onChange(newValue);
+                  setContent(newValue);
+                }}
               />
             )}
           />
@@ -261,76 +231,136 @@ useEffect(() => {
           )}
         </div>
 
-        {/* Author */}
+        {/* Status */}
         <div>
-          <label className="block mb-1 font-medium">Author</label>
+          <label className="block font-medium mb-1">Status</label>
           <select
-            className="w-full border px-3 py-2 rounded"
-            {...register("authorId")}
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-pink-300"
           >
-            <option value="">Select Author</option>
-            {authors.map((author) => (
-              <option key={author._id} value={author._id}>
-                {author.name}
-              </option>
-            ))}
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
           </select>
-          {errors.authorId && (
-            <p className="text-red-500">{errors.authorId.message}</p>
-          )}
         </div>
 
-        {/* Category */}
+        {/* Type */}
         <div>
-          <label className="block mb-1 font-medium">Category</label>
+          <label className="block font-medium mb-1">Story Type</label>
           <select
-            className="w-full border px-3 py-2 rounded"
-            {...register("categoryId")}
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-pink-300"
           >
-            <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat._id} value={cat._id}>
-                {cat.name}
-              </option>
-            ))}
+            <option value="written">Written</option>
+            <option value="video">Video</option>
           </select>
-          {errors.categoryId && (
-            <p className="text-red-500">{errors.categoryId.message}</p>
-          )}
         </div>
+
+        {/* Video Options */}
+        {type === "video" && (
+          <>
+            <div>
+              <label className="block font-medium mb-1">Video File</label>
+              <input
+                type="file"
+                accept="video/*"
+                onChange={(e) => setVideoFile(e.target.files[0])}
+                className="w-full border rounded-lg px-3 py-2"
+              />
+              {editingStory?.videoFile && (
+                <video
+                  src={editingStory.videoFile}
+                  controls
+                  className="mt-2 w-64 rounded"
+                />
+              )}
+            </div>
+
+            <div>
+              <label className="block font-medium mb-1">
+                YouTube / Vimeo URL
+              </label>
+              <input
+                type="url"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-pink-300"
+                placeholder="https://youtube.com/..."
+              />
+            </div>
+          </>
+        )}
 
         {/* Featured Image */}
         <div>
-          <label className="block mb-1 font-medium">Featured Image</label>
-          <div className="relative">
-            <input
-              type="text"
-              value={selectedImageName || ""}
-              readOnly
-              placeholder="Choose an image..."
-              className="border p-2 rounded w-full cursor-pointer bg-gray-50 text-gray-600"
-              onClick={triggerFileInput}
+          <label className="block font-medium mb-1">Featured Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setFeaturedImage(e.target.files[0])}
+            className="w-full border rounded-lg px-3 py-2"
+          />
+          {editingStory?.featuredImage && (
+            <img
+              src={editingStory.featuredImage}
+              alt="preview"
+              className="mt-2 w-32 h-32 object-cover rounded"
             />
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={handleImageChange}
-            />
-          </div>
-          {errors.featuredImage && (
-            <p className="text-red-500">{errors.featuredImage.message}</p>
           )}
         </div>
 
+        {/* Author */}
+        <div>
+          <label className="block font-medium mb-1">Author</label>
+          <select
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-pink-300"
+          >
+            <option value="">Select Author</option>
+            {authors.map((a) => (
+              <option key={a._id} value={a._id}>
+                {a.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Categories */}
+        <div>
+          <label className="block font-medium mb-2">Categories</label>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <label
+                key={cat._id}
+                className="flex items-center gap-1 border rounded px-2 py-1 cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedCategories.includes(cat._id)}
+                  onChange={() => handleCategoryChange(cat._id)}
+                />
+                {cat.name}
+              </label>
+            ))}
+          </div>
+        </div>
+
         {/* Submit */}
-        <button
-          type="submit"
-          className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 transition"
-        >
-          {editStory ? "Update Story" : "Create Story"}
-        </button>
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-pink-600 text-white px-6 py-2 rounded-lg hover:bg-pink-700 disabled:opacity-50"
+          >
+            {loading
+              ? "Saving..."
+              : editingStory
+              ? "Update Story"
+              : "Create Story"}
+          </button>
+        </div>
       </form>
     </div>
   );

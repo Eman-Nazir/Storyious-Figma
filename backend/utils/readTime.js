@@ -1,6 +1,3 @@
-
-
-
 export const calculateReadTime = (content) => {
   if (!content) return "0 min";
 
@@ -11,5 +8,5 @@ export const calculateReadTime = (content) => {
   if (wordCount === 0) return "0 min";
 
   const time = wordCount / wordsPerMinute;
-  return `${time.toFixed(1)} min`; // e.g., 0.3 min, 1.5 min
+  return `${time.toFixed(1)} min`; 
 };

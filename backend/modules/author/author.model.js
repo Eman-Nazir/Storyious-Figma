@@ -1,7 +1,9 @@
+
 import mongoose from 'mongoose';
 
 const socialSchema = new mongoose.Schema({
-  platform: String, 
+  platform: String,
+  url: String,
 });
 
 const authorSchema = new mongoose.Schema({

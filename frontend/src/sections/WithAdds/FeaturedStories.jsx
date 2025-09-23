@@ -1,5 +1,4 @@
 
-
 import { ArrowRight, CalendarRange, Clock7, Eye } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -14,11 +13,14 @@ const FeaturedStories = () => {
   useEffect(() => {
     const fetchFeaturedStories = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/stories?populate=category");
+        const response = await axios.get("http://localhost:8000/api/stories");
         
         const allStories = response.data.data || response.data || [];
         
-        const sortedStories = allStories.sort((a, b) => {
+        console.log("Raw stories data:", allStories); 
+        
+        const writtenStories = allStories.filter(story => story.type === "written");
+        const sortedStories = writtenStories.sort((a, b) => {
           return new Date(b.createdAt) - new Date(a.createdAt);
         });
         
@@ -26,7 +28,6 @@ const FeaturedStories = () => {
         
         const featuredStories = [...lastThreeStories];
         if (featuredStories.length > 0) {
-
           const firstStoryCopy = {...featuredStories[0]};
           featuredStories.push(firstStoryCopy);
         }
@@ -43,20 +44,29 @@ const FeaturedStories = () => {
     fetchFeaturedStories();
   }, []);
 
-  // Format story data for display
   const formatStoryData = (story, index) => {
     if (!story) return null;
     
+    const categoryNames = story.categories && story.categories.length > 0 
+      ? story.categories.map(cat => cat.name || "Story")
+      : ["Story"];
+
     return {
       id: story._id || "",
       title: story.title || "Untitled Story",
+      introText: story.introText || "",
       date: story.createdAt ? new Date(story.createdAt).toLocaleDateString() : "Unknown date",
-      readTime: story.meta?.readTime || "0 min",
-      views: `${story.meta?.views || 0} Views`,
-      categories: [story.category?.name || "Story"],
+      readTime: story.meta && story.meta.readTime ? story.meta.readTime : "0 min",
+      views: `${story.meta && story.meta.views ? story.meta.views : 0} Views`,
+      categories: categoryNames,
       image: story.featuredImage || "",
       link: `/story/${story._id || ""}`
     };
+  };
+
+  const handleImageError = (e) => {
+    console.log("Image failed to load:", e.target.src);
+    e.target.style.display = 'none';
   };
 
   if (loading) return <div className="text-center py-8">Loading featured stories...</div>;
@@ -94,28 +104,36 @@ const FeaturedStories = () => {
           className="block w-[90%] sm:w-[80%] mx-auto"
         >
           <div className="bg-white rounded-xl shadow-md overflow-hidden">
-            <img
-              src={formattedStories[activeIndex].image}
-              alt={formattedStories[activeIndex].title}
-              className="w-full h-48 object-cover"
-            />
+            {formattedStories[activeIndex].image && (
+              <img
+                src={formattedStories[activeIndex].image}
+                alt={formattedStories[activeIndex].title}
+                className="w-full h-48 object-cover"
+                onError={handleImageError}
+              />
+            )}
             <div className="p-4">
               <div className="text-sm text-[var(--primary-color)] font-semibold space-x-1">
                 {formattedStories[activeIndex].categories.map((cat, id) => (
                   <span key={id}>{cat}.</span>
                 ))}
-                <span className="text-[var(--primary-color)]">{formattedStories[activeIndex].readTime}</span>
+                <span className="text-[var(--primary-color)]"> {formattedStories[activeIndex].readTime}</span>
               </div>
               <h2 className="font-bold text-lg mt-2 text-[var(--text-dark)]">
                 {formattedStories[activeIndex].title}
               </h2>
+              {formattedStories[activeIndex].introText && (
+                <p className="text-sm text-[var(--text-muted)] mt-2 line-clamp-2">
+                  {formattedStories[activeIndex].introText}
+                </p>
+              )}
               <div className="text-sm text-[var(--text-muted)] mt-2 flex flex-wrap gap-x-4">
                 <span className="flex items-center gap-1">
                   <CalendarRange className="w-4 h-4" /> {formattedStories[activeIndex].date}
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock7 className="w-4 h-4" /> {formattedStories[activeIndex].readTime}
-                  </span>
+                </span>
                 <span className="flex items-center gap-1">
                   <Eye className="w-4 h-4" /> {formattedStories[activeIndex].views}
                 </span>
@@ -143,25 +161,33 @@ const FeaturedStories = () => {
         <div className="w-[45%]">
           <Link to={formattedStories[0].link} className="block h-full">
             <div className="bg-white rounded-xl shadow-md overflow-hidden h-full">
-              <img
-                src={formattedStories[0].image}
-                alt={formattedStories[0].title}
-                className="w-full h-[300px] object-cover"
-              />
+              {formattedStories[0].image && (
+                <img
+                  src={formattedStories[0].image}
+                  alt={formattedStories[0].title}
+                  className="w-full h-[300px] object-cover"
+                  onError={handleImageError}
+                />
+              )}
               <div className="p-4">
                 <div className="text-sm text-[var(--primary-color)] font-semibold space-x-1">
                   {formattedStories[0].categories.map((cat, idx) => (
                     <span key={idx}>{cat}</span>
                   ))}
-                  <span className="text-[var(--primary-color)]">{formattedStories[0].readTime}</span>
+                  <span className="text-[var(--primary-color)]"> {formattedStories[0].readTime}</span>
                 </div>
                 <h2 className="font-bold text-xl mt-2 text-[var(--text-dark)]">{formattedStories[0].title}</h2>
+                {formattedStories[0].introText && (
+                  <p className="text-sm text-[var(--text-muted)] mt-2 line-clamp-3">
+                    {formattedStories[0].introText}
+                  </p>
+                )}
                 <div className="text-sm text-[var(--text-muted)] mt-2 flex gap-x-4 flex-wrap">
                   <span className="flex items-center gap-1">
                     <CalendarRange className="w-4 h-4" /> {formattedStories[0].date}
                   </span>
-                   <span className="flex items-center gap-1">
-                  <Clock7 className="w-4 h-4" /> {formattedStories[activeIndex].readTime}
+                  <span className="flex items-center gap-1">
+                    <Clock7 className="w-4 h-4" /> {formattedStories[0].readTime}
                   </span>
                   <span className="flex items-center gap-1">
                     <Eye className="w-4 h-4" /> {formattedStories[0].views}
@@ -179,25 +205,35 @@ const FeaturedStories = () => {
               key={story.id + index}
               className="flex gap-3 bg-white rounded-lg shadow-md overflow-hidden h-[150px]"
             >
-              <img
-                src={story.image}
-                alt={story.title}
-                className="w-36 h-full object-cover"
-              />
-              <div className="py-2 pr-2 space-y-2">
-                <div className="text-sm text-[var(--primary-color)] space-x-1 font-semibold">
-                  {story.categories.map((cat, id) => (
-                    <span key={id}>{cat}.</span>
-                  ))}
-                  <span className="text-[var(--primary-color)]">{story.readTime}</span>
+              {story.image && (
+                <img
+                  src={story.image}
+                  alt={story.title}
+                  className="w-36 h-full object-cover"
+                  onError={handleImageError}
+                />
+              )}
+              <div className="py-2 pr-2 space-y-2 flex flex-col justify-between h-full">
+                <div>
+                  <div className="text-sm text-[var(--primary-color)] space-x-1 font-semibold">
+                    {story.categories.map((cat, id) => (
+                      <span key={id}>{cat}.</span>
+                    ))}
+                    <span className="text-[var(--primary-color)]"> {story.readTime}</span>
+                  </div>
+                  <h3 className="font-semibold text-sm text-[var(--text-dark)]">{story.title}</h3>
+                  {story.introText && (
+                    <p className="text-xs text-[var(--text-muted)] mt-1 line-clamp-2">
+                      {story.introText}
+                    </p>
+                  )}
                 </div>
-                <h3 className="font-semibold text-sm text-[var(--text-dark)]">{story.title}</h3>
                 <div className="text-sm text-[var(--text-muted)] flex gap-x-4 flex-wrap">
                   <span className="flex items-center gap-1">
                     <CalendarRange className="w-4 h-4" /> {story.date}
                   </span>
-                   <span className="flex items-center gap-1">
-                  <Clock7 className="w-4 h-4" /> {formattedStories[activeIndex].readTime}
+                  <span className="flex items-center gap-1">
+                    <Clock7 className="w-4 h-4" /> {story.readTime}
                   </span>
                   <span className="flex items-center gap-1">
                     <Eye className="w-4 h-4" /> {story.views}

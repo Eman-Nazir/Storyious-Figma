@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from 'react';
-import Community from "../../src/components/common/Community";
-import WriterCard from "../../src/components/common/Cards/WriterCard";
+import Community from "../components/common/Community";
+import AuthorCard from "../components/common/Cards/AuthorCard";
 
-const WriterPage = () => {
+const AuthorPage = () => {
   const [writers, setWriters] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -44,7 +44,7 @@ const WriterPage = () => {
 
       <div className="max-w-[1200px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-10 px-4">
         {writers.map((writer) => (
-          <WriterCard key={writer._id} writer={writer} />
+          <AuthorCard key={writer._id} writer={writer} />
         ))}
       </div>
 
@@ -53,4 +53,4 @@ const WriterPage = () => {
   );
 };
 
-export default WriterPage;
+export default AuthorPage;

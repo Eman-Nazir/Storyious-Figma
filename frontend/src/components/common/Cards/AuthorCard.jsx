@@ -1,7 +1,3 @@
-
-
-
-
 import React from 'react';
 import {
   FaFacebookF,
@@ -20,11 +16,20 @@ const iconMap = {
   instagram: FaInstagram
 };
 
-const WriterCard = ({ writer }) => {
-  const socialIcons = writer.socials?.map(social => social.platform) || [];
+const AuthorCard = ({ writer }) => {
+  const validSocials = writer.socials
+    ? writer.socials.filter(
+        social =>
+          social &&
+          social.platform &&
+          social.url &&
+          social.url.trim() !== "" &&
+          social.url !== "undefined"
+      )
+    : [];
 
   return (
-    <div className="flex flex-col h-[480px] p-4 sm:mx-4 sm:mt-10 rounded-md shadow-md bg-[var(--white)]">
+    <div className="flex flex-col min-h-[480px] p-4 sm:mx-4 sm:mt-10 rounded-md shadow-md bg-[var(--white)]">
       {/* Writer Image */}
       <img
         src={writer.image}
@@ -44,16 +49,17 @@ const WriterCard = ({ writer }) => {
 
       {/* Social Icons */}
       <div className="flex items-center gap-2 mt-2 h-[44px]">
-        {socialIcons.length > 0 && (
+        {validSocials.length > 0 ? (
           <div className="flex flex-wrap justify-start gap-2">
-            {socialIcons.map((platform, i) => {
-              const Icon = iconMap[platform];
+            {validSocials.map((social, index) => {
+              const Icon = iconMap[social.platform];
               return Icon ? (
                 <a
-                  key={i}
-                  href={writer.socials[i]?.url || "#"}
+                  key={index}
+                  href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={`${writer.name} on ${social.platform}`}
                   className="p-2 rounded-md border border-[var(--pink-dark)] text-[var(--pink-dark)]
                              hover:bg-[var(--pink-dark)] hover:text-[var(--white)] transition-colors duration-200"
                 >
@@ -62,6 +68,8 @@ const WriterCard = ({ writer }) => {
               ) : null;
             })}
           </div>
+        ) : (
+          <span className="text-xs text-gray-400">No social links</span>
         )}
       </div>
 
@@ -79,4 +87,4 @@ const WriterCard = ({ writer }) => {
   );
 };
 
-export default WriterCard;
+export default AuthorCard;

@@ -1,6 +1,3 @@
-
-
-
 import { X } from "lucide-react";
 
 const Subscribe = ({ show, onClose }) => {

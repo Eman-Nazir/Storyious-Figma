@@ -7,7 +7,16 @@ import { generateSlug } from "../../utils/slugify.js";
 
 // Get all authors
 export const getAllAuthors = asyncHandler(async (req, res) => {
-  const authors = await Author.find().sort({ createdAt: -1 });
+  const { verified } = req.query;
+  const filter = {};
+  
+  if (verified === 'true') {
+    filter.isVerified = true;
+  } else if (verified === 'false') {
+    filter.isVerified = false;
+  }
+  
+  const authors = await Author.find(filter).sort({ createdAt: -1 });
   res.status(200).json(new ApiResponse(200, authors));
 });
 
@@ -38,7 +47,6 @@ export const addAuthor = asyncHandler(async (req, res) => {
   }
 
   const image = req.file?.path;
-
   const slug = generateSlug(name);
 
   const newAuthor = await Author.create({
@@ -54,17 +62,14 @@ export const addAuthor = asyncHandler(async (req, res) => {
   res.status(201).json(new ApiResponse(201, newAuthor, "Author created successfully"));
 });
 
+// Get author by slug
 export const getAuthorBySlug = asyncHandler(async (req, res) => {
   const { slug } = req.params;
-  
   const author = await Author.findOne({ slug });
   if (!author) throw new ApiError(404, "Author not found");
 
   res.status(200).json(new ApiResponse(200, author));
 });
-
-
-
 
 // Update author
 export const updateAuthor = asyncHandler(async (req, res) => {
@@ -82,7 +87,7 @@ export const updateAuthor = asyncHandler(async (req, res) => {
     }
   }
 
-  const image = req.file?.path; 
+  const image = req.file?.path;
 
   const updatedAuthor = await Author.findByIdAndUpdate(
     id,
@@ -92,7 +97,7 @@ export const updateAuthor = asyncHandler(async (req, res) => {
       fullBio,
       isVerified: isVerified === "true" || isVerified === true,
       socials: socialsArray,
-      ...(image && { image }), 
+      ...(image && { image }),
     },
     { new: true }
   );

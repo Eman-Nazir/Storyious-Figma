@@ -1,7 +1,3 @@
-
-
-
-
 import React from "react";
 import Community from "../components/common/Community";
 
