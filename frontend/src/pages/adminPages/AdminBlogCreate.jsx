@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -12,6 +13,9 @@ const AdminBlogCreate = () => {
   const navigate = useNavigate();
   const editingBlog = location.state?.blog;
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [authors, setAuthors] = useState([]);
+  const [loadingAuthors, setLoadingAuthors] = useState(false);
+  const [selectedAuthor, setSelectedAuthor] = useState("");
 
   const {
     register,
@@ -26,6 +30,7 @@ const AdminBlogCreate = () => {
     defaultValues: {
       title: "",
       introText: "",
+      author: "",
       status: "active",
       cards: [
         { title: "", subtitle: "", description: "", button_text: "", button_link: "", image: null },
@@ -39,9 +44,14 @@ const AdminBlogCreate = () => {
   });
 
   useEffect(() => {
+    fetchAuthors();
+  }, []);
+
+  useEffect(() => {
     if (editingBlog) {
       setValue("title", editingBlog.title || "");
       setValue("introText", editingBlog.introText || "");
+      setValue("author", editingBlog.author?._id || "");
       setValue("status", editingBlog.status || "active");
       setValue(
         "cards",
@@ -58,8 +68,40 @@ const AdminBlogCreate = () => {
             }))
           : [{ title: "", subtitle: "", description: "", button_text: "", button_link: "", image: null }]
       );
+      
+      // Set the selected author for display
+      if (editingBlog.author) {
+        setSelectedAuthor(editingBlog.author._id);
+      }
     }
   }, [editingBlog, setValue]);
+
+  const fetchAuthors = async () => {
+    try {
+      setLoadingAuthors(true);
+      const res = await axios.get("http://localhost:8000/api/authors");
+      if (res.data && Array.isArray(res.data.data)) {
+        setAuthors(res.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching authors:", error);
+      toast.error("Failed to load authors");
+    } finally {
+      setLoadingAuthors(false);
+    }
+  };
+
+  const handleAuthorChange = (e) => {
+    const authorId = e.target.value;
+    setSelectedAuthor(authorId);
+    setValue("author", authorId);
+  };
+
+  const getSelectedAuthorName = () => {
+    if (!selectedAuthor) return "";
+    const author = authors.find(a => a._id === selectedAuthor);
+    return author ? author.name : "";
+  };
 
   const addCard = () => {
     append({ title: "", subtitle: "", description: "", button_text: "", button_link: "", image: null });
@@ -80,6 +122,7 @@ const AdminBlogCreate = () => {
       const formData = new FormData();
       formData.append("title", data.title);
       formData.append("introText", data.introText);
+      formData.append("author", data.author);
       formData.append("status", data.status);
 
       const cardsData = data.cards.map((card) => ({
@@ -112,6 +155,7 @@ const AdminBlogCreate = () => {
         
         if (!editingBlog) {
           reset();
+          setSelectedAuthor("");
         }
         
         setTimeout(() => {
@@ -122,7 +166,7 @@ const AdminBlogCreate = () => {
       }
     } catch (err) {
       console.error("Error saving blog:", err);
-      toast.error(" Failed to save blog");
+      toast.error("Failed to save blog");
     } finally {
       setIsSubmitting(false);
     }
@@ -155,6 +199,31 @@ const AdminBlogCreate = () => {
             className="w-full border p-2 rounded"
             rows="3"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Author</label>
+          
+         
+          
+          <select
+            {...register("author")}
+            onChange={handleAuthorChange}
+            value={selectedAuthor}
+            className="w-full border p-2 rounded"
+          >
+            <option value="">Select Author</option>
+            {loadingAuthors ? (
+              <option value="">Loading authors...</option>
+            ) : (
+              authors.map((author) => (
+                <option key={author._id} value={author._id}>
+                  {author.name}
+                </option>
+              ))
+            )}
+          </select>
+          {errors.author && <p className="text-red-500 text-sm mt-1">{errors.author.message}</p>}
         </div>
 
         <div>

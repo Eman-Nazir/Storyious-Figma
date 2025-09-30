@@ -47,7 +47,7 @@ import submissionRoute from "./modules/submission/submission.routes.js";
 import uploadRoutes from "./routes/upload.route.js";
 import commentRoutes from './modules/story/commnet.route.js';
 import newsletterRoutes from './modules/newsletter/newsLetter.routes.js';
-// import searchRoutes from "./modules/search/search.route.js";
+import searchRoutes from "./modules/search/search.route.js";
 
 
 // API Routes
@@ -61,7 +61,7 @@ app.use("/api/faqs", faqRoutes);
 app.use("/api/submissions", submissionRoute);
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/newsLetter", newsletterRoutes);
-// app.use("/api/search", searchRoutes);
+app.use("/api/search", searchRoutes);
 
 
 

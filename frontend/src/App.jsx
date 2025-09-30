@@ -45,7 +45,7 @@ import AdminViewFAQs from "./pages/adminPages/AdminViewFaq";
 import AdminCreateAd from "./pages/adminPages/AdminCreateAd";
 import AdminViewAd from "./pages/adminPages/AdminViewAd";
 import AdminNewsletterView from "./pages/adminPages/AdminNewsLetterView";
-// import SearchResults from "./pages/SearchResultPage";
+import SearchResults from "./pages/SearchResultPage";
 
 function App() {
   useScrollToTop();
@@ -76,7 +76,7 @@ function App() {
           <Route path="/About-Us" element={<AboutUs />} />
           <Route path="/Video-Page" element={<VideoStoryPage />} />
           <Route path="/ContactUs" element={<ContactUsPage />} />
-          {/* <Route path="/search" element={<SearchResults/>} /> */}
+          <Route path="/search" element={<SearchResults/>} />
         </Route>
 
         {/* Admin layout */}

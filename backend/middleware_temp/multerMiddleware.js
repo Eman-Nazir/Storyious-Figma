@@ -2,49 +2,50 @@ import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../config/cloudinary.js";
 
+const memoryStorage = multer.memoryStorage();
+
 const Upload = (folderName = "general") => {
-  const storage = new CloudinaryStorage({
-    cloudinary,
-    params: async (req, file) => {
-      const ext = file.originalname.split(".").pop().toLowerCase();
+  try {
+    const storage = new CloudinaryStorage({
+      cloudinary,
+      params: async (req, file) => {
+        const ext = file.originalname.split(".").pop().toLowerCase();
+        
+        let resourceType = "auto";
+        if (["jpg", "jpeg", "png", "webp", "gif", "bmp"].includes(ext)) {
+          resourceType = "image";
+        } else if (["mp4", "mov", "avi", "mkv", "webm"].includes(ext)) {
+          resourceType = "video";
+        } else {
+          resourceType = "raw"; 
+        }
 
-      let resourceType = "image"; 
-      if (["mp4", "mov", "avi"].includes(ext)) {
-        resourceType = "video";
-      } else if (["doc", "docx", "pdf", "txt"].includes(ext)) {
-        resourceType = "raw";
-      }
+        return {
+          folder: folderName,
+          resource_type: resourceType,
+          public_id: `${file.originalname.split(".")[0]}-${Date.now()}`,
+        };
+      },
+    });
 
-      return {
-        folder: folderName,
-        resource_type: resourceType,
-        allowed_formats: [
-          "jpg", "jpeg", "png", "webp",
-          "mp4", "mov", "avi",
-          "doc", "docx", "pdf", "txt"
-        ],
-        public_id: file.originalname.split(".")[0],
-      };
-    },
-  });
-
-  return multer({
-    storage,
-    fileFilter: (req, file, cb) => {
-      const allowedExts = [
-        "jpg", "jpeg", "png", "webp",
-        "mp4", "mov", "avi",
-        "doc", "docx", "pdf", "txt"
-      ];
-      const ext = file.originalname.split(".").pop().toLowerCase();
-
-      if (allowedExts.includes(ext)) {
+    return multer({
+      storage,
+      fileFilter: (req, file, cb) => {
         cb(null, true);
-      } else {
-        cb(new Error(`File type ".${ext}" is not allowed`));
+      },
+      limits: {
+        fileSize: 5 * 1024 * 1024, 
+      },
+    });
+  } catch (error) {
+    console.error("Cloudinary storage failed, using memory storage:", error);
+    return multer({
+      storage: memoryStorage,
+      limits: {
+        fileSize: 5 * 1024 * 1024,
       }
-    },
-  });
+    });
+  }
 };
 
 export default Upload;

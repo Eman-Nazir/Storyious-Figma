@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Clock7, Eye, CalendarRange } from "lucide-react";
 import { GoComment } from "react-icons/go";
 import Share from "../assets/icons/Share";
@@ -103,6 +103,8 @@ const BlogDetailPage = () => {
       <div className="w-full lg:w-[65%] space-y-8">
         <h1 className="text-3xl sm:text-4xl font-bold text-[var(--text-dark)]">{blog.title}</h1>
 
+    
+
         <div className="flex flex-col sm:flex-row sm:justify-between border-t border-b border-[var(--text-muted)] py-3 gap-4">
           <div className="flex flex-wrap items-center gap-4 text-[var(--text-muted)] text-sm sm:text-base">
             <p className="flex items-center gap-1"><CalendarRange className="w-4 h-4" /> {formatDate(blog.createdAt)}</p>
@@ -181,3 +183,7 @@ const BlogDetailPage = () => {
 };
 
 export default BlogDetailPage;
+
+
+
+

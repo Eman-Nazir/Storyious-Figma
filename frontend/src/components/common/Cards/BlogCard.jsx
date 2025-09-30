@@ -1,3 +1,6 @@
+
+
+
 import { Link } from 'react-router-dom';
 import { Clock7, Eye, CalendarRange } from "lucide-react";
 import { GoComment } from "react-icons/go";
@@ -20,6 +23,12 @@ const BlogCard = ({ article }) => {
 
   const formatImageUrl = (imagePath) => {
     if (!imagePath) return '/placeholder-image.jpg';
+    if (imagePath.startsWith('http')) return imagePath;
+    return `http://localhost:8000/${imagePath.replace(/\\/g, '/')}`;
+  };
+
+  const formatAuthorImageUrl = (imagePath) => {
+    if (!imagePath) return '/placeholder-avatar.png';
     if (imagePath.startsWith('http')) return imagePath;
     return `http://localhost:8000/${imagePath.replace(/\\/g, '/')}`;
   };
@@ -50,6 +59,19 @@ const BlogCard = ({ article }) => {
             <p className="text-[var(--text-gray)] mb-4 line-clamp-3">
               {article.introText || "No description available."}
             </p>
+            
+            {/* Author Display */}
+            {article.author && (
+              <div className="flex items-center mt-2 mb-3">
+                <img 
+                  src={formatAuthorImageUrl(article.author.image)} 
+                  alt={article.author.name}
+                  className="w-6 h-6 rounded-full mr-2 object-cover"
+                  onError={(e) => { e.target.src = '/placeholder-avatar.png'; }}
+                />
+                <span className="text-sm text-gray-600 font-medium">{article.author.name}</span>
+              </div>
+            )}
           </div>
 
           {/* Meta Info */}

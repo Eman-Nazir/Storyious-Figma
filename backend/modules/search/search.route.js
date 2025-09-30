@@ -3,9 +3,8 @@ import { globalSearch } from "./search.controller.js";
 
 const router = express.Router();
 
-
 router.get("/", globalSearch);
 
-
+router.get("/quick", globalSearch);
 
 export default router;

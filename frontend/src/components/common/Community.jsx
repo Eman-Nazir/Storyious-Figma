@@ -53,7 +53,7 @@ const Community = () => {
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-7 h-7 border-2 border-[var(--pink-dark)] rounded-md flex items-center justify-center hover:bg-[var(--pink-dark)] hover:text-white transition"
+              className="w-7 h-7 border-2 border-[var(--pink-dark)] rounded-md flex items-center justify-center "
             >
               {icon}
             </a>

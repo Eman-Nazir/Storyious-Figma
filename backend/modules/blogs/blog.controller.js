@@ -1,3 +1,4 @@
+
 import Blog from "../blogs/blog.model.js";
 import { calculateReadTime } from "../../utils/readTime.js";
 import { asyncHandler } from "../../utils/asyncHandler.js";
@@ -5,6 +6,12 @@ import { ApiError } from "../../utils/ApiError.js";
 import { ApiResponse } from "../../utils/ApiResponse.js";
 
 export const createBlog = asyncHandler(async (req, res) => {
+  const { author } = req.body;
+  
+  if (!author) {
+    throw new ApiError(400, "Author is required");
+  }
+
   let cards = [];
   if (req.body.cards) {
     try {
@@ -27,12 +34,16 @@ export const createBlog = asyncHandler(async (req, res) => {
   const blog = new Blog({
     title: req.body.title,
     introText: req.body.introText,
+    author: req.body.author,
     cards,
     meta: { readTime, views: 0 },
     status: req.body.status || 'active'
   });
 
   await blog.save();
+  
+  // Populate author details 
+  await blog.populate('author', 'name slug image');
 
   res.status(201).json(new ApiResponse(201, { blog, success: true }, "Blog created"));
 });
@@ -46,13 +57,19 @@ export const getBlogs = asyncHandler(async (req, res) => {
     filter.status = status;
   }
   
-  const blogs = await Blog.find(filter).populate("commentsCount");
+  const blogs = await Blog.find(filter)
+    .populate("author", "name slug image")
+    .populate("commentsCount");
+    
   res.status(200).json(new ApiResponse(200, { blogs, success: true }));
 });
 
 // GET SINGLE BLOG
 export const getSingleBlog = asyncHandler(async (req, res) => {
-  const blog = await Blog.findById(req.params.id).populate("commentsCount");
+  const blog = await Blog.findById(req.params.id)
+    .populate("author", "name slug image shortBio socials")
+    .populate("commentsCount");
+    
   if (!blog) throw new ApiError(404, "Blog not found");
 
   blog.meta.views += 1;
@@ -92,11 +109,15 @@ export const updateBlog = asyncHandler(async (req, res) => {
 
   blog.title = req.body.title || blog.title;
   blog.introText = req.body.introText || blog.introText;
+  blog.author = req.body.author || blog.author;
   blog.cards = cards.length > 0 ? cards : blog.cards;
   blog.meta.readTime = readTime;
   blog.status = req.body.status || blog.status;
 
   await blog.save();
+  
+  // Populate author details in the response
+  await blog.populate('author', 'name slug image');
 
   res.status(200).json(new ApiResponse(200, { blog, success: true }, "Blog updated"));
 });

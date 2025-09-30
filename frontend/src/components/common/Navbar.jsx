@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import storyiousLogo from "../../assets/images/storyiousLogo.png";
 import Subscribe from '../../components/common/Subscribe';
@@ -68,6 +67,7 @@ const Navbar = () => {
     setShowResults(false);
   };
 
+  // Search function
   const submitSearch = async (searchTerm = searchInput) => {
     if (!searchTerm.trim()) {
       setSearchResults([]);
@@ -112,6 +112,7 @@ const Navbar = () => {
     }
   };
 
+ 
   const handleQuickSearch = async (term) => {
     if (term.length < 2) {
       setSearchResults([]);
@@ -124,7 +125,11 @@ const Navbar = () => {
         `${API_BASE_URL}/search/quick?q=${encodeURIComponent(term)}`
       );
       
-      
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.data?.suggestions || []);
+        setShowResults(true);
+      }
     } catch (error) {
       console.error('Quick search error:', error);
       submitSearch(term);
@@ -145,68 +150,33 @@ const Navbar = () => {
   }, [searchInput]);
 
   const handleSearchItemClick = (item) => {
-    switch (item.type) {
-      case 'story':
-        navigate(`/story/${item.id}`, { 
-          state: { 
-            story: item,
-            fromSearch: true 
-          }
-        });
+    let path = '';
+    
+    switch (item.resultType) {
+      case 'stories':
+        path = `/story/${item._id}`;
         break;
-      
-      case 'blog':
-        navigate(`/blog/${item.id}`, { 
-          state: { 
-            blog: item,
-            fromSearch: true 
-          }
-        });
+      case 'blogs':
+        path = `/blog/${item._id}`;
         break;
-      
-      case 'author':
-        if (item.slug) {
-          navigate(`/author/${item.slug}`, { 
-            state: { 
-              author: item,
-              fromSearch: true 
-            }
-          });
-        } else {
-          navigate(`/author/${item.id}`, { 
-            state: { 
-              author: item,
-              fromSearch: true 
-            }
-          });
-        }
+      case 'authors':
+        path = `/writers/${item.slug || item._id}`;
         break;
-      
-      case 'category':
-        navigate(`/category/${item.id}`, { 
-          state: { 
-            category: item,
-            fromSearch: true 
-          }
-        });
+      case 'categories':
+        const categoryName = encodeURIComponent(item.name.toLowerCase().replace(/\s+/g, '-'));
+        path = `/category/${categoryName}`;
         break;
-      
-      case 'faq':
-        navigate(`/faq/${item.slug || item.id}`, { 
-          state: { 
-            faq: item,
-            fromSearch: true 
-          }
-        });
+      case 'faqs':
+        path = `/faq/${item.slug || item._id}`;
         break;
-      
       default:
-        navigate(`/search?q=${encodeURIComponent(searchInput)}`);
+        path = `/search?q=${encodeURIComponent(searchInput)}`;
     }
 
     setSearchInput('');
     setShowResults(false);
     setShowSearch(false);
+    navigate(path);
   };
 
   const handleFullSearch = () => {
@@ -227,18 +197,18 @@ const Navbar = () => {
 
   const getResultIcon = (type) => {
     switch (type) {
-      case 'story': return '';
-      case 'blog': return '';
-      case 'author': return '';
-      case 'category': return '';
-      case 'faq': return '';
-      default: return '';
+      case 'stories': return '📖';
+      case 'blogs': return '📝';
+      case 'authors': return '👤';
+      case 'categories': return '📂';
+      case 'faqs': return '❓';
+      default: return '🔍';
     }
   };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (showResults) {
+      if (showResults && !event.target.closest('.search-container')) {
         setShowResults(false);
       }
     };
@@ -250,7 +220,7 @@ const Navbar = () => {
   }, [showResults]);
 
   return (
-    <div className='relative bg-[var(--white)] shadow-sm'>
+    <div className='relative bg-[var(--white)] shadow-sm '>
       {/* Top Navbar */}
       <nav className='py-2 max-w-[1200px] mx-auto flex flex-wrap justify-between items-center px-4 md:px-6'>
         <div className='flex items-center gap-3 flex-1 relative'>
@@ -272,7 +242,7 @@ const Navbar = () => {
           </div>
 
           {/* Search Bar - Desktop */}
-          <div className='hidden md:flex ml-2 rounded-lg border border-[var(--gray-light)] relative'>
+          <div className='hidden md:flex ml-2 rounded-lg border border-[var(--gray-light)] relative search-container'>
             <input
               type='text'
               placeholder='Search stories, authors, blogs...'
@@ -310,13 +280,13 @@ const Navbar = () => {
                     className='p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0'
                   >
                     <div className='flex items-center gap-3'>
-                      <span className='text-lg'>{getResultIcon(item.type)}</span>
+                      <span className='text-lg'>{getResultIcon(item.resultType)}</span>
                       <div className='flex-1'>
-                        <div className='font-medium text-sm'>{item.title}</div>
+                        <div className='font-medium text-sm'>{item.title || item.name || item.question}</div>
                         <div className='text-xs text-gray-600 mt-1'>
-                          {item.description || item.author || item.category || ''}
+                          {item.introText || item.bio || item.description || item.answer || ''}
                         </div>
-                        <div className='text-xs text-gray-400 capitalize'>{item.type}</div>
+                        <div className='text-xs text-gray-400 capitalize'>{item.resultType}</div>
                       </div>
                     </div>
                   </div>
@@ -375,7 +345,7 @@ const Navbar = () => {
       
       {/* Mobile Search Bar */}
       {showSearch && (
-        <div className='md:hidden px-4 py-2 bg-[var(--white)] shadow-sm flex gap-2 relative'>
+        <div className='md:hidden px-4 py-2 bg-[var(--white)] shadow-sm flex gap-2 relative search-container'>
           <input
             type='text'
             placeholder='Search stories, authors, blogs...'
@@ -402,10 +372,10 @@ const Navbar = () => {
                   className='p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0'
                 >
                   <div className='flex items-center gap-3'>
-                    <span className='text-lg'>{getResultIcon(item.type)}</span>
+                    <span className='text-lg'>{getResultIcon(item.resultType)}</span>
                     <div className='flex-1'>
-                      <div className='font-medium text-sm'>{item.title}</div>
-                      <div className='text-xs text-gray-600'>{item.type}</div>
+                      <div className='font-medium text-sm'>{item.title || item.name || item.question}</div>
+                      <div className='text-xs text-gray-600'>{item.resultType}</div>
                     </div>
                   </div>
                 </div>

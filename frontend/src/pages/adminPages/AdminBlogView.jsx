@@ -1,3 +1,6 @@
+
+
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit, FaTrash, FaImage, FaPlus, FaFilter } from "react-icons/fa";
@@ -111,19 +114,19 @@ const AdminViewBlogs = () => {
 
       {/* Table */}
       <div className="rounded-lg border border-gray-200 shadow overflow-hidden">
-        <table className="w-full table-fixed border-collapse">
+        <table className="w-full border-collapse">
           <thead>
             <tr className="bg-pink-100 text-pink-800 uppercase text-sm">
-              <th className="px-6 py-4 text-left font-semibold w-12">#</th>
-              <th className="px-6 py-4 text-left font-semibold w-20">Image</th>
-              <th className="px-6 py-4 text-left font-semibold w-48">Title</th>
-              <th className="px-6 py-4 text-left font-semibold w-64">Intro</th>
-              <th className="px-6 py-4 text-center font-semibold w-28">Status</th>
-              <th className="px-6 py-4 text-center font-semibold w-20">Views</th>
-              <th className="px-6 py-4 text-center font-semibold w-28">Read Time</th>
-              <th className="px-6 py-4 text-center font-semibold w-28">Comments</th>
-              <th className="px-6 py-4 text-left font-semibold w-32">Created</th>
-              <th className="px-6 py-4 text-center font-semibold w-28">Actions</th>
+              <th className="px-4 py-4 text-left font-semibold w-12">#</th>
+              <th className="px-4 py-4 text-left font-semibold w-20">Image</th>
+              <th className="px-4 py-4 text-left font-semibold w-64">Title</th>
+              <th className="px-4 py-4 text-left font-semibold w-48">Author</th>
+              <th className="px-4 py-4 text-center font-semibold w-28">Status</th>
+              <th className="px-4 py-4 text-center font-semibold w-20">Views</th>
+              <th className="px-4 py-4 text-center font-semibold w-28">Read Time</th>
+              <th className="px-4 py-4 text-center font-semibold w-28">Comments</th>
+              <th className="px-4 py-4 text-left font-semibold w-32">Created</th>
+              <th className="px-4 py-4 text-center font-semibold w-28">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -133,8 +136,8 @@ const AdminViewBlogs = () => {
                   key={blog._id}
                   className="hover:bg-pink-50 transition-colors duration-150"
                 >
-                  <td className="px-6 py-4">{index + 1}</td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-4 text-center">{index + 1}</td>
+                  <td className="px-4 py-4">
                     <img
                       src={getImageUrl(blog.cards?.[0]?.image)}
                       alt={blog.title}
@@ -145,39 +148,60 @@ const AdminViewBlogs = () => {
                     />
                   </td>
                   <td
-                    className="px-6 py-4 font-medium text-gray-900 truncate"
+                    className="px-4 py-4 font-medium text-gray-900"
                     title={blog.title}
                   >
-                    {blog.title}
+                    <div className="max-w-xs">
+                      <p className="truncate">{blog.title}</p>
+                      {blog.introText && (
+                        <p className="text-xs text-gray-500 mt-1 truncate" title={blog.introText}>
+                          {blog.introText}
+                        </p>
+                      )}
+                    </div>
                   </td>
-                  <td
-                    className="px-6 py-4 text-sm text-gray-500 truncate"
-                    title={blog.introText || "No intro"}
-                  >
-                    {blog.introText || "No intro"}
+                  <td className="px-4 py-4">
+                    <div className="flex items-center">
+                      {blog.author?.image && (
+                        <img 
+                          src={getImageUrl(blog.author.image)} 
+                          alt={blog.author.name}
+                          className="h-8 w-8 rounded-full mr-3 object-cover"
+                          onError={(e) => {
+                            e.target.src = "/placeholder-avatar.png";
+                          }}
+                        />
+                      )}
+                      <span 
+                        className="text-sm text-gray-700 truncate max-w-[120px]" 
+                        title={blog.author?.name || "No author"}
+                      >
+                        {blog.author?.name || "No author"}
+                      </span>
+                    </div>
                   </td>
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-4 py-4 text-center">
                     <span className={getStatusBadge(blog.status)}>
                       {blog.status || "inactive"}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-center text-gray-700">
+                  <td className="px-4 py-4 text-center text-gray-700 font-medium">
                     {blog.meta?.views || 0}
                   </td>
-                  <td className="px-6 py-4 text-center text-gray-700">
+                  <td className="px-4 py-4 text-center text-gray-700">
                     {blog.meta?.readTime || "N/A"}
                   </td>
-                  <td className="px-6 py-4 text-center text-gray-700">
+                  <td className="px-4 py-4 text-center text-gray-700 font-medium">
                     {blog.commentsCount || 0}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
+                  <td className="px-4 py-4 text-sm text-gray-500">
                     {new Date(blog.createdAt).toLocaleDateString("en-GB", {
                       day: "2-digit",
                       month: "short",
                       year: "numeric",
                     })}
                   </td>
-                  <td className="px-6 py-4">
+                  <td className="px-4 py-4">
                     <div className="flex justify-center space-x-2">
                       <button
                         onClick={() => handleEdit(blog)}
