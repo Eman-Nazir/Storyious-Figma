@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Facebook, X, Linkedin, Instagram } from "lucide-react";
@@ -24,7 +23,15 @@ const FAQAnswer = () => {
   }, [slug]);
 
   if (loading) {
-    return <p className="p-6 text-center">Loading FAQ...</p>;
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-128px)]">
+        <div className="flex flex-col items-center">
+          {/* Pink spinner */}
+          <div className="w-12 h-12 border-4 border-t-4 border-gray-300 rounded-full animate-spin border-t-pink-500"></div>
+          <p className="mt-4 text-gray-500">Loading FAQ...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!faq) {

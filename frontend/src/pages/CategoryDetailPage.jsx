@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -22,7 +24,6 @@ const CategoryDetailedPage = () => {
       "classic-stories": "classic",
       "bedtime-stories": "bedtime"
     };
-    
     return categoryMap[pageCategory] || "general";
   };
 
@@ -31,27 +32,25 @@ const CategoryDetailedPage = () => {
       try {
         const categoriesResponse = await axios.get("http://localhost:8000/api/categories");
         const categories = categoriesResponse.data.data || categoriesResponse.data || [];
-        
+
         const formattedCategoryName = categoryName.replace(/-/g, ' ').toLowerCase();
-        const currentCategory = categories.find(cat => 
-          cat.name.toLowerCase() === formattedCategoryName
-        );
-        
+        const currentCategory = categories.find(cat => cat.name.toLowerCase() === formattedCategoryName);
+
         if (currentCategory) {
           setCategory(currentCategory);
-          
-          const storiesResponse = await axios.get(`http://localhost:8000/api/stories?category=${currentCategory._id}&populate=category,author`);
+          const storiesResponse = await axios.get(
+            `http://localhost:8000/api/stories?category=${currentCategory._id}&populate=category,author`
+          );
           const allStories = storiesResponse.data.data || storiesResponse.data || [];
           setStories(allStories);
         } else {
           setError('Category not found');
         }
-        
-        setLoading(false);
       } catch (err) {
         setError('Failed to fetch category data');
-        setLoading(false);
         console.error("Error fetching category data:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -62,12 +61,33 @@ const CategoryDetailedPage = () => {
   const nextThreeStories = stories.slice(3, 6);
   const faqCategory = getFAQCategory(categoryName);
 
-  if (loading) return <div className="text-center py-8">Loading...</div>;
-  if (error) return <div className="text-center py-8 text-red-500">{error}</div>;
-  if (!category) return <div className="text-center py-8">Category not found</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-128px)]">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-t-4 border-gray-300 rounded-full animate-spin border-t-pink-500"></div>
+          <p className="mt-4 text-gray-500">Loading category...</p>
+        </div>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-128px)] text-red-500">
+        {error}
+      </div>
+    );
+
+  if (!category)
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-128px)] text-gray-500">
+        Category not found
+      </div>
+    );
 
   return (
     <div className="bg-[var(--bg-section)] text-[var(--text-dark)]">
+      {/* Header Section */}
       <div className="bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] mb-8 py-14 px-4 sm:px-6 md:px-8 lg:px-[140px]">
         <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--text-dark)]">{category.name}</h1>
         <div className="md:flex-row items-start lg:items-center">

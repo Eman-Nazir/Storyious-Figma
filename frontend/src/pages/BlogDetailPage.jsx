@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Clock7, Eye, CalendarRange } from "lucide-react";
 import { GoComment } from "react-icons/go";
 import Share from "../assets/icons/Share";
@@ -34,16 +34,11 @@ const BlogDetailPage = () => {
         const res = await axios.get(`${API_URL}/${id}`);
         const data = res.data;
 
-        if (data.success && data.data?.blog) {
-          setBlog(data.data.blog);
-          fetchCommentsCount();
-        } else if (data.success && data.blog) {
-          setBlog(data.blog);
-          fetchCommentsCount();
-        } else {
-          setBlog(data);
-          fetchCommentsCount();
-        }
+        if (data.success && data.data?.blog) setBlog(data.data.blog);
+        else if (data.success && data.blog) setBlog(data.blog);
+        else setBlog(data);
+        
+        fetchCommentsCount();
       } catch (err) {
         console.error("Error fetching blog:", err);
         setError(err.message);
@@ -58,9 +53,7 @@ const BlogDetailPage = () => {
     const fetchAd = async () => {
       try {
         const res = await axios.get("http://localhost:8000/api/stories/ads");
-        if (res.data?.data?.length > 0) {
-          setAd(res.data.data[0]);
-        }
+        if (res.data?.data?.length > 0) setAd(res.data.data[0]);
       } catch (err) {
         console.error("Error fetching ad:", err);
       }
@@ -71,30 +64,37 @@ const BlogDetailPage = () => {
   const fetchCommentsCount = async () => {
     try {
       const res = await axios.get(`http://localhost:8000/api/comments?blogId=${id}`);
-      if (res.data.success && res.data.data) {
-        setCommentsCount(res.data.data.length);
-      }
+      if (res.data.success && res.data.data) setCommentsCount(res.data.data.length);
     } catch (err) {
       console.error("Error fetching comments count:", err);
     }
   };
 
-  useEffect(() => {
-    fetchCommentsCount();
-  }, [refreshComments]);
+  useEffect(() => { fetchCommentsCount(); }, [refreshComments]);
 
   const formatImageUrl = (imagePath) => {
     if (!imagePath) return '/placeholder-image.jpg';
     return imagePath.startsWith('http') ? imagePath : `http://localhost:8000/${imagePath.replace(/\\/g, '/')}`;
   };
 
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
+  const formatDate = (dateString) => new Date(dateString).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
 
-  if (loading) return <div className="flex justify-center items-center h-64 text-gray-500">Loading blog...</div>;
-  if (error || !blog) return <div className="flex justify-center items-center h-64 text-red-500">Error: {error || 'Blog not found'}</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-128px)]">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-t-4 border-gray-300 rounded-full animate-spin border-t-pink-500"></div>
+          <p className="mt-4 text-gray-500">Loading blog...</p>
+        </div>
+      </div>
+    );
+
+  if (error || !blog)
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-128px)] text-red-500">
+        Error: {error || 'Blog not found'}
+      </div>
+    );
 
   return (
     <div className="flex flex-col lg:flex-row gap-10 px-6 lg:px-20 py-10 lg:py-14">
@@ -102,8 +102,6 @@ const BlogDetailPage = () => {
       {/* LEFT SIDE */}
       <div className="w-full lg:w-[65%] space-y-8">
         <h1 className="text-3xl sm:text-4xl font-bold text-[var(--text-dark)]">{blog.title}</h1>
-
-    
 
         <div className="flex flex-col sm:flex-row sm:justify-between border-t border-b border-[var(--text-muted)] py-3 gap-4">
           <div className="flex flex-wrap items-center gap-4 text-[var(--text-muted)] text-sm sm:text-base">
@@ -183,7 +181,3 @@ const BlogDetailPage = () => {
 };
 
 export default BlogDetailPage;
-
-
-
-

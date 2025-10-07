@@ -1,9 +1,6 @@
-
-
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { FaEdit, FaTrash, FaImage, FaPlus, FaFilter } from "react-icons/fa";
+import { FaEdit, FaTrash, FaImage, FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,7 +9,15 @@ const AdminViewBlogs = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [blogsPerPage, setBlogsPerPage] = useState(4);
   const navigate = useNavigate();
+
+  const handleSearchChange = useCallback((e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  }, []);
 
   useEffect(() => {
     fetchBlogs();
@@ -20,6 +25,7 @@ const AdminViewBlogs = () => {
 
   const fetchBlogs = async () => {
     try {
+      setLoading(true);
       const url =
         statusFilter === "all"
           ? "http://localhost:8000/api/blogs"
@@ -62,11 +68,28 @@ const AdminViewBlogs = () => {
   const getStatusBadge = (status) => {
     const baseClasses =
       "px-2.5 py-0.5 rounded-full text-xs font-medium inline-flex items-center";
-    if (status === "active") {
-      return `${baseClasses} bg-green-100 text-green-800`;
-    } else {
-      return `${baseClasses} bg-red-100 text-red-800`;
-    }
+    return status === "active"
+      ? `${baseClasses} bg-green-100 text-green-800`
+      : `${baseClasses} bg-red-100 text-red-800`;
+  };
+
+  const filteredBlogs = blogs.filter((blog) => {
+    const search = searchTerm.toLowerCase();
+    return (
+      blog.title?.toLowerCase().includes(search) ||
+      blog.introText?.toLowerCase().includes(search)
+    );
+  });
+
+  const totalBlogs = filteredBlogs.length;
+  const totalPages = Math.ceil(totalBlogs / blogsPerPage);
+
+  const indexOfLast = currentPage * blogsPerPage;
+  const indexOfFirst = indexOfLast - blogsPerPage;
+  const currentBlogs = filteredBlogs.slice(indexOfFirst, indexOfLast);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   if (loading)
@@ -91,9 +114,8 @@ const AdminViewBlogs = () => {
         </button>
       </div>
 
-      {/* Filter Section */}
-      <div className="mb-6 bg-gray-50 border border-gray-200 p-4 rounded-lg">
-        <div className="flex items-center space-x-4">
+      <div className="mb-6 bg-gray-50 border border-gray-200 p-4 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-3">
           <label className="text-sm font-medium text-gray-700">
             Filter by Status:
           </label>
@@ -106,9 +128,37 @@ const AdminViewBlogs = () => {
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
-          <span className="text-sm text-gray-600">
-            Showing {blogs.length} blogs
-          </span>
+        </div>
+
+        {/* Search input */}
+        <div className="flex items-center gap-2 w-full sm:w-64">
+          <input
+            type="text"
+            placeholder="Search blogs..."
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="border border-gray-300 w-full rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-pink-300 outline-none"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700">
+            Blogs per page:
+          </label>
+          <input
+            type="number"
+            min="1"
+            max="50"
+            value={blogsPerPage}
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              if (value > 0 && value <= 50) {
+                setBlogsPerPage(value);
+                setCurrentPage(1);
+              }
+            }}
+            className="border border-gray-300 rounded-lg px-2 py-1 w-20 text-sm focus:ring-2 focus:ring-pink-300 outline-none"
+          />
         </div>
       </div>
 
@@ -123,20 +173,28 @@ const AdminViewBlogs = () => {
               <th className="px-4 py-4 text-left font-semibold w-48">Author</th>
               <th className="px-4 py-4 text-center font-semibold w-28">Status</th>
               <th className="px-4 py-4 text-center font-semibold w-20">Views</th>
-              <th className="px-4 py-4 text-center font-semibold w-28">Read Time</th>
-              <th className="px-4 py-4 text-center font-semibold w-28">Comments</th>
+              <th className="px-4 py-4 text-center font-semibold w-28">
+                Read Time
+              </th>
+              <th className="px-4 py-4 text-center font-semibold w-28">
+                Comments
+              </th>
               <th className="px-4 py-4 text-left font-semibold w-32">Created</th>
-              <th className="px-4 py-4 text-center font-semibold w-28">Actions</th>
+              <th className="px-4 py-4 text-center font-semibold w-28">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {blogs.length > 0 ? (
-              blogs.map((blog, index) => (
+            {currentBlogs.length > 0 ? (
+              currentBlogs.map((blog, index) => (
                 <tr
                   key={blog._id}
                   className="hover:bg-pink-50 transition-colors duration-150"
                 >
-                  <td className="px-4 py-4 text-center">{index + 1}</td>
+                  <td className="px-4 py-4 text-center">
+                    {(currentPage - 1) * blogsPerPage + index + 1}
+                  </td>
                   <td className="px-4 py-4">
                     <img
                       src={getImageUrl(blog.cards?.[0]?.image)}
@@ -154,7 +212,10 @@ const AdminViewBlogs = () => {
                     <div className="max-w-xs">
                       <p className="truncate">{blog.title}</p>
                       {blog.introText && (
-                        <p className="text-xs text-gray-500 mt-1 truncate" title={blog.introText}>
+                        <p
+                          className="text-xs text-gray-500 mt-1 truncate"
+                          title={blog.introText}
+                        >
                           {blog.introText}
                         </p>
                       )}
@@ -163,8 +224,8 @@ const AdminViewBlogs = () => {
                   <td className="px-4 py-4">
                     <div className="flex items-center">
                       {blog.author?.image && (
-                        <img 
-                          src={getImageUrl(blog.author.image)} 
+                        <img
+                          src={getImageUrl(blog.author.image)}
                           alt={blog.author.name}
                           className="h-8 w-8 rounded-full mr-3 object-cover"
                           onError={(e) => {
@@ -172,8 +233,8 @@ const AdminViewBlogs = () => {
                           }}
                         />
                       )}
-                      <span 
-                        className="text-sm text-gray-700 truncate max-w-[120px]" 
+                      <span
+                        className="text-sm text-gray-700 truncate max-w-[120px]"
                         title={blog.author?.name || "No author"}
                       >
                         {blog.author?.name || "No author"}
@@ -239,8 +300,30 @@ const AdminViewBlogs = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => handlePageChange(i + 1)}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium border transition ${
+                currentPage === i + 1
+                  ? "bg-pink-600 text-white border-pink-600"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
 export default AdminViewBlogs;
+
+
+

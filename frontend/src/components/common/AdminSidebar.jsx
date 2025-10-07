@@ -30,16 +30,8 @@ const AdminSidebar = ({ activePage, setActivePage }) => {
       key: "storyCategories",
       icon: Folders,
       children: [
-        {
-          name: "View All",
-          key: "storyCategories-view",
-          path: "/admin/story-categories",
-        },
-        {
-          name: "Create New",
-          key: "storyCategories-create",
-          path: "/admin/story-categories/create",
-        },
+        { name: "View All", key: "storyCategories-view", path: "/admin/story-categories" },
+        { name: "Create New", key: "storyCategories-create", path: "/admin/story-categories/create" },
       ],
     },
     {
@@ -62,11 +54,11 @@ const AdminSidebar = ({ activePage, setActivePage }) => {
     },
     {
       name: "Blogs",
-      key: "blog",
+      key: "blogs",
       icon: PenSquare,
       children: [
-        { name: "View All", key: "blog-view", path: "/admin/blogs" },
-        { name: "Create New", key: "blog-create", path: "/admin/blogs/create" },
+        { name: "View All", key: "blogs-view", path: "/admin/blogs" },
+        { name: "Create New", key: "blogs-create", path: "/admin/blogs/create" },
       ],
     },
     {
@@ -91,7 +83,9 @@ const AdminSidebar = ({ activePage, setActivePage }) => {
       name: "Subscribers",
       key: "newsLetter",
       icon: Mail,
-      children: [{ name: "View All", key: "newsLetter-view", path: "/admin/newsLetter" }],
+      children: [
+        { name: "View All", key: "newsLetter-view", path: "/admin/newsLetter" },
+      ],
     },
   ];
 
@@ -100,10 +94,11 @@ const AdminSidebar = ({ activePage, setActivePage }) => {
   };
 
   return (
-    <aside className="w-64 bg-white shadow-lg p-6 hidden md:block">
-      <h2 className="text-2xl font-bold text-[var(--primary-color)] mb-6">
-        Admin Panel
+    <aside className="w-full h-full bg-white shadow-lg p-6 overflow-y-auto">
+      <h2 className="text-3xl font-extrabold text-[var(--primary-color)] mb-6">
+        Storyious
       </h2>
+
       <ul className="space-y-2">
         {menuItems.map((item) => {
           const Icon = item.icon;

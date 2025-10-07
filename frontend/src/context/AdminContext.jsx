@@ -7,7 +7,7 @@ export const AdminProvider = ({ children }) => {
   const [admin, setAdmin] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const BASE_URL = import.meta.env.VITE_BACKEND_ADMIN_URL;
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
   //  AUTH 
   const login = async (email, password) => {

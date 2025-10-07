@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import {
   FaFacebookF,
   FaXTwitter,
   FaLinkedinIn,
   FaPinterestP,
   FaInstagram
-} from 'react-icons/fa6';
-import AllStories from './AllStories';
+} from "react-icons/fa6";
+import AllStories from "./AllStories";
 
 const iconMap = {
   facebook: FaFacebookF,
@@ -29,13 +29,13 @@ const AuthorDetailPage = () => {
       try {
         const response = await fetch(`http://localhost:8000/api/authors/slug/${slug}`);
         if (!response.ok) {
-          throw new Error('Author not found');
+          throw new Error("Author not found");
         }
         const data = await response.json();
         setAuthor(data.data);
       } catch (err) {
         setError(err.message);
-        console.error('Error fetching author:', err);
+        console.error("Error fetching author:", err);
       } finally {
         setLoading(false);
       }
@@ -44,33 +44,56 @@ const AuthorDetailPage = () => {
     fetchAuthor();
   }, [slug]);
 
-  const validSocials = author && author.socials ? author.socials.filter(social => 
-    social && social.platform && social.url && social.url.trim() !== "" && social.url !== "undefined"
-  ) : [];
+  const validSocials =
+    author && author.socials
+      ? author.socials.filter(
+          (social) =>
+            social &&
+            social.platform &&
+            social.url &&
+            social.url.trim() !== "" &&
+            social.url !== "undefined"
+        )
+      : [];
 
-  if (loading) return <div className="text-center py-10">Loading author...</div>;
-  if (error) return <div className="text-center py-10 text-red-500">Error: {error}</div>;
-  if (!author) return <div className="text-center py-10">Author not found</div>;
+  if (loading)
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-128px)]">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-t-4 border-gray-300 rounded-full animate-spin border-t-pink-500"></div>
+          <p className="mt-4 text-gray-500">Loading author...</p>
+        </div>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-128px)] text-red-500">
+        Error: {error}
+      </div>
+    );
+
+  if (!author)
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-128px)]">
+        Author not found
+      </div>
+    );
 
   return (
     <div>
       {/* Top Section */}
-      <div className='px-4 sm:px-6 md:px-10 lg:px-30 pt-10 bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] flex flex-col md:flex-row gap-6 md:gap-10 items-center py-6 my-6'>
-        
+      <div className="px-4 sm:px-6 md:px-10 lg:px-30 pt-10 bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)] flex flex-col md:flex-row gap-6 md:gap-10 items-center py-6 my-6">
         <img
           src={author.image}
           alt={author.name}
-          className='w-full max-w-[250px] rounded-lg object-cover'
+          className="w-full max-w-[250px] rounded-lg object-cover"
         />
 
-        <div className='space-y-3 text-center md:text-left'>
-          <h1 className='font-bold text-2xl text-[var(--text-dark)]'>
-            {author.name}
-          </h1>
+        <div className="space-y-3 text-center md:text-left">
+          <h1 className="font-bold text-2xl text-[var(--text-dark)]">{author.name}</h1>
 
-          <p className='hidden md:block max-w-[700px] text-[var(--text-gray)]'>
-            {author.shortBio}
-          </p>
+          <p className="hidden md:block max-w-[700px] text-[var(--text-gray)]">{author.shortBio}</p>
 
           <div className="flex justify-center md:justify-start flex-wrap gap-2 pt-2">
             {validSocials.length > 0 ? (
@@ -95,23 +118,23 @@ const AuthorDetailPage = () => {
         </div>
       </div>
 
-      {/* About the Writer  */}
-      <div className='m-0 md:m-10 px-6 sm:px-10 md:px-20'>
-        <h1 className='font-bold text-xl mb-2 text-[var(--text-dark)]'>About the Writer</h1>
+      {/* About the Writer */}
+      <div className="m-0 md:m-10 px-6 sm:px-10 md:px-20">
+        <h1 className="font-bold text-xl mb-2 text-[var(--text-dark)]">About the Writer</h1>
 
-        <p className='hidden md:block text-justify leading-relaxed text-sm text-[var(--text-gray)]'>
+        <p className="hidden md:block text-justify leading-relaxed text-sm text-[var(--text-gray)]">
           {author.fullBio}
         </p>
 
-        <div className='block md:hidden'>
-          <p className='text-justify text-sm text-[var(--text-gray)]'>
+        <div className="block md:hidden">
+          <p className="text-justify text-sm text-[var(--text-gray)]">
             {showFullBio ? author.fullBio : author.shortBio}
           </p>
           <button
-            className='mt-2 mb-2 px-4 py-1 rounded-md text-white bg-[var(--pink-dark)] text-sm'
+            className="mt-2 mb-2 px-4 py-1 rounded-md text-white bg-[var(--pink-dark)] text-sm"
             onClick={() => setShowFullBio(!showFullBio)}
           >
-            {showFullBio ? 'Show Less' : 'Read More'}
+            {showFullBio ? "Show Less" : "Read More"}
           </button>
         </div>
       </div>

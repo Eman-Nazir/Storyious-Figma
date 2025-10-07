@@ -1,8 +1,7 @@
-
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signupSchema } from "../schemas/userSchemas";
+import { signupSchema } from "../schemas/userSchemas"; 
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -13,20 +12,21 @@ const Signup = () => {
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(signupSchema),
   });
+const onSubmit = async (data) => {
+  try {
+    const res = await axios.post(
+      "http://localhost:8000/api/users/signup",
+      { ...data, role: "user" }, 
+      { withCredentials: true }
+    );
 
-  const onSubmit = async (data) => {
-    try {
+    toast.success(res.data.message);
+    navigate("/login");
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Signup failed");
+  }
+};
 
-     const res =  await axios.post("http://localhost:8000/api/users/signup", {
-  username, email, password, role: "user" 
-}, { withCredentials: true });
-
-      toast.success(res.data.message);
-      navigate("/login"); 
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Signup failed");
-    }
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--bg-section)] px-4">

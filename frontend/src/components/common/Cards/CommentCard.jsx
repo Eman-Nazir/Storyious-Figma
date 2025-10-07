@@ -2,19 +2,29 @@ import React, { useState } from 'react';
 import { FiMessageCircle, FiCornerUpRight, FiThumbsUp, FiThumbsDown, FiEdit, FiTrash2 } from 'react-icons/fi';
 import axios from 'axios';
 import CommentReply from '../../../sections/StoryDetailedPage/1stStory/CommentReply';
+import { toast } from 'react-toastify';
 
 const CommentCard = ({ 
-  commentId, 
-  name, 
-  email, 
-  comment, 
-  date, 
-  likes, 
-  dislikes, 
-  replies, 
-  userId,
-  onAction 
+  comment,
+  onUpdateComment,
+  onUpdateReply,
+  onDeleteComment,
+  onDeleteReply,
+  onRefresh
 }) => {
+  const {
+    _id: commentId,
+    name,
+    email,
+    showEmail,
+    text: commentText,
+    createdAt,
+    likesCount = 0,
+    dislikesCount = 0,
+    replies = [],
+    user
+  } = comment;
+
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
   const [isDisliking, setIsDisliking] = useState(false);
@@ -23,15 +33,16 @@ const CommentCard = ({
   const handleLike = async () => {
     setIsLiking(true);
     try {
-      await axios.put(
-        `http://localhost:8000/api/comments/like/${commentId}`,
-        {},
-        { withCredentials: true }
+      const response = await axios.put(
+        `http://localhost:8000/api/comments/like/${commentId}`
       );
-      onAction();
+      
+      if (response.data.success && response.data.data) {
+        onUpdateComment(commentId, response.data.data);
+      }
     } catch (error) {
       console.error("Error liking comment:", error);
-      alert("Failed to like comment. Please login.");
+      toast.error("Failed to like comment. Please try again.");
     } finally {
       setIsLiking(false);
     }
@@ -40,65 +51,81 @@ const CommentCard = ({
   const handleDislike = async () => {
     setIsDisliking(true);
     try {
-      await axios.put(
-        `http://localhost:8000/api/comments/dislike/${commentId}`,
-        {},
-        { withCredentials: true }
+      const response = await axios.put(
+        `http://localhost:8000/api/comments/dislike/${commentId}`
       );
-      onAction();
+      
+      if (response.data.success && response.data.data) {
+        onUpdateComment(commentId, response.data.data);
+      }
     } catch (error) {
       console.error("Error disliking comment:", error);
-      alert("Failed to dislike comment. Please login.");
+      toast.error("Failed to dislike comment. Please try again.");
     } finally {
       setIsDisliking(false);
     }
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this comment?")) return;
-    try {
-      await axios.delete(
-        `http://localhost:8000/api/comments/${commentId}`,
-        { withCredentials: true }
-      );
-      onAction();
-    } catch (error) {
-      console.error("Error deleting comment:", error);
-      alert("Failed to delete comment");
-    }
-  };
 
+  
+  const handleDelete = async () => {
+  try {
+    await axios.delete(
+      `http://localhost:8000/api/comments/${commentId}`,
+      { withCredentials: true }
+    );
+    onDeleteComment(commentId);
+    toast.success("Comment deleted successfully!");
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    toast.error("Failed to delete comment");
+  }
+};
+
+  
+  
+  
   const handleReplyAdded = () => {
     setShowReplyForm(false);
-    onAction();
+    onRefresh();
   };
+
+  const date = new Date(createdAt).toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric' 
+  });
 
   return (
     <div className="p-4 rounded shadow-sm bg-gradient-to-r from-[var(--gradient-start)] to-[var(--gradient-end)]">
       <div className="flex justify-between items-start">
         <div>
           <h4 className="text-md font-semibold text-[var(--text-dark)]">{name}</h4>
-          {email && <p className="text-sm text-[var(--text-gray-light)]">{email}</p>}
+          {showEmail && email && <p className="text-sm text-[var(--text-gray-light)]">{email}</p>}
         </div>
         <p className="text-xs text-[var(--gray-muted)]">{date}</p>
       </div>
-      <p className="mt-2 text-[var(--text-gray)] text-sm">{comment}</p>
+      <p className="mt-2 text-[var(--text-gray)] text-sm">{commentText}</p>
 
       {/* Like/Dislike buttons */}
       <div className="mt-3 flex items-center gap-4">
         <button 
           onClick={handleLike} 
           disabled={isLiking}
-          className="flex items-center gap-1 text-sm text-[var(--text-gray-light)] hover:text-[var(--primary-color)]"
+          className={`flex items-center gap-1 text-sm ${
+            isLiking ? 'text-[var(--primary-color)]' : 'text-[var(--text-gray-light)] hover:text-[var(--primary-color)]'
+          } disabled:opacity-50`}
         >
-          <FiThumbsUp /> {likes || 0}
+          <FiThumbsUp /> {likesCount}
         </button>
         <button 
           onClick={handleDislike} 
           disabled={isDisliking}
-          className="flex items-center gap-1 text-sm text-[var(--text-gray-light)] hover:text-[var(--primary-color)]"
+          className={`flex items-center gap-1 text-sm ${
+            isDisliking ? 'text-[var(--primary-color)]' : 'text-[var(--text-gray-light)] hover:text-[var(--primary-color)]'
+          } disabled:opacity-50`}
         >
-          <FiThumbsDown /> {dislikes || 0}
+          <FiThumbsDown /> {dislikesCount}
         </button>
       </div>
 
@@ -111,7 +138,7 @@ const CommentCard = ({
           >
             <FiCornerUpRight /> Reply
           </button>
-          {replies && replies.length > 0 && (
+          {replies.length > 0 && (
             <button 
               onClick={() => setShowReplies(!showReplies)}
               className="flex items-center gap-1 text-sm hover:text-[var(--primary-color)]"
@@ -121,6 +148,14 @@ const CommentCard = ({
           )}
         </div>
 
+        {user && (
+          <button 
+            onClick={handleDelete}
+            className="text-sm text-red-500 hover:text-red-700"
+          >
+            <FiTrash2 />
+          </button>
+        )}
       </div>
 
       {showReplyForm && (
@@ -133,13 +168,15 @@ const CommentCard = ({
         </div>
       )}
 
-      {showReplies && replies && replies.length > 0 && (
+      {showReplies && replies.length > 0 && (
         <div className="mt-4 pl-4 border-l-2 border-gray-200 space-y-3">
           {replies.map(reply => (
             <ReplyCard 
               key={reply._id} 
               reply={reply} 
-              onAction={onAction}
+              commentId={commentId}
+              onUpdateReply={onUpdateReply}
+              onDeleteReply={onDeleteReply}
             />
           ))}
         </div>
@@ -148,22 +185,24 @@ const CommentCard = ({
   );
 };
 
-const ReplyCard = ({ reply, onAction }) => {
+const ReplyCard = ({ reply, commentId, onUpdateReply, onDeleteReply }) => {
   const [isLiking, setIsLiking] = useState(false);
   const [isDisliking, setIsDisliking] = useState(false);
 
   const handleLike = async () => {
     setIsLiking(true);
     try {
-      await axios.put(
-        `http://localhost:8000/api/comments/reply/like/${reply._id}`,
-        {},
-        { withCredentials: true }
+      const response = await axios.put(
+        `http://localhost:8000/api/comments/reply/like/${reply._id}`
       );
-      onAction();
+      
+      if (response.data.success && response.data.data) {
+        onUpdateReply(commentId, reply._id, response.data.data);
+        toast.success("Liked reply!");
+      }
     } catch (error) {
       console.error("Error liking reply:", error);
-      alert("Failed to like reply. Please login.");
+      toast.error("Failed to like reply. Please try again.");
     } finally {
       setIsLiking(false);
     }
@@ -172,15 +211,17 @@ const ReplyCard = ({ reply, onAction }) => {
   const handleDislike = async () => {
     setIsDisliking(true);
     try {
-      await axios.put(
-        `http://localhost:8000/api/comments/reply/dislike/${reply._id}`,
-        {},
-        { withCredentials: true }
+      const response = await axios.put(
+        `http://localhost:8000/api/comments/reply/dislike/${reply._id}`
       );
-      onAction();
+      
+      if (response.data.success && response.data.data) {
+        onUpdateReply(commentId, reply._id, response.data.data);
+        toast.success("Disliked reply!");
+      }
     } catch (error) {
       console.error("Error disliking reply:", error);
-      alert("Failed to dislike reply. Please login.");
+      toast.error("Failed to dislike reply. Please try again.");
     } finally {
       setIsDisliking(false);
     }
@@ -193,10 +234,11 @@ const ReplyCard = ({ reply, onAction }) => {
         `http://localhost:8000/api/comments/reply/${reply._id}`,
         { withCredentials: true }
       );
-      onAction();
+      onDeleteReply(commentId, reply._id);
+      toast.success("Reply deleted successfully!");
     } catch (error) {
       console.error("Error deleting reply:", error);
-      alert("Failed to delete reply");
+      toast.error("Failed to delete reply");
     }
   };
 
@@ -217,16 +259,20 @@ const ReplyCard = ({ reply, onAction }) => {
         <button 
           onClick={handleLike} 
           disabled={isLiking}
-          className="flex items-center gap-1 text-xs text-gray-500 hover:text-[var(--primary-color)]"
+          className={`flex items-center gap-1 text-xs ${
+            isLiking ? 'text-[var(--primary-color)]' : 'text-gray-500 hover:text-[var(--primary-color)]'
+          } disabled:opacity-50`}
         >
-          <FiThumbsUp /> {reply.likes?.length || 0}
+          <FiThumbsUp /> {reply.likesCount || 0}
         </button>
         <button 
           onClick={handleDislike} 
           disabled={isDisliking}
-          className="flex items-center gap-1 text-xs text-gray-500 hover:text-[var(--primary-color)]"
+          className={`flex items-center gap-1 text-xs ${
+            isDisliking ? 'text-[var(--primary-color)]' : 'text-gray-500 hover:text-[var(--primary-color)]'
+          } disabled:opacity-50`}
         >
-          <FiThumbsDown /> {reply.dislikes?.length || 0}
+          <FiThumbsDown /> {reply.dislikesCount || 0}
         </button>
 
         {reply.user && (
@@ -243,7 +289,3 @@ const ReplyCard = ({ reply, onAction }) => {
 };
 
 export default CommentCard;
-
-
-
-

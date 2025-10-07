@@ -26,7 +26,7 @@ const WrittenDetailed = () => {
             </p>
             <button
               onClick={() => setShowPopup(true)}
-              className="bg-[var(--color-pink)] hover:bg-[var(--color-pink-dark)] text-white font-semibold px-6 py-3 rounded"
+              className="bg-pink-500 hover:bg-pink-600 text-white font-semibold px-6 py-3 rounded"
             >
               Submit Story
             </button>

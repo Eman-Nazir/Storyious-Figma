@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import Community from "../components/common/Community";
 import AuthorCard from "../components/common/Cards/AuthorCard";
@@ -28,8 +27,29 @@ const AuthorPage = () => {
     fetchWriters();
   }, []);
 
-  if (loading) return <div className="text-center py-10">Loading authors...</div>;
-  if (error) return <div className="text-center py-10 text-red-500">Error: {error}</div>;
+  if (loading) 
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-128px)]">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-t-4 border-gray-300 rounded-full animate-spin border-t-pink-500"></div>
+          <p className="mt-4 text-gray-500">Loading authors...</p>
+        </div>
+      </div>
+    );
+
+  if (error) 
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-128px)] text-red-500">
+        Error: {error}
+      </div>
+    );
+
+  if (writers.length === 0)
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-128px)]">
+        No authors found
+      </div>
+    );
 
   return (
     <div className="bg-[var(--bg-section)] text-[var(--text-dark)]">

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
@@ -35,6 +34,18 @@ const FAQList = () => {
       setFilterText(search); 
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-128px)]">
+        <div className="flex flex-col items-center">
+          {/* Pink spinner */}
+          <div className="w-12 h-12 border-4 border-t-4 border-gray-300 rounded-full animate-spin border-t-pink-500"></div>
+          <p className="mt-4 text-gray-500">Loading FAQs...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -76,9 +87,7 @@ const FAQList = () => {
 
         {/* FAQ List */}
         <div className="space-y-2">
-          {loading ? (
-            <p className="text-[var(--text-muted)]">Loading FAQs...</p>
-          ) : filteredFaqs.length > 0 ? (
+          {filteredFaqs.length > 0 ? (
             filteredFaqs.map((faq) => (
               <Link
                 key={faq.slug}

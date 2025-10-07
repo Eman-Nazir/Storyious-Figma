@@ -10,20 +10,21 @@ import {
   deleteComment,
   deleteReply
 } from "../story/comment.controller.js";
+
 import { auth } from "../../middleware_temp/authMiddleware.js";
 
 const router = express.Router();
 
 router.get("/", getAllComments);
-router.post("/", createComment); 
-router.post("/reply", createReply); 
 
-router.put("/like/:commentId", auth, likeComment);
-router.put("/dislike/:commentId", auth, dislikeComment);
-router.put("/reply/like/:replyId", auth, likeReply);
-router.put("/reply/dislike/:replyId", auth, dislikeReply);
-
+router.post("/", auth, createComment);
+router.post("/reply", auth, createReply);
 router.delete("/:commentId", auth, deleteComment);
 router.delete("/reply/:replyId", auth, deleteReply);
+
+router.put("/like/:commentId", likeComment);
+router.put("/dislike/:commentId", dislikeComment);
+router.put("/reply/like/:replyId", likeReply);
+router.put("/reply/dislike/:replyId", dislikeReply);
 
 export default router;

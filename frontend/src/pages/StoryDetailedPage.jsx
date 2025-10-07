@@ -47,7 +47,6 @@ const StoryDetailPage = () => {
         console.error("Error fetching story:", err);
       }
     };
-
     fetchStory();
   }, [id]);
 
@@ -86,7 +85,17 @@ const StoryDetailPage = () => {
     fetchCommentsCount();
   }, [refreshComments]);
 
-  if (loading) return <div className="text-center py-8">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="flex flex-col items-center">
+          <div className="w-12 h-12 border-4 border-t-4 border-gray-300 rounded-full animate-spin border-t-pink-500"></div>
+          <p className="mt-4 text-gray-500 text-lg">Loading story...</p>
+        </div>
+      </div>
+    );
+  }
+
   if (error) return <div className="text-center py-8 text-red-500">{error}</div>;
   if (!story) return <div className="text-center py-8">Story not found</div>;
 
@@ -100,7 +109,7 @@ const StoryDetailPage = () => {
         {/* Main Content */}
         <div className={`${isVideo ? "w-full" : "flex-1 lg:pr-6"}`}>
           <div className="space-y-6">
-            
+
             {/* Title */}
             <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 ${isVideo ? "text-center" : ""}`}>
               {story.title || "Untitled Story"}
@@ -179,8 +188,10 @@ const StoryDetailPage = () => {
                 />
               </div>
             )}
-            <DiscoverMore/>
-             <History writer={story.author} storyDate={story.createdAt} />
+
+            {/* DiscoverMore & History */}
+            <DiscoverMore />
+            <History writer={story.author} storyDate={story.createdAt} />
 
             {/* Comments */}
             <Comment onCommentAdded={handleCommentAdded} />
@@ -195,11 +206,10 @@ const StoryDetailPage = () => {
                 <div className="space-y-6">
                   {relatedStories.map((relatedStory, index) => {
                     const isRelatedVideo = relatedStory.type === "video";
-
                     return (
                       <div key={relatedStory._id} className={index !== relatedStories.length - 1 ? "pb-6 border-b" : ""}>
                         <Link to={`/story/${relatedStory._id}`} className="flex gap-4 group">
-                          
+
                           {/* Thumbnail */}
                           <div className="w-40 h-28 rounded-md overflow-hidden relative flex-shrink-0">
                             {isRelatedVideo ? (
@@ -242,17 +252,13 @@ const StoryDetailPage = () => {
                               </div>
                             )}
                           </div>
-                          
+
                           {/* Content */}
                           <div className="flex-1">
-                            {/* Categories from backend */}
                             <div className="text-sm font-medium mb-1 space-x-1">
                               {relatedStory.categories && relatedStory.categories.length > 0 ? (
                                 relatedStory.categories.map((cat, i) => (
-                                  <span 
-                                    key={cat._id} 
-                                    className="text-pink-600"
-                                  >
+                                  <span key={cat._id} className="text-pink-600">
                                     {cat.name}{i < relatedStory.categories.length - 1 && " · "}
                                   </span>
                                 ))
@@ -260,21 +266,15 @@ const StoryDetailPage = () => {
                                 <span className="text-gray-500">No Category</span>
                               )}
                             </div>
-                            
-                            {/* Title */}
+
                             <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-pink-600 transition-colors line-clamp-2">
                               {relatedStory.title}
                             </h3>
-                            
-                            {/* Meta */}
+
                             <div className="flex items-center text-xs text-gray-500 space-x-3">
                               <span className="flex items-center">
                                 <CalendarRange className="w-3 h-3 mr-1" />
-                                {relatedStory.createdAt ? new Date(relatedStory.createdAt).toLocaleDateString('en-US', { 
-                                  day: 'numeric', 
-                                  month: 'short', 
-                                  year: 'numeric' 
-                                }) : "Unknown date"}
+                                {relatedStory.createdAt ? new Date(relatedStory.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : "Unknown date"}
                               </span>
                               <span className="flex items-center">
                                 <Clock7 className="w-3 h-3 mr-1" />

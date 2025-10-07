@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -51,7 +50,7 @@ const CommentReply = ({ parentCommentId, onReplyAdded, onCancel }) => {
       setAgree(false);
 
       if (onReplyAdded) onReplyAdded();
-      toast.success("Reply posted successfully ");
+      toast.success("Reply posted successfully!");
     } catch (error) {
       console.error("Error posting reply:", error);
       toast.error("Failed to post reply. Please login.");

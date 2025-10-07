@@ -3,7 +3,7 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify"; 
 import "react-toastify/dist/ReactToastify.css";
 
 const Comment = ({ onCommentAdded }) => {
@@ -36,11 +36,8 @@ const Comment = ({ onCommentAdded }) => {
         saveDetails,
       };
 
-      if (isBlogPage) {
-        commentData.blogId = id;
-      } else if (isStoryPage) {
-        commentData.storyId = id;
-      }
+      if (isBlogPage) commentData.blogId = id;
+      if (isStoryPage) commentData.storyId = id;
 
       await axios.post("http://localhost:8000/api/comments", commentData, {
         withCredentials: true,
@@ -56,10 +53,16 @@ const Comment = ({ onCommentAdded }) => {
 
       if (onCommentAdded) onCommentAdded();
 
-      toast.success("Comment posted successfully!");
+      toast.success("Comment posted successfully!", {
+        position: "top-right",
+        autoClose: 3000, 
+      });
     } catch (error) {
       console.error("Error posting comment:", error);
-      toast.error("Failed to post comment. Please try again.");
+      toast.error("Failed to post comment. Please try again.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
     } finally {
       setLoading(false);
     }
@@ -224,7 +227,8 @@ const Comment = ({ onCommentAdded }) => {
           </button>
         </div>
       </form>
-      <ToastContainer />
+
+      
     </div>
   );
 };
