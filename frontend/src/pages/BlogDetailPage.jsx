@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Clock7, Eye, CalendarRange } from "lucide-react";
+import { useParams, useNavigate } from 'react-router-dom';
+import { Clock7, Eye, CalendarRange, Bookmark, BookmarkCheck } from "lucide-react";
 import { GoComment } from "react-icons/go";
 import Share from "../assets/icons/Share";
 import { LuCopyCheck } from "react-icons/lu";
@@ -9,11 +9,13 @@ import { FaFacebookF, FaXTwitter, FaLinkedinIn, FaPinterestP, FaInstagram } from
 import Comment from '../sections/StoryDetailedPage/1stStory/Comment';
 import CommentsList from '../sections/StoryDetailedPage/1stStory/CommentsList';
 import axios from "axios";
+import { toast } from 'react-toastify';
 
 const API_URL = 'http://localhost:8000/api/blogs';
 
 const BlogDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,6 +23,91 @@ const BlogDetailPage = () => {
   const [refreshComments, setRefreshComments] = useState(0);
   const [commentsCount, setCommentsCount] = useState(0);
   const [ad, setAd] = useState(null);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
+
+  const checkBookmarkStatus = async () => {
+    try {
+      console.log("Checking bookmark status for blog:", id);
+      const response = await axios.get(
+        `http://localhost:8000/api/bookmarks/status?blogId=${id}`, 
+        { withCredentials: true }
+      );
+      
+      console.log("Blog bookmark status response:", response.data);
+      
+      if (response.data.success) {
+        setIsBookmarked(response.data.data.bookmarked);
+      }
+    } catch (error) {
+      console.error("Error checking blog bookmark status:", error);
+      if (error.response?.status === 401) {
+        setIsBookmarked(false);
+        console.log("User not logged in, blog bookmark status: false");
+      } else {
+        console.error("Blog bookmark check failed:", error);
+      }
+    }
+  };
+
+  const toggleBookmark = async () => {
+    try {
+      setBookmarkLoading(true);
+      console.log("Toggling bookmark for blog:", id);
+      
+      const response = await axios.post(
+        'http://localhost:8000/api/bookmarks/toggle',
+        { blogId: id },
+        { 
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      console.log("Toggle blog bookmark response:", response.data);
+      
+      if (response.data.success) {
+        const newBookmarkStatus = response.data.data.bookmarked;
+        setIsBookmarked(newBookmarkStatus);
+        
+        if (newBookmarkStatus) {
+          toast.success('Blog added to bookmarks!', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        } else {
+          toast.info('Blog removed from bookmarks', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling blog bookmark:", error);
+      if (error.response?.status === 401) {
+        if (window.confirm('Please login to bookmark blogs. Redirect to login page?')) {
+          navigate('/login', { state: { from: `/blog/${id}` } });
+        }
+      } else if (error.response?.data?.message) {
+        console.error("Blog bookmark error:", error.response.data.message);
+        toast.error(`Failed to bookmark: ${error.response.data.message}`);
+      } else {
+        toast.error('Failed to bookmark blog. Please try again.');
+      }
+    } finally {
+      setBookmarkLoading(false);
+    }
+  };
 
   const handleCommentAdded = () => {
     setRefreshComments(prev => prev + 1);
@@ -31,6 +118,7 @@ const BlogDetailPage = () => {
     const fetchBlog = async () => {
       try {
         setLoading(true);
+        console.log("Fetching blog with ID:", id);
         const res = await axios.get(`${API_URL}/${id}`);
         const data = res.data;
 
@@ -38,7 +126,9 @@ const BlogDetailPage = () => {
         else if (data.success && data.blog) setBlog(data.blog);
         else setBlog(data);
         
-        fetchCommentsCount();
+        await fetchCommentsCount();
+        
+        await checkBookmarkStatus();
       } catch (err) {
         console.error("Error fetching blog:", err);
         setError(err.message);
@@ -111,6 +201,26 @@ const BlogDetailPage = () => {
             <p className="flex items-center gap-1"><GoComment className="w-5 h-5" /> {commentsCount} Comments</p>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              onClick={toggleBookmark}
+              disabled={bookmarkLoading}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                isBookmarked 
+                  ? 'bg-pink-500 text-white shadow-md hover:bg-pink-600' 
+                  : 'bg-white text-[var(--text-muted)] border border-[var(--text-muted)] hover:bg-gray-50 hover:border-pink-300 hover:text-pink-600'
+              } ${bookmarkLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {bookmarkLoading ? (
+                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+              ) : isBookmarked ? (
+                <BookmarkCheck className="w-5 h-5" />
+              ) : (
+                <Bookmark className="w-5 h-5" />
+              )}
+              <span className="text-sm font-medium">
+                {bookmarkLoading ? '...' : isBookmarked ? 'Saved' : 'Save'}
+              </span>
+            </button>
             <Share />
             <LuCopyCheck className="text-[var(--text-muted)] w-6 h-6 rounded-sm border border-[var(--text-muted)] p-1 cursor-pointer hover:text-[var(--pink-dark)] hover:border-[var(--pink-dark)]" />
           </div>

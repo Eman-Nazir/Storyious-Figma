@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Clock7, Eye, CalendarRange, PlayCircle } from "lucide-react";
+import { Clock7, Eye, CalendarRange, PlayCircle, Bookmark, BookmarkCheck } from "lucide-react";
 import { GoComment } from "react-icons/go";
 import { LuCopyCheck } from "react-icons/lu";
 import Share from "../assets/icons/Share";
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Comment from '../sections/StoryDetailedPage/1stStory/Comment';
 import CommentsList from '../sections/StoryDetailedPage/1stStory/CommentsList';
 import Ads from '../sections/StoryDetailedPage/1stStory/Ads';
 import History from '../sections/StoryDetailedPage/1stStory/History';
 import DiscoverMore from '../sections/StoryDetailedPage/1stStory/DiscoverMore';
+import { toast } from 'react-toastify';
 
 const StoryDetailPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,6 +22,81 @@ const StoryDetailPage = () => {
   const [commentsCount, setCommentsCount] = useState(0);
   const [relatedStories, setRelatedStories] = useState([]);
   const [loadingRelated, setLoadingRelated] = useState(true);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
+
+  //  bookmark status function
+  const checkBookmarkStatus = async () => {
+    try {
+      console.log("Checking bookmark status for story:", id);
+      const response = await axios.get(
+        `http://localhost:8000/api/bookmarks/status?storyId=${id}`, 
+        { withCredentials: true }
+      );
+      
+      console.log("Bookmark status response:", response.data);
+      
+      if (response.data.success) {
+        setIsBookmarked(response.data.data.bookmarked);
+      }
+    } catch (error) {
+      console.error("Error checking bookmark status:", error);
+      if (error.response?.status === 401) {
+        setIsBookmarked(false);
+        console.log("User not logged in, bookmark status: false");
+      } else {
+        console.error("Bookmark check failed:", error);
+      }
+    }
+  };
+
+  const toggleBookmark = async () => {
+    try {
+      setBookmarkLoading(true);
+      console.log("Toggling bookmark for story:", id);
+      
+      const response = await axios.post(
+        'http://localhost:8000/api/bookmarks/toggle',
+        { storyId: id },
+        { 
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      
+      console.log("Toggle bookmark response:", response.data);
+      
+      if (response.data.success) {
+        const newBookmarkStatus = response.data.data.bookmarked;
+        setIsBookmarked(newBookmarkStatus);
+        
+        if (newBookmarkStatus) {
+          toast.success('Story added to bookmarks!');
+        } else {
+          toast.info('Story removed from bookmarks');
+        }
+      }
+    } 
+
+
+    catch (error) {
+  console.error("Error toggling bookmark:", error);
+  if (error.response?.status === 401) {
+    toast.error('Please login to bookmark stories');
+  } else if (error.response?.data?.message) {
+    console.error("Bookmark error:", error.response.data.message);
+    toast.error(`Failed to bookmark: ${error.response.data.message}`);
+  } else {
+    toast.error('Failed to bookmark story. Please try again.');
+  }
+} 
+    
+    finally {
+      setBookmarkLoading(false);
+    }
+  };
 
   const handleCommentAdded = () => {
     setRefreshComments(prev => prev + 1);
@@ -27,33 +104,47 @@ const StoryDetailPage = () => {
   };
 
   const getYouTubeId = (url) => {
+    if (!url) return null;
     const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
     const match = url.match(regExp);
     return (match && match[7].length === 11) ? match[7] : null;
   };
 
+  // Fetch story data
   useEffect(() => {
     const fetchStory = async () => {
       try {
+        console.log("Fetching story with ID:", id);
         const response = await axios.get(`http://localhost:8000/api/stories/${id}`);
         const storyData = response.data.data || response.data;
+        console.log("Story data received:", storyData);
         setStory(storyData);
-        fetchCommentsCount();
-        fetchRelatedStories(storyData.type);
+        
+        await Promise.all([
+          fetchCommentsCount(),
+          fetchRelatedStories(storyData.type)
+        ]);
+        
         setLoading(false);
+        
+        await checkBookmarkStatus();
       } catch (err) {
+        console.error("Error fetching story:", err);
         setError('Failed to fetch story');
         setLoading(false);
-        console.error("Error fetching story:", err);
       }
     };
+    
     fetchStory();
   }, [id]);
 
   const fetchRelatedStories = async (type) => {
     try {
       setLoadingRelated(true);
-      const response = await axios.get(`http://localhost:8000/api/stories?type=${type}&limit=3&exclude=${id}`);
+      const response = await axios.get(
+        `http://localhost:8000/api/stories?type=${type}&limit=4&exclude=${id}`
+      );
+      
       if (response.data.success && response.data.data) {
         const filteredStories = response.data.data
           .filter(s => s._id !== id && s.type === type)
@@ -62,10 +153,10 @@ const StoryDetailPage = () => {
       } else {
         setRelatedStories([]);
       }
-      setLoadingRelated(false);
     } catch (error) {
       console.error("Error fetching related stories:", error);
       setRelatedStories([]);
+    } finally {
       setLoadingRelated(false);
     }
   };
@@ -115,7 +206,7 @@ const StoryDetailPage = () => {
               {story.title || "Untitled Story"}
             </h1>
 
-            {/* Meta Data */}
+            {/* Meta Data - Bookmark button */}
             <div className="flex flex-wrap justify-between items-center border-t border-b border-gray-200 py-3 gap-4 text-gray-600 text-sm sm:text-base">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <p className="flex items-center gap-1 whitespace-nowrap">
@@ -134,8 +225,30 @@ const StoryDetailPage = () => {
                 </p>
               </div>
               <div className="flex items-center gap-3">
+                {/* Bookmark Button */}
+                <button
+                  onClick={toggleBookmark}
+                  disabled={bookmarkLoading}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                    isBookmarked 
+                      ? 'bg-pink-500 text-white shadow-md hover:bg-pink-600' 
+                      : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 hover:border-pink-300 hover:text-pink-600'
+                  } ${bookmarkLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {bookmarkLoading ? (
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                  ) : isBookmarked ? (
+                    <BookmarkCheck className="w-5 h-5" />
+                  ) : (
+                    <Bookmark className="w-5 h-5" />
+                  )}
+                  <span className="text-sm font-medium">
+                    {bookmarkLoading ? '...' : isBookmarked ? 'Saved' : 'Save'}
+                  </span>
+                </button>
+                
                 <Share />
-                <LuCopyCheck className="text-gray-600 w-6 h-6 rounded-sm border-gray-300 border p-1" />
+                <LuCopyCheck className="text-gray-600 w-6 h-6 rounded-sm border-gray-300 border p-1 cursor-pointer hover:text-pink-600 hover:border-pink-300" />
               </div>
             </div>
 
@@ -209,7 +322,6 @@ const StoryDetailPage = () => {
                     return (
                       <div key={relatedStory._id} className={index !== relatedStories.length - 1 ? "pb-6 border-b" : ""}>
                         <Link to={`/story/${relatedStory._id}`} className="flex gap-4 group">
-
                           {/* Thumbnail */}
                           <div className="w-40 h-28 rounded-md overflow-hidden relative flex-shrink-0">
                             {isRelatedVideo ? (

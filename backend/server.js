@@ -4,84 +4,93 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import path from "path";
 import connectDB from "./config/mongodb.js";
+import { initializeAdmin } from "./modules/user/user.controller.js";
 
 dotenv.config();
 
 const app = express();
-connectDB();
+
+//  Connect to Database 
+connectDB().then(() => {
+  initializeAdmin().catch((err) =>
+    console.error(" Admin initialization failed:", err.message)
+  );
+});
+
+//  Allowed Origins 
 const allowedOrigins = [
-  'http://localhost:5173',
-  'https://storyious-figma.vercel.app',
-  'storyious-figma-git-development-eman-nazirs-projects.vercel.app',
-  'storyious-figma-ayarzlwol-eman-nazirs-projects.vercel.app'
+  "http://localhost:5173",
+  "https://storyious-figma.vercel.app",
+  "https://storyious-figma-git-development-eman-nazirs-projects.vercel.app",
+  "https://storyious-figma-ayarzlwol-eman-nazirs-projects.vercel.app",
 ];
 
-// Middlewares
+//  Middlewares 
 app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      callback(new Error("CORS not allowed"));
+    },
+    credentials: true,
+  })
+);
 
-
-app.use(cors({
-  origin: function(origin, callback) {
-    if (!origin) return callback(null, true); 
-    if (allowedOrigins.indexOf(origin) === -1) {
-      return callback(new Error('CORS not allowed'), false);
-    }
-    return callback(null, true);
-  },
-  credentials: true
-}));
-
-
-
-// Import Routes
+//  Import Routes 
 import storyRoutes from "./modules/story/story.routes.js";
 import userRoutes from "./modules/user/user.routes.js";
-import authorRoutes from "./modules/author/author.routes.js"; 
+import authorRoutes from "./modules/author/author.routes.js";
 import categoryRoutes from "./modules/category/category.routes.js";
 import blogRoutes from "./modules/blogs/blog.routes.js";
 import faqRoutes from "./modules/faqs/faq.routes.js";
-import submissionRoute from "./modules/submission/submission.routes.js";
+import submissionRoutes from "./modules/submission/submission.routes.js";
 import uploadRoutes from "./routes/upload.route.js";
-import commentRoutes from './modules/story/commnet.route.js';
-import newsletterRoutes from './modules/newsletter/newsLetter.routes.js';
+import commentRoutes from "./modules/story/commnet.route.js";
+import newsletterRoutes from "./modules/newsletter/newsLetter.routes.js";
 import searchRoutes from "./modules/search/search.route.js";
-
-
-// API Routes
+import bookmarkRoutes from './modules/bookmark/bookmark.routes.js';
+//  API Routes 
 app.use("/api/stories", storyRoutes);
-app.use('/api/comments', commentRoutes);
+app.use("/api/comments", commentRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/authors", authorRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/faqs", faqRoutes);
-app.use("/api/submissions", submissionRoute);
+app.use("/api/submissions", submissionRoutes);
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/newsLetter", newsletterRoutes);
 app.use("/api/search", searchRoutes);
+app.use('/api/bookmarks', bookmarkRoutes);
 
 
-
-app.use((err, req, res, next) => {
-  console.error("Global error:", err.stack);
-  res.status(err.status || 500).json({
-    status: "error",
-    message: err.message || "Internal server error"
+// Add this to your server.js or app.js
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`, {
+    body: req.body,
+    query: req.query,
+    cookies: req.cookies
   });
+  next();
 });
-
+//  Default Route 
 app.get("/", (req, res) => {
-  res.send("Backend is running ");
+  res.send(" Storyious backend is running successfully.");
 });
 
+
+//  Start Server 
+const PORT = process.env.PORT || 8000;
 if (process.env.NODE_ENV !== "production") {
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  app.listen(PORT, () =>
+    console.log(` Server running at: http://localhost:${PORT}`)
+  );
 }
 
 export default app;

@@ -1,17 +1,20 @@
-
-import User from "../user/user.model.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import User from "../user/user.model.js";
+import { generateToken } from "../../utils/token.js"; 
 
-const generateToken = (payload) =>
-  jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1d" });
+export const initializeAdmin = async () => {
+  try {
+    await User.ensureAdminExists();
+  } catch (error) {
+    console.error(" Failed to ensure admin user:", error.message);
+  }
+};
 
-//  SIGNUP 
+//  Signup
 export const signup = async (req, res) => {
   try {
     const { username, email, password, confirmPassword } = req.body;
 
-    // Validation
     if (!username || !email || !password || !confirmPassword) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -28,52 +31,38 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "Username already exists" });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Save user
     const user = await User.create({
       username,
       email,
       password: hashedPassword,
-      role: "user", 
+      role: "user",
     });
 
-    res.status(201).json({ message: "User created successfully", user });
+    return res.status(201).json({
+      message: "User created successfully",
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Server error during signup" });
   }
 };
 
-//  LOGIN 
+//  Login
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Admin login (from env) 
-    if (
-      email === process.env.ADMIN_EMAIL &&
-      password === process.env.ADMIN_PASSWORD
-    ) {
-      const token = generateToken({
-        id: "admin",
-        role: "admin",
-        username: "Admin",
-      });
-
-      res.cookie("token", token, {
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-      });
-
-      return res.json({
-        message: "Admin login successful",
-        role: "admin",
-        username: "Admin",
-      });
+    if (!email || !password) {
+      return res.status(400).json({ message: "Email and password are required" });
     }
 
-    // user login 
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });
@@ -88,30 +77,67 @@ export const login = async (req, res) => {
       id: user._id,
       role: user.role,
       username: user.username,
+      email: user.email,
     });
 
     res.cookie("token", token, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    res.json({
+    return res.json({
       message: "Login successful",
-      role: user.role,
-      username: user.username,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Server error during login" });
   }
 };
 
-//  LOGOUT 
+//  Get Current User
+export const getCurrentUser = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    res.json({
+      user: {
+        id: req.user.id,
+        username: req.user.username,
+        email: req.user.email,
+        role: req.user.role,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching current user" });
+  }
+};
+
+//  Logout
 export const logout = (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  });
   res.json({ message: "Logged out successfully" });
 };
 
-//  ADMIN DASHBOARD 
+// Admin Dashboard
 export const dashboard = (req, res) => {
-  res.json({ message: "Welcome to Admin Dashboard", user: req.user });
+  res.json({
+    message: "Welcome to Admin Dashboard",
+    user: req.user,
+  });
 };
+
+
+

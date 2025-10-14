@@ -1,32 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signupSchema } from "../schemas/userSchemas"; 
+import { signupSchema } from "../schemas/userSchemas";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(signupSchema),
   });
-const onSubmit = async (data) => {
-  try {
-    const res = await axios.post(
-      "http://localhost:8000/api/users/signup",
-      { ...data, role: "user" }, 
-      { withCredentials: true }
-    );
 
-    toast.success(res.data.message);
-    navigate("/login");
-  } catch (err) {
-    toast.error(err.response?.data?.message || "Signup failed");
-  }
-};
+  const onSubmit = async (data) => {
+    try {
+      setLoading(true);
 
+      const res = await axios.post(
+        "http://localhost:8000/api/users/signup",
+        { ...data, role: "user" },
+        { withCredentials: true }
+      );
+
+      toast.success(res.data.message || "Signup successful!");
+      navigate("/login");
+    } catch (err) {
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "Signup failed. Please try again.";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--bg-section)] px-4">
@@ -35,7 +44,7 @@ const onSubmit = async (data) => {
           Create an Account
         </h2>
         <p className="text-center text-gray-500 mb-5">
-          Join Storious and start your journey
+          Join Storyious and start your journey
         </p>
 
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -43,7 +52,7 @@ const onSubmit = async (data) => {
             type="text"
             placeholder="Username"
             {...register("username")}
-            className="w-full border px-4 py-3 rounded-lg"
+            className="w-full border px-4 py-3 rounded-lg bg-white"
           />
           {errors.username && <p className="text-red-500">{errors.username.message}</p>}
 
@@ -51,15 +60,15 @@ const onSubmit = async (data) => {
             type="email"
             placeholder="Email Address"
             {...register("email")}
-            className="w-full border px-4 py-3 rounded-lg"
+            className="w-full border px-4 py-3 rounded-lg bg-white"
           />
           {errors.email && <p className="text-red-500">{errors.email.message}</p>}
 
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Password must be at least 8 characters"
             {...register("password")}
-            className="w-full border px-4 py-3 rounded-lg"
+            className="w-full border  bg-white px-4 py-3 rounded-lg"
           />
           {errors.password && <p className="text-red-500">{errors.password.message}</p>}
 
@@ -67,21 +76,27 @@ const onSubmit = async (data) => {
             type="password"
             placeholder="Confirm Password"
             {...register("confirmPassword")}
-            className="w-full border px-4 py-3 rounded-lg"
+            className="w-full border px-4 py-3 bg-white rounded-lg"
           />
           {errors.confirmPassword && <p className="text-red-500">{errors.confirmPassword.message}</p>}
 
           <button
             type="submit"
-            className="w-full bg-[var(--primary-color)] text-white py-3 rounded-lg font-semibold shadow-md transition"
+            disabled={loading}
+            className={`w-full bg-[var(--primary-color)] text-white py-3 rounded-lg font-semibold shadow-md transition ${
+              loading ? "opacity-70 cursor-not-allowed" : "hover:opacity-90"
+            }`}
           >
-            Sign Up
+            {loading ? "Signing up..." : "Sign Up"}
           </button>
         </form>
 
         <p className="text-sm text-center mt-5 text-gray-600">
           Already have an account?{" "}
-          <Link to="/login" className="text-[var(--primary-color)] font-semibold hover:underline">
+          <Link
+            to="/login"
+            className="text-[var(--primary-color)] font-semibold hover:underline"
+          >
             Login
           </Link>
         </p>
@@ -91,3 +106,6 @@ const onSubmit = async (data) => {
 };
 
 export default Signup;
+
+
+

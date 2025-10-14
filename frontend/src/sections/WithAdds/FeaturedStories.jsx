@@ -76,7 +76,7 @@ const FeaturedStories = () => {
   const formattedStories = stories.map((story, index) => formatStoryData(story, index)).filter(Boolean);
 
   return (
-    <div className="py-10 px-4 md:px-6 lg:px-24 max-w-[1200px] mx-auto">
+    <div className="py-10 px-4 md:px-6 lg:px-8 max-w-[1200px] mx-auto">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h1 className="font-bold text-2xl text-[var(--text-dark)]">Featured Stories</h1>

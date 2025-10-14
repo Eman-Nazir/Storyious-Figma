@@ -28,6 +28,7 @@ import AuthorDetailPage from "./pages/AuthorDetailPage";
 import FAQ from "./sections/WithAdds/FAQ";
 import BlogDetailPage from "./pages/BlogDetailPage";
 import StoryDetailPage from "./pages/StoryDetailedPage";
+import UserProfile from "./pages/UserProfile";
 
 // Admin
 import { AdminProvider } from "./context/AdminContext";
@@ -77,6 +78,7 @@ function App() {
           <Route path="/Video-Page" element={<VideoStoryPage />} />
           <Route path="/ContactUs" element={<ContactUsPage />} />
           <Route path="/search" element={<SearchResults/>} />
+          <Route path="/profile" element={<UserProfile/>} />
         </Route>
 
         {/* Admin layout */}

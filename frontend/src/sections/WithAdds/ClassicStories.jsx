@@ -40,7 +40,7 @@ const ClassicStories = () => {
 
   return (
     <>
-      <div className="py-10 px-4 md:px-12 lg:px-24 max-w-[1200px] mx-auto">
+      <div className="py-10 px-4 md:px-12 lg:px-8 max-w-[1200px] mx-auto">
         {/* Heading */}
         <div className="flex justify-between items-center mb-4">
           <h1 className="font-bold text-2xl text-[var(--text-dark)]">Classic Stories</h1>

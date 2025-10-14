@@ -1,6 +1,6 @@
-
 import React, { useEffect, useState, useContext } from "react";
 import { AdminContext } from "../../context/AdminContext";
+import defaultAdminAvatar from "../../assets/images/defaultUserAvatar.png"; 
 
 const AdminDashboard = () => {
   const {
@@ -43,15 +43,42 @@ const AdminDashboard = () => {
     };
 
     fetchAll();
-  }, [getDashboard, getCategories, getAuthors, getStories, getBlogs, getFAQs, getSubscribers, getAds]);
+  }, [
+    getDashboard,
+    getCategories,
+    getAuthors,
+    getStories,
+    getBlogs,
+    getFAQs,
+    getSubscribers,
+    getAds,
+  ]);
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold text-[var(--primary-color)] mb-4">
-        Dashboard
-      </h1>
-      <p className="text-gray-600 mb-6">{message}</p>
+      {/* 🔹 Admin Info Section */}
+      <div className="flex flex-col md:flex-row items-center justify-between bg-white shadow rounded-xl p-5 mb-6 border border-gray-100">
+        <div className="flex items-center gap-4">
+          <img
+            src={admin?.profileImage || defaultAdminAvatar}
+            alt="Admin Avatar"
+            className="w-16 h-16 rounded-full object-cover border border-gray-300"
+          />
+          <div>
+            <h1 className="text-2xl font-bold text-[var(--primary-color)]">
+              {admin?.name || "Admin User"}
+            </h1>
+            <p className="text-sm text-gray-500">
+              Role: <span className="font-medium text-gray-700">Administrator</span>
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 md:mt-0 text-gray-600">
+          <p>{message}</p>
+        </div>
+      </div>
 
+      {/* 🔹 Dashboard Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white shadow rounded-xl p-6 text-center">
           <h3 className="text-lg font-semibold">Story Categories</h3>
