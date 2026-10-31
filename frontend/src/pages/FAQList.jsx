@@ -13,7 +13,7 @@ const FAQList = () => {
     const fetchFAQs = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:8000/api/faqs/category/competitive-exams"
+          `${import.meta.env.VITE_API_URL}/api/faqs/category/competitive-exams`
         );
         setFaqs(res.data.data);
       } catch (error) {

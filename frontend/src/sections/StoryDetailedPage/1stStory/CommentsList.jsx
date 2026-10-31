@@ -20,7 +20,7 @@ const CommentsList = ({ refresh }) => {
   const fetchComments = async () => {
     setLoading(true);
     try {
-      let url = `http://localhost:8000/api/comments?`;
+      let url = `${import.meta.env.VITE_API_URL}/api/comments?`;
 
       if (isBlogPage) {
         url += `blogId=${id}`;

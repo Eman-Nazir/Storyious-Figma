@@ -36,7 +36,7 @@ const CommentReply = ({ parentCommentId, onReplyAdded, onCancel }) => {
       };
 
       await axios.post(
-        "http://localhost:8000/api/comments/reply",
+        `${import.meta.env.VITE_API_URL}/api/comments/reply`,
         replyData,
         { withCredentials: true } 
       );

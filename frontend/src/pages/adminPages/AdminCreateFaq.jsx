@@ -27,7 +27,7 @@ const AdminCreateFAQ = ({ onFAQCreated }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/faqs/categories");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/faqs/categories`);
         setCategories(res.data.data);
       } catch (err) {
         toast.error("Failed to load categories");
@@ -38,7 +38,7 @@ const AdminCreateFAQ = ({ onFAQCreated }) => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post("http://localhost:8000/api/faqs", data);
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/faqs`, data);
       toast.success("FAQ created successfully");
       reset();
       if (onFAQCreated) onFAQCreated(response.data.data);

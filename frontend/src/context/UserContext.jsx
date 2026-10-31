@@ -11,7 +11,7 @@ export const UserProvider = ({ children }) => {
     const checkAuthStatus = async () => {
       try {
         console.log('Checking authentication status...');
-        const response = await axios.get('http://localhost:8000/api/users/me', {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/me`, {
           withCredentials: true
         });
         
@@ -45,7 +45,7 @@ export const UserProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('http://localhost:8000/api/users/logout', {}, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/users/logout`, {}, {
         withCredentials: true
       });
       console.log('User logged out successfully');

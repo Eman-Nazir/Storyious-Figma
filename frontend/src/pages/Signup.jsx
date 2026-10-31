@@ -19,7 +19,7 @@ const Signup = () => {
       setLoading(true);
 
       const res = await axios.post(
-        "http://localhost:8000/api/users/signup",
+        `${import.meta.env.VITE_API_URL}/api/users/signup`,
         { ...data, role: "user" },
         { withCredentials: true }
       );

@@ -14,7 +14,7 @@ const BedtimeStories = () => {
   useEffect(() => {
     const fetchMorals = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/stories?populate=category");
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/stories?populate=category`);
         
         const stories = response.data.data || response.data || [];
         

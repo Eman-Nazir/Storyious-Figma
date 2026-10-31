@@ -11,7 +11,7 @@ const FAQAnswer = () => {
   useEffect(() => {
     const fetchFAQ = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/api/faqs/${slug}`);
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/faqs/${slug}`);
         setFaq(res.data.data);
       } catch (error) {
         console.error("Error fetching FAQ", error);

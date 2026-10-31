@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, Loader, Book, FileText, User, Folder, Clock, Eye, Video, HelpCircle } from 'lucide-react';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 const SearchResults = () => {
   const [results, setResults] = useState({});

@@ -30,7 +30,7 @@ const CategoryDetailedPage = () => {
   useEffect(() => {
     const fetchCategoryData = async () => {
       try {
-        const categoriesResponse = await axios.get("http://localhost:8000/api/categories");
+        const categoriesResponse = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories`);
         const categories = categoriesResponse.data.data || categoriesResponse.data || [];
 
         const formattedCategoryName = categoryName.replace(/-/g, ' ').toLowerCase();
@@ -39,7 +39,7 @@ const CategoryDetailedPage = () => {
         if (currentCategory) {
           setCategory(currentCategory);
           const storiesResponse = await axios.get(
-            `http://localhost:8000/api/stories?category=${currentCategory._id}&populate=category,author`
+            `${import.meta.env.VITE_API_URL}/api/stories?category=${currentCategory._id}&populate=category,author`
           );
           const allStories = storiesResponse.data.data || storiesResponse.data || [];
           setStories(allStories);

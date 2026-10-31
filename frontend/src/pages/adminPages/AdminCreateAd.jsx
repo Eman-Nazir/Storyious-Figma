@@ -62,13 +62,13 @@ const AdminCreateAd = () => {
 
       if (editingAd) {
         await axios.put(
-          `http://localhost:8000/api/stories/ads/${editingAd._id}`,
+          `${import.meta.env.VITE_API_URL}/api/stories/ads/${editingAd._id}`,
           form,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
         setMessage(" Ad updated successfully!");
       } else {
-        await axios.post("http://localhost:8000/api/stories/ads", form, {
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/stories/ads`, form, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setMessage("Ad created successfully!");

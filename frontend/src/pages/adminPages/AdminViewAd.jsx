@@ -11,7 +11,7 @@ const AdminViewAd = () => {
 
   const fetchAds = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/stories/ads");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/stories/ads`);
       setAds(res.data.data || []);
     } catch (err) {
       console.error("Error fetching ads:", err);
@@ -26,7 +26,7 @@ const AdminViewAd = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/stories/ads/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/stories/ads/${id}`);
       setAds((prev) => prev.filter((ad) => ad._id !== id));
     } catch (err) {
       console.error("Error deleting ad:", err);

@@ -20,7 +20,7 @@ const Footer = () => {
     e.preventDefault();
     try {
       const { data } = await axios.post(
-        "http://localhost:8000/api/newsletter/subscribe",
+        `${import.meta.env.VITE_API_URL}/api/newsletter/subscribe`,
         { email }
       );
 

@@ -28,8 +28,8 @@ const AdminViewBlogs = () => {
       setLoading(true);
       const url =
         statusFilter === "all"
-          ? "http://localhost:8000/api/blogs"
-          : `http://localhost:8000/api/blogs?status=${statusFilter}`;
+          ? `${import.meta.env.VITE_API_URL}/api/blogs`
+          : `${import.meta.env.VITE_API_URL}/api/blogs?status=${statusFilter}`;
 
       const res = await axios.get(url);
       setBlogs(res.data.data?.blogs || []);
@@ -43,7 +43,7 @@ const AdminViewBlogs = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this blog?")) return;
     try {
-      await axios.delete(`http://localhost:8000/api/blogs/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/blogs/${id}`);
       setBlogs(blogs.filter((blog) => blog._id !== id));
       toast.success("Blog deleted successfully");
     } catch (err) {
@@ -62,7 +62,7 @@ const AdminViewBlogs = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/placeholder.png";
     if (imagePath.startsWith("http")) return imagePath;
-    return `http://localhost:8000/${imagePath.replace(/\\/g, "/")}`;
+    return `${import.meta.env.VITE_API_URL}/${imagePath.replace(/\\/g, "/")}`;
   };
 
   const getStatusBadge = (status) => {

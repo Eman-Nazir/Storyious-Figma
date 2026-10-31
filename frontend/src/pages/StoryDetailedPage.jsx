@@ -30,7 +30,7 @@ const StoryDetailPage = () => {
     try {
       console.log("Checking bookmark status for story:", id);
       const response = await axios.get(
-        `http://localhost:8000/api/bookmarks/status?storyId=${id}`, 
+        `${import.meta.env.VITE_API_URL}/api/bookmarks/status?storyId=${id}`, 
         { withCredentials: true }
       );
       
@@ -56,7 +56,7 @@ const StoryDetailPage = () => {
       console.log("Toggling bookmark for story:", id);
       
       const response = await axios.post(
-        'http://localhost:8000/api/bookmarks/toggle',
+        `${import.meta.env.VITE_API_URL}/api/bookmarks/toggle`,
         { storyId: id },
         { 
           withCredentials: true,
@@ -115,7 +115,7 @@ const StoryDetailPage = () => {
     const fetchStory = async () => {
       try {
         console.log("Fetching story with ID:", id);
-        const response = await axios.get(`http://localhost:8000/api/stories/${id}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/stories/${id}`);
         const storyData = response.data.data || response.data;
         console.log("Story data received:", storyData);
         setStory(storyData);
@@ -142,7 +142,7 @@ const StoryDetailPage = () => {
     try {
       setLoadingRelated(true);
       const response = await axios.get(
-        `http://localhost:8000/api/stories?type=${type}&limit=4&exclude=${id}`
+        `${import.meta.env.VITE_API_URL}/api/stories?type=${type}&limit=4&exclude=${id}`
       );
       
       if (response.data.success && response.data.data) {
@@ -163,7 +163,7 @@ const StoryDetailPage = () => {
 
   const fetchCommentsCount = async () => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/comments?storyId=${id}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/comments?storyId=${id}`);
       if (response.data.success && response.data.data) {
         setCommentsCount(response.data.data.length);
       }

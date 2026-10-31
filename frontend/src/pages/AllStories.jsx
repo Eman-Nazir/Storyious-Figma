@@ -10,7 +10,7 @@ const AllStories = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/categories");
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories`);
         const categoriesData = response.data.data || response.data || [];
         setCategories(categoriesData);
         setLoading(false);

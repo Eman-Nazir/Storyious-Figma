@@ -11,7 +11,7 @@ const VideoStoryPage = () => {
   useEffect(() => {
     const fetchVideoStories = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/stories");
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/stories`);
         const stories = response.data.data || response.data;
         const videoStories = stories.filter((story) => story.type === "video");
         setVideoStories(videoStories);

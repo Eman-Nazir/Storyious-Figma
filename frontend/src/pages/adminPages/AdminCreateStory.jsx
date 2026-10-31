@@ -39,8 +39,8 @@ const AdminCreateStory = () => {
     const fetchData = async () => {
       try {
         const [authorsRes, categoriesRes] = await Promise.all([
-          axios.get("http://localhost:8000/api/authors"),
-          axios.get("http://localhost:8000/api/categories"),
+          axios.get(`${import.meta.env.VITE_API_URL}/api/authors`),
+          axios.get(`${import.meta.env.VITE_API_URL}/api/categories`),
         ]);
         setAuthors(authorsRes.data?.data || []);
         setCategories(categoriesRes.data?.data || []);
@@ -82,13 +82,13 @@ const AdminCreateStory = () => {
 
       if (editingStory) {
         await axios.put(
-          `http://localhost:8000/api/stories/${editingStory._id}`,
+          `${import.meta.env.VITE_API_URL}/api/stories/${editingStory._id}`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
         toast.success("Story updated successfully");
       } else {
-        await axios.post("http://localhost:8000/api/stories/create", formData, {
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/stories/create`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         toast.success("Story created successfully");
@@ -181,7 +181,7 @@ const AdminCreateStory = () => {
 
                       try {
                         const res = await axios.post(
-                          "http://localhost:8000/api/uploads",
+                          `${import.meta.env.VITE_API_URL}/api/uploads`,
                           formData,
                           {
                             headers: { "Content-Type": "multipart/form-data" },
@@ -206,7 +206,7 @@ const AdminCreateStory = () => {
 
                     try {
                       const res = await axios.post(
-                        "http://localhost:8000/api/uploads",
+                        `${import.meta.env.VITE_API_URL}/api/uploads`,
                         formData,
                         {
                           headers: { "Content-Type": "multipart/form-data" },

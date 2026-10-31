@@ -34,7 +34,7 @@ const CommentCard = ({
     setIsLiking(true);
     try {
       const response = await axios.put(
-        `http://localhost:8000/api/comments/like/${commentId}`
+        `${import.meta.env.VITE_API_URL}/api/comments/like/${commentId}`
       );
       
       if (response.data.success && response.data.data) {
@@ -52,7 +52,7 @@ const CommentCard = ({
     setIsDisliking(true);
     try {
       const response = await axios.put(
-        `http://localhost:8000/api/comments/dislike/${commentId}`
+        `${import.meta.env.VITE_API_URL}/api/comments/dislike/${commentId}`
       );
       
       if (response.data.success && response.data.data) {
@@ -71,7 +71,7 @@ const CommentCard = ({
   const handleDelete = async () => {
   try {
     await axios.delete(
-      `http://localhost:8000/api/comments/${commentId}`,
+      `${import.meta.env.VITE_API_URL}/api/comments/${commentId}`,
       { withCredentials: true }
     );
     onDeleteComment(commentId);
@@ -193,7 +193,7 @@ const ReplyCard = ({ reply, commentId, onUpdateReply, onDeleteReply }) => {
     setIsLiking(true);
     try {
       const response = await axios.put(
-        `http://localhost:8000/api/comments/reply/like/${reply._id}`
+        `${import.meta.env.VITE_API_URL}/api/comments/reply/like/${reply._id}`
       );
       
       if (response.data.success && response.data.data) {
@@ -212,7 +212,7 @@ const ReplyCard = ({ reply, commentId, onUpdateReply, onDeleteReply }) => {
     setIsDisliking(true);
     try {
       const response = await axios.put(
-        `http://localhost:8000/api/comments/reply/dislike/${reply._id}`
+        `${import.meta.env.VITE_API_URL}/api/comments/reply/dislike/${reply._id}`
       );
       
       if (response.data.success && response.data.data) {
@@ -231,7 +231,7 @@ const ReplyCard = ({ reply, commentId, onUpdateReply, onDeleteReply }) => {
     if (!window.confirm("Are you sure you want to delete this reply?")) return;
     try {
       await axios.delete(
-        `http://localhost:8000/api/comments/reply/${reply._id}`,
+        `${import.meta.env.VITE_API_URL}/api/comments/reply/${reply._id}`,
         { withCredentials: true }
       );
       onDeleteReply(commentId, reply._id);

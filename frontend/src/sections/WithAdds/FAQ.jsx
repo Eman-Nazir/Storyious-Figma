@@ -11,10 +11,10 @@ const FAQ = ({ category = "general" }) => {
   useEffect(() => {
     const fetchFAQs = async () => {
       try {
-        let url = "http://localhost:8000/api/faqs";
+        let url = `${import.meta.env.VITE_API_URL}/api/faqs`;
         
         if (category && category !== "all") {
-          url = `http://localhost:8000/api/faqs/category/${category}`;
+          url = `${import.meta.env.VITE_API_URL}/api/faqs/category/${category}`;
         }
         
         const response = await axios.get(url);

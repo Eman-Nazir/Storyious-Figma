@@ -12,7 +12,7 @@ const AdminNewsletterView = () => {
 
   const fetchSubscribers = async () => {
     try {
-      const { data } = await axios.get("http://localhost:8000/api/newsletter");
+      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/newsletter`);
       setSubscribers(data);
     } catch (err) {
       toast.error(err.response?.data?.message || "Error fetching subscribers");
@@ -27,7 +27,7 @@ const AdminNewsletterView = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/newsletter/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/newsletter/${id}`);
       setSubscribers((prev) => prev.filter((s) => s._id !== id));
       toast.success("Subscriber deleted successfully!");
     } catch (err) {
@@ -42,7 +42,7 @@ const AdminNewsletterView = () => {
 
   const handleEditSave = async (id) => {
     try {
-      const { data } = await axios.put(`http://localhost:8000/api/newsletter/${id}`, {
+      const { data } = await axios.put(`${import.meta.env.VITE_API_URL}/api/newsletter/${id}`, {
         email: editEmail,
       });
       setSubscribers((prev) => prev.map((s) => (s._id === id ? data : s)));

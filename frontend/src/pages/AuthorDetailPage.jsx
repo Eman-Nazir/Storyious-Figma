@@ -27,7 +27,7 @@ const AuthorDetailPage = () => {
   useEffect(() => {
     const fetchAuthor = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/authors/slug/${slug}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/authors/slug/${slug}`);
         if (!response.ok) {
           throw new Error("Author not found");
         }

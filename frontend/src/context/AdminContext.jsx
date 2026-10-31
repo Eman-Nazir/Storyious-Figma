@@ -46,7 +46,7 @@ export const AdminProvider = ({ children }) => {
   //  CATEGORIES 
   const getCategories = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/categories", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/categories`, {
         withCredentials: true,
       });
       return res.data.data;
@@ -59,7 +59,7 @@ export const AdminProvider = ({ children }) => {
   //  AUTHORS 
   const getAuthors = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/authors", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/authors`, {
         withCredentials: true,
       });
       return res.data.data;
@@ -72,7 +72,7 @@ export const AdminProvider = ({ children }) => {
   //  STORIES 
   const getStories = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/stories", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/stories`, {
         withCredentials: true,
       });
       return res.data.data;
@@ -85,7 +85,7 @@ export const AdminProvider = ({ children }) => {
   //  BLOGS 
   const getBlogs = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/blogs", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/blogs`, {
         withCredentials: true,
       });
 
@@ -112,7 +112,7 @@ export const AdminProvider = ({ children }) => {
   //  FAQS 
   const getFAQs = async () => {
     try {
-      const res = await axios.get("http://localhost:8000/api/faqs", {
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/faqs`, {
         withCredentials: true,
       });
 
@@ -135,7 +135,7 @@ export const AdminProvider = ({ children }) => {
   //  SUBSCRIBERS 
 const getSubscribers = async () => {
   try {
-    const res = await axios.get("http://localhost:8000/api/newsletter", {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/newsletter`, {
       withCredentials: true,
     });
 
@@ -158,7 +158,7 @@ const getSubscribers = async () => {
 //  ADS 
 const getAds = async () => {
   try {
-    const res = await axios.get("http://localhost:8000/api/stories/ads", {
+    const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/stories/ads`, {
       withCredentials: true,
     });
 

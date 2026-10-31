@@ -43,8 +43,8 @@ const AdminViewAuthor = () => {
     try {
       const url =
         verifiedFilter === "all"
-          ? "http://localhost:8000/api/authors"
-          : `http://localhost:8000/api/authors?verified=${verifiedFilter}`;
+          ? `${import.meta.env.VITE_API_URL}/api/authors`
+          : `${import.meta.env.VITE_API_URL}/api/authors?verified=${verifiedFilter}`;
       const res = await axios.get(url);
       setAuthors(res.data.data || []);
     } catch (err) {
@@ -57,7 +57,7 @@ const AdminViewAuthor = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this author?")) return;
     try {
-      await axios.delete(`http://localhost:8000/api/authors/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/authors/${id}`);
       toast.success("Author deleted successfully");
       setAuthors(authors.filter((a) => a._id !== id));
     } catch (err) {

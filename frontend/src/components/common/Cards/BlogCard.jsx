@@ -13,13 +13,13 @@ const BlogCard = ({ article }) => {
   const formatImageUrl = (imagePath) => {
     if (!imagePath) return '/placeholder-image.jpg';
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:8000/${imagePath.replace(/\\/g, '/')}`;
+    return `${import.meta.env.VITE_API_URL}/${imagePath.replace(/\\/g, '/')}`;
   };
 
   const formatAuthorImageUrl = (imagePath) => {
     if (!imagePath) return '/placeholder-avatar.png';
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:8000/${imagePath.replace(/\\/g, '/')}`;
+    return `${import.meta.env.VITE_API_URL}/${imagePath.replace(/\\/g, '/')}`;
   };
 
   const getFirstImage = () => {

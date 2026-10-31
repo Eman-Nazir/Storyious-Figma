@@ -11,7 +11,7 @@ import CommentsList from '../sections/StoryDetailedPage/1stStory/CommentsList';
 import axios from "axios";
 import { toast } from 'react-toastify';
 
-const API_URL = 'http://localhost:8000/api/blogs';
+const API_URL = `${import.meta.env.VITE_API_URL}/api/blogs`;
 
 const BlogDetailPage = () => {
   const { id } = useParams();
@@ -30,7 +30,7 @@ const BlogDetailPage = () => {
     try {
       console.log("Checking bookmark status for blog:", id);
       const response = await axios.get(
-        `http://localhost:8000/api/bookmarks/status?blogId=${id}`, 
+        `${import.meta.env.VITE_API_URL}/api/bookmarks/status?blogId=${id}`, 
         { withCredentials: true }
       );
       
@@ -56,7 +56,7 @@ const BlogDetailPage = () => {
       console.log("Toggling bookmark for blog:", id);
       
       const response = await axios.post(
-        'http://localhost:8000/api/bookmarks/toggle',
+        `${import.meta.env.VITE_API_URL}/api/bookmarks/toggle`,
         { blogId: id },
         { 
           withCredentials: true,
@@ -142,7 +142,7 @@ const BlogDetailPage = () => {
   useEffect(() => {
     const fetchAd = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/stories/ads");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/stories/ads`);
         if (res.data?.data?.length > 0) setAd(res.data.data[0]);
       } catch (err) {
         console.error("Error fetching ad:", err);
@@ -153,7 +153,7 @@ const BlogDetailPage = () => {
 
   const fetchCommentsCount = async () => {
     try {
-      const res = await axios.get(`http://localhost:8000/api/comments?blogId=${id}`);
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/comments?blogId=${id}`);
       if (res.data.success && res.data.data) setCommentsCount(res.data.data.length);
     } catch (err) {
       console.error("Error fetching comments count:", err);
@@ -164,7 +164,7 @@ const BlogDetailPage = () => {
 
   const formatImageUrl = (imagePath) => {
     if (!imagePath) return '/placeholder-image.jpg';
-    return imagePath.startsWith('http') ? imagePath : `http://localhost:8000/${imagePath.replace(/\\/g, '/')}`;
+    return imagePath.startsWith('http') ? imagePath : `${import.meta.env.VITE_API_URL}/${imagePath.replace(/\\/g, '/')}`;
   };
 
   const formatDate = (dateString) => new Date(dateString).toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });

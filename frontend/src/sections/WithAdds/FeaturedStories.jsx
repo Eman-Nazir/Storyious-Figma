@@ -13,7 +13,7 @@ const FeaturedStories = () => {
   useEffect(() => {
     const fetchFeaturedStories = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/stories");
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/stories`);
         
         const allStories = response.data.data || response.data || [];
         

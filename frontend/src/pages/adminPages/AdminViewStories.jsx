@@ -39,8 +39,8 @@ const AdminViewStories = () => {
       setLoading(true);
       const url =
         statusFilter === "all"
-          ? "http://localhost:8000/api/stories"
-          : `http://localhost:8000/api/stories?status=${statusFilter}`;
+          ? `${import.meta.env.VITE_API_URL}/api/stories`
+          : `${import.meta.env.VITE_API_URL}/api/stories?status=${statusFilter}`;
       const res = await axios.get(url);
       setStories(res.data?.data || []);
     } catch (error) {
@@ -52,7 +52,7 @@ const AdminViewStories = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/stories/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/stories/${id}`);
       setStories(stories.filter((story) => story._id !== id));
       toast.success("Story deleted successfully");
     } catch (err) {

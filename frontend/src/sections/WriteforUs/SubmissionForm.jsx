@@ -58,7 +58,7 @@ const SubmissionForm = () => {
         console.log("File appended:", file.name);
       }
 
-      const response = await fetch("http://localhost:8000/api/submissions/create", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/submissions/create`, {
         method: "POST",
         body: formDataToSend,
       });

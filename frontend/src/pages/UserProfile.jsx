@@ -27,8 +27,8 @@ const UserProfilePage = () => {
       setLoading(true);
       const url =
         activeTab === "all"
-          ? "http://localhost:8000/api/bookmarks/my-bookmarks"
-          : `http://localhost:8000/api/bookmarks/my-bookmarks?type=${activeTab}`;
+          ? `${import.meta.env.VITE_API_URL}/api/bookmarks/my-bookmarks`
+          : `${import.meta.env.VITE_API_URL}/api/bookmarks/my-bookmarks?type=${activeTab}`;
 
       const response = await axios.get(url, { withCredentials: true });
       if (response.data.success) {
@@ -48,7 +48,7 @@ const UserProfilePage = () => {
   const removeBookmark = async (bookmarkId) => {
     try {
       setRemovingBookmark(bookmarkId);
-      await axios.delete(`http://localhost:8000/api/bookmarks/${bookmarkId}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/bookmarks/${bookmarkId}`, {
         withCredentials: true,
       });
       setBookmarks((prev) => prev.filter((b) => b._id !== bookmarkId));
@@ -79,7 +79,7 @@ const UserProfilePage = () => {
   const formatImageUrl = (imagePath) => {
     if (!imagePath) return null;
     if (imagePath.startsWith("http")) return imagePath;
-    return `http://localhost:8000/${imagePath.replace(/\\/g, "/")}`;
+    return `${import.meta.env.VITE_API_URL}/${imagePath.replace(/\\/g, "/")}`;
   };
 
   const formatDate = (dateString) =>

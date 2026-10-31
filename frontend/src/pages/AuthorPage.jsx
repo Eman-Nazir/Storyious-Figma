@@ -10,7 +10,7 @@ const AuthorPage = () => {
   useEffect(() => {
     const fetchWriters = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/authors');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/authors`);
         if (!response.ok) {
           throw new Error('Failed to fetch authors');
         }

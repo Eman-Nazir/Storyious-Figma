@@ -116,13 +116,13 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
 
       if (authorToEdit) {
         await axios.put(
-          `http://localhost:8000/api/authors/${authorToEdit._id}`,
+          `${import.meta.env.VITE_API_URL}/api/authors/${authorToEdit._id}`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
         toast.success("Author updated successfully!");
       } else {
-        await axios.post("http://localhost:8000/api/authors", formData, {
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/authors`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         toast.success("Author created successfully!");

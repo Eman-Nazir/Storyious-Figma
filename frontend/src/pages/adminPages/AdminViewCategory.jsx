@@ -28,8 +28,8 @@ const AdminViewCategory = () => {
       setLoading(true);
       const url =
         statusFilter === "all"
-          ? "http://localhost:8000/api/categories"
-          : `http://localhost:8000/api/categories?status=${statusFilter}`;
+          ? `${import.meta.env.VITE_API_URL}/api/categories`
+          : `${import.meta.env.VITE_API_URL}/api/categories?status=${statusFilter}`;
 
       const res = await axios.get(url);
       setCategories(res.data.data || []);
@@ -43,7 +43,7 @@ const AdminViewCategory = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this category?")) return;
     try {
-      await axios.delete(`http://localhost:8000/api/categories/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/categories/${id}`);
       setCategories(categories.filter((cat) => cat._id !== id));
       toast.success("Category deleted successfully");
     } catch (err) {
@@ -62,7 +62,7 @@ const AdminViewCategory = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/placeholder.png";
     if (imagePath.startsWith("http")) return imagePath;
-    return `http://localhost:8000/${imagePath.replace(/\\/g, "/")}`;
+    return `${import.meta.env.VITE_API_URL}/${imagePath.replace(/\\/g, "/")}`;
   };
 
   const getStatusBadge = (status) => {

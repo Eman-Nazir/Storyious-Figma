@@ -53,14 +53,14 @@ const AdminCreateCategory = () => {
 
       if (editCategory) {
         await axios.put(
-          `http://localhost:8000/api/categories/${editCategory._id}`,
+          `${import.meta.env.VITE_API_URL}/api/categories/${editCategory._id}`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
         toast.success("Category updated successfully!");
       } else {
         await axios.post(
-          "http://localhost:8000/api/categories/create",
+          `${import.meta.env.VITE_API_URL}/api/categories/create`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );

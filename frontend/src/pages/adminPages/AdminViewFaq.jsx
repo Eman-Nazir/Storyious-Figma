@@ -19,7 +19,7 @@ const AdminViewFAQs = () => {
 
   const fetchFAQs = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/faqs");
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/faqs`);
       setFaqs(response.data?.data || []);
     } catch (error) {
       toast.error(error.response?.data?.message || "Error fetching FAQs");
@@ -30,7 +30,7 @@ const AdminViewFAQs = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/faqs/categories");
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/faqs/categories`);
       setCategories(response.data?.data || []);
     } catch (error) {
       toast.error(error.response?.data?.message || "Error fetching categories");
@@ -45,7 +45,7 @@ const AdminViewFAQs = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this FAQ?")) return;
     try {
-      await axios.delete(`http://localhost:8000/api/faqs/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/faqs/${id}`);
       toast.success("FAQ deleted successfully");
       setFaqs(faqs.filter((faq) => faq._id !== id));
     } catch (error) {
@@ -62,7 +62,7 @@ const AdminViewFAQs = () => {
 
   const handleEditSave = async (id) => {
     try {
-      const response = await axios.put(`http://localhost:8000/api/faqs/${id}`, {
+      const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/faqs/${id}`, {
         question: editQuestion,
         answer: editAnswer,
         category: editCategory,

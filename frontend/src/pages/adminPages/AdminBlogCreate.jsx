@@ -79,7 +79,7 @@ const AdminBlogCreate = () => {
   const fetchAuthors = async () => {
     try {
       setLoadingAuthors(true);
-      const res = await axios.get("http://localhost:8000/api/authors");
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/authors`);
       if (res.data && Array.isArray(res.data.data)) {
         setAuthors(res.data.data);
       }
@@ -143,10 +143,10 @@ const AdminBlogCreate = () => {
       });
 
       const res = editingBlog
-        ? await axios.put(`http://localhost:8000/api/blogs/${editingBlog._id}`, formData, {
+        ? await axios.put(`${import.meta.env.VITE_API_URL}/api/blogs/${editingBlog._id}`, formData, {
             headers: { "Content-Type": "multipart/form-data" },
           })
-        : await axios.post("http://localhost:8000/api/blogs", formData, {
+        : await axios.post(`${import.meta.env.VITE_API_URL}/api/blogs`, formData, {
             headers: { "Content-Type": "multipart/form-data" },
           });
 

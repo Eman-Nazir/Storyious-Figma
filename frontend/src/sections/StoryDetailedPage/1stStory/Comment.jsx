@@ -39,7 +39,7 @@ const Comment = ({ onCommentAdded }) => {
       if (isBlogPage) commentData.blogId = id;
       if (isStoryPage) commentData.storyId = id;
 
-      await axios.post("http://localhost:8000/api/comments", commentData, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/comments`, commentData, {
         withCredentials: true,
       });
 

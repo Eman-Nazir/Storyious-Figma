@@ -16,7 +16,7 @@ const Ads = () => {
   useEffect(() => {
     const fetchAds = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/stories/ads");
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/stories/ads`);
         const lastSix = res.data.data.slice(-6);
         setAds(lastSix);
       } catch (err) {

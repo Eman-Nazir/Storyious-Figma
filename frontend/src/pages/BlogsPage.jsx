@@ -4,7 +4,7 @@ import BlogCard from "../components/common/Cards/BlogCard";
 import { RefreshCcwDot } from 'lucide-react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api/blogs';
+const API_URL = `${import.meta.env.VITE_API_URL}/api/blogs`;
 
 const BlogsPage = () => {
   const [articles, setArticles] = useState([]);
