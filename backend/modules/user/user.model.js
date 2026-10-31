@@ -10,17 +10,25 @@ const userSchema = new mongoose.Schema({
 
 userSchema.statics.ensureAdminExists = async function () {
   const User = this;
-  const adminEmail = "admin@storyious.com";
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    console.log("ADMIN_EMAIL or ADMIN_PASSWORD missing in .env");
+    return;
+  }
+
   const existingAdmin = await User.findOne({ email: adminEmail });
 
   if (!existingAdmin) {
-    const hashedPassword = await bcrypt.hash("admin123", 10);
+    const hashedPassword = await bcrypt.hash(adminPassword, 10);
     await User.create({
       username: "Admin",
       email: adminEmail,
       password: hashedPassword,
       role: "admin",
     });
+    console.log("Admin created");
   }
 };
 

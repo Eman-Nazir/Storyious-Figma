@@ -1,5 +1,6 @@
 import "dotenv/config";
 
+import dns from "node:dns";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -21,6 +22,10 @@ import commentRoutes from "./modules/story/commnet.route.js";
 import newsletterRoutes from "./modules/newsletter/newsLetter.routes.js";
 import searchRoutes from "./modules/search/search.route.js";
 import bookmarkRoutes from "./modules/bookmark/bookmark.routes.js";
+
+// Fix for "queryTxt ESERVFAIL" with mongodb+srv:// connection strings.
+// Uses Google and Cloudflare DNS instead of the ISP DNS.
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 
 const app = express();
 const PORT = process.env.PORT || 8000;
