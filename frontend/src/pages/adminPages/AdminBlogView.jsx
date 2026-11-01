@@ -12,6 +12,7 @@ const AdminViewBlogs = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [blogsPerPage, setBlogsPerPage] = useState(4);
+
   const navigate = useNavigate();
 
   const handleSearchChange = useCallback((e) => {
@@ -26,6 +27,7 @@ const AdminViewBlogs = () => {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
+
       const url =
         statusFilter === "all"
           ? `${import.meta.env.VITE_API_URL}/api/blogs`
@@ -41,9 +43,18 @@ const AdminViewBlogs = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this blog?")) return;
+    if (!window.confirm("Are you sure you want to delete this blog?")) {
+      return;
+    }
+
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/blogs/${id}`);
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/blogs/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
       setBlogs(blogs.filter((blog) => blog._id !== id));
       toast.success("Blog deleted successfully");
     } catch (err) {
@@ -62,12 +73,14 @@ const AdminViewBlogs = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return "/placeholder.png";
     if (imagePath.startsWith("http")) return imagePath;
+
     return `${import.meta.env.VITE_API_URL}/${imagePath.replace(/\\/g, "/")}`;
   };
 
   const getStatusBadge = (status) => {
     const baseClasses =
       "px-2.5 py-0.5 rounded-full text-xs font-medium inline-flex items-center";
+
     return status === "active"
       ? `${baseClasses} bg-green-100 text-green-800`
       : `${baseClasses} bg-red-100 text-red-800`;
@@ -75,6 +88,7 @@ const AdminViewBlogs = () => {
 
   const filteredBlogs = blogs.filter((blog) => {
     const search = searchTerm.toLowerCase();
+
     return (
       blog.title?.toLowerCase().includes(search) ||
       blog.introText?.toLowerCase().includes(search)
@@ -92,12 +106,15 @@ const AdminViewBlogs = () => {
     setCurrentPage(pageNumber);
   };
 
-  if (loading)
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <p className="text-center text-gray-500 text-lg">Loading blogs...</p>
+        <p className="text-center text-gray-500 text-lg">
+          Loading blogs...
+        </p>
       </div>
     );
+  }
 
   return (
     <div className="p-6 bg-white shadow-lg rounded-xl max-w-7xl mx-auto mt-6 overflow-hidden">
@@ -105,7 +122,9 @@ const AdminViewBlogs = () => {
 
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-[var(--pink-dark)]">Blogs</h2>
+        <h2 className="text-3xl font-bold text-[var(--pink-dark)]">
+          Blogs
+        </h2>
         <button
           onClick={handleAddBlog}
           className="flex items-center gap-2 bg-[var(--pink-dark)] text-white px-4 py-2 rounded-lg shadow hover:opacity-90 transition"
@@ -114,6 +133,7 @@ const AdminViewBlogs = () => {
         </button>
       </div>
 
+      {/* Filters and Search */}
       <div className="mb-6 bg-gray-50 border border-gray-200 p-4 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
           <label className="text-sm font-medium text-gray-700">
@@ -130,7 +150,6 @@ const AdminViewBlogs = () => {
           </select>
         </div>
 
-        {/* Search input */}
         <div className="flex items-center gap-2 w-full sm:w-64">
           <input
             type="text"
@@ -152,6 +171,7 @@ const AdminViewBlogs = () => {
             value={blogsPerPage}
             onChange={(e) => {
               const value = Number(e.target.value);
+
               if (value > 0 && value <= 50) {
                 setBlogsPerPage(value);
                 setCurrentPage(1);
@@ -167,24 +187,39 @@ const AdminViewBlogs = () => {
         <table className="w-full border-collapse">
           <thead>
             <tr className="bg-pink-100 text-pink-800 uppercase text-sm">
-              <th className="px-4 py-4 text-left font-semibold w-12">#</th>
-              <th className="px-4 py-4 text-left font-semibold w-20">Image</th>
-              <th className="px-4 py-4 text-left font-semibold w-64">Title</th>
-              <th className="px-4 py-4 text-left font-semibold w-48">Author</th>
-              <th className="px-4 py-4 text-center font-semibold w-28">Status</th>
-              <th className="px-4 py-4 text-center font-semibold w-20">Views</th>
+              <th className="px-4 py-4 text-left font-semibold w-12">
+                #
+              </th>
+              <th className="px-4 py-4 text-left font-semibold w-20">
+                Image
+              </th>
+              <th className="px-4 py-4 text-left font-semibold w-64">
+                Title
+              </th>
+              <th className="px-4 py-4 text-left font-semibold w-48">
+                Author
+              </th>
+              <th className="px-4 py-4 text-center font-semibold w-28">
+                Status
+              </th>
+              <th className="px-4 py-4 text-center font-semibold w-20">
+                Views
+              </th>
               <th className="px-4 py-4 text-center font-semibold w-28">
                 Read Time
               </th>
               <th className="px-4 py-4 text-center font-semibold w-28">
                 Comments
               </th>
-              <th className="px-4 py-4 text-left font-semibold w-32">Created</th>
+              <th className="px-4 py-4 text-left font-semibold w-32">
+                Created
+              </th>
               <th className="px-4 py-4 text-center font-semibold w-28">
                 Actions
               </th>
             </tr>
           </thead>
+
           <tbody className="divide-y divide-gray-200">
             {currentBlogs.length > 0 ? (
               currentBlogs.map((blog, index) => (
@@ -195,6 +230,7 @@ const AdminViewBlogs = () => {
                   <td className="px-4 py-4 text-center">
                     {(currentPage - 1) * blogsPerPage + index + 1}
                   </td>
+
                   <td className="px-4 py-4">
                     <img
                       src={getImageUrl(blog.cards?.[0]?.image)}
@@ -205,12 +241,14 @@ const AdminViewBlogs = () => {
                       }}
                     />
                   </td>
+
                   <td
                     className="px-4 py-4 font-medium text-gray-900"
                     title={blog.title}
                   >
                     <div className="max-w-xs">
                       <p className="truncate">{blog.title}</p>
+
                       {blog.introText && (
                         <p
                           className="text-xs text-gray-500 mt-1 truncate"
@@ -221,6 +259,7 @@ const AdminViewBlogs = () => {
                       )}
                     </div>
                   </td>
+
                   <td className="px-4 py-4">
                     <div className="flex items-center">
                       {blog.author?.image && (
@@ -233,6 +272,7 @@ const AdminViewBlogs = () => {
                           }}
                         />
                       )}
+
                       <span
                         className="text-sm text-gray-700 truncate max-w-[120px]"
                         title={blog.author?.name || "No author"}
@@ -241,20 +281,25 @@ const AdminViewBlogs = () => {
                       </span>
                     </div>
                   </td>
+
                   <td className="px-4 py-4 text-center">
                     <span className={getStatusBadge(blog.status)}>
                       {blog.status || "inactive"}
                     </span>
                   </td>
+
                   <td className="px-4 py-4 text-center text-gray-700 font-medium">
                     {blog.meta?.views || 0}
                   </td>
+
                   <td className="px-4 py-4 text-center text-gray-700">
                     {blog.meta?.readTime || "N/A"}
                   </td>
+
                   <td className="px-4 py-4 text-center text-gray-700 font-medium">
                     {blog.commentsCount || 0}
                   </td>
+
                   <td className="px-4 py-4 text-sm text-gray-500">
                     {new Date(blog.createdAt).toLocaleDateString("en-GB", {
                       day: "2-digit",
@@ -262,6 +307,7 @@ const AdminViewBlogs = () => {
                       year: "numeric",
                     })}
                   </td>
+
                   <td className="px-4 py-4">
                     <div className="flex justify-center space-x-2">
                       <button
@@ -271,6 +317,7 @@ const AdminViewBlogs = () => {
                       >
                         <FaEdit className="text-sm" />
                       </button>
+
                       <button
                         onClick={() => handleDelete(blog._id)}
                         className="h-8 w-8 flex items-center justify-center rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
@@ -284,7 +331,10 @@ const AdminViewBlogs = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="10" className="px-6 py-12 text-center text-gray-500">
+                <td
+                  colSpan="10"
+                  className="px-6 py-12 text-center text-gray-500"
+                >
                   <div className="flex flex-col items-center">
                     <FaImage className="h-12 w-12 text-gray-300 mb-2" />
                     <p className="text-lg font-medium">No blogs found</p>
@@ -324,6 +374,3 @@ const AdminViewBlogs = () => {
 };
 
 export default AdminViewBlogs;
-
-
-

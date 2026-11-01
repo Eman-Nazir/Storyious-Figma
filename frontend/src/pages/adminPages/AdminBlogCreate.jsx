@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -12,6 +11,7 @@ const AdminBlogCreate = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const editingBlog = location.state?.blog;
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authors, setAuthors] = useState([]);
   const [loadingAuthors, setLoadingAuthors] = useState(false);
@@ -33,7 +33,14 @@ const AdminBlogCreate = () => {
       author: "",
       status: "active",
       cards: [
-        { title: "", subtitle: "", description: "", button_text: "", button_link: "", image: null },
+        {
+          title: "",
+          subtitle: "",
+          description: "",
+          button_text: "",
+          button_link: "",
+          image: null,
+        },
       ],
     },
   });
@@ -53,6 +60,7 @@ const AdminBlogCreate = () => {
       setValue("introText", editingBlog.introText || "");
       setValue("author", editingBlog.author?._id || "");
       setValue("status", editingBlog.status || "active");
+
       setValue(
         "cards",
         editingBlog.cards.length > 0
@@ -62,14 +70,22 @@ const AdminBlogCreate = () => {
               description: card.description || "",
               button_text: card.button_text || "",
               button_link: card.button_link || "",
-              image: null, 
+              image: null,
               oldImage: card.image || "",
               fileName: card.image ? card.image.split("/").pop() : "",
             }))
-          : [{ title: "", subtitle: "", description: "", button_text: "", button_link: "", image: null }]
+          : [
+              {
+                title: "",
+                subtitle: "",
+                description: "",
+                button_text: "",
+                button_link: "",
+                image: null,
+              },
+            ]
       );
-      
-      // Set the selected author for display
+
       if (editingBlog.author) {
         setSelectedAuthor(editingBlog.author._id);
       }
@@ -79,7 +95,11 @@ const AdminBlogCreate = () => {
   const fetchAuthors = async () => {
     try {
       setLoadingAuthors(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/authors`);
+
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/authors`
+      );
+
       if (res.data && Array.isArray(res.data.data)) {
         setAuthors(res.data.data);
       }
@@ -99,12 +119,20 @@ const AdminBlogCreate = () => {
 
   const getSelectedAuthorName = () => {
     if (!selectedAuthor) return "";
-    const author = authors.find(a => a._id === selectedAuthor);
+
+    const author = authors.find((a) => a._id === selectedAuthor);
     return author ? author.name : "";
   };
 
   const addCard = () => {
-    append({ title: "", subtitle: "", description: "", button_text: "", button_link: "", image: null });
+    append({
+      title: "",
+      subtitle: "",
+      description: "",
+      button_text: "",
+      button_link: "",
+      image: null,
+    });
   };
 
   const removeCard = (index) => {
@@ -118,8 +146,10 @@ const AdminBlogCreate = () => {
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
+
     try {
       const formData = new FormData();
+
       formData.append("title", data.title);
       formData.append("introText", data.introText);
       formData.append("author", data.author);
@@ -143,21 +173,39 @@ const AdminBlogCreate = () => {
       });
 
       const res = editingBlog
-        ? await axios.put(`${import.meta.env.VITE_API_URL}/api/blogs/${editingBlog._id}`, formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-          })
-        : await axios.post(`${import.meta.env.VITE_API_URL}/api/blogs`, formData, {
-            headers: { "Content-Type": "multipart/form-data" },
-          });
+        ? await axios.put(
+            `${import.meta.env.VITE_API_URL}/api/blogs/${editingBlog._id}`,
+            formData,
+            {
+              withCredentials: true,
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          )
+        : await axios.post(
+            `${import.meta.env.VITE_API_URL}/api/blogs`,
+            formData,
+            {
+              withCredentials: true,
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          );
 
       if (res.status >= 200 && res.status < 300) {
-        toast.success(editingBlog ? "Blog updated successfully!" : "Blog created successfully!");
-        
+        toast.success(
+          editingBlog
+            ? "Blog updated successfully!"
+            : "Blog created successfully!"
+        );
+
         if (!editingBlog) {
           reset();
           setSelectedAuthor("");
         }
-        
+
         setTimeout(() => {
           navigate("/admin/blogs");
         }, 1500);
@@ -177,22 +225,33 @@ const AdminBlogCreate = () => {
   return (
     <div className="container mx-auto p-6 bg-white shadow rounded-lg mb-8">
       <ToastContainer position="top-right" autoClose={3000} />
-      <h1 className="text-2xl font-bold mb-6">{editingBlog ? "Edit Blog" : "Create Blog"}</h1>
+
+      <h1 className="text-2xl font-bold mb-6">
+        {editingBlog ? "Edit Blog" : "Create Blog"}
+      </h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Main Title</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Main Title
+          </label>
           <input
             type="text"
             placeholder="Main Title"
             {...register("title")}
             className="w-full border p-2 rounded"
           />
-          {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+          {errors.title && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.title.message}
+            </p>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Intro Text</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Intro Text
+          </label>
           <textarea
             placeholder="Intro Text"
             {...register("introText")}
@@ -202,10 +261,10 @@ const AdminBlogCreate = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Author</label>
-          
-         
-          
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Author
+          </label>
+
           <select
             {...register("author")}
             onChange={handleAuthorChange}
@@ -223,11 +282,18 @@ const AdminBlogCreate = () => {
               ))
             )}
           </select>
-          {errors.author && <p className="text-red-500 text-sm mt-1">{errors.author.message}</p>}
+
+          {errors.author && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.author.message}
+            </p>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Status
+          </label>
           <select
             {...register("status")}
             className="w-full border p-2 rounded"
@@ -235,13 +301,24 @@ const AdminBlogCreate = () => {
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
-          {errors.status && <p className="text-red-500 text-sm mt-1">{errors.status.message}</p>}
+
+          {errors.status && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.status.message}
+            </p>
+          )}
         </div>
 
         {fields.map((card, index) => (
-          <div key={card.id} className="border p-4 rounded-lg shadow-sm bg-gray-50">
+          <div
+            key={card.id}
+            className="border p-4 rounded-lg shadow-sm bg-gray-50"
+          >
             <div className="flex justify-between items-center mb-2">
-              <h2 className="text-lg font-semibold">Card {index + 1}</h2>
+              <h2 className="text-lg font-semibold">
+                Card {index + 1}
+              </h2>
+
               {fields.length > 1 && (
                 <button
                   type="button"
@@ -252,23 +329,30 @@ const AdminBlogCreate = () => {
                 </button>
               )}
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Card Title</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Card Title
+                </label>
                 <input
                   type="text"
                   placeholder="Card Title"
                   {...register(`cards.${index}.title`)}
                   className="w-full border p-2 rounded"
                 />
+
                 {errors.cards?.[index]?.title && (
-                  <p className="text-red-500 text-sm mt-1">{errors.cards[index].title.message}</p>
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.cards[index].title.message}
+                  </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Subtitle
+                </label>
                 <input
                   type="text"
                   placeholder="Subtitle"
@@ -279,7 +363,9 @@ const AdminBlogCreate = () => {
             </div>
 
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
               <textarea
                 placeholder="Description"
                 {...register(`cards.${index}.description`)}
@@ -290,7 +376,9 @@ const AdminBlogCreate = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Button Text</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Button Text
+                </label>
                 <input
                   type="text"
                   placeholder="Button Text"
@@ -300,7 +388,9 @@ const AdminBlogCreate = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Button Link</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Button Link
+                </label>
                 <input
                   type="text"
                   placeholder="Button Link"
@@ -311,8 +401,10 @@ const AdminBlogCreate = () => {
             </div>
 
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Image</label>
-              
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Image
+              </label>
+
               <div className="flex items-center">
                 <input
                   type="text"
@@ -330,7 +422,9 @@ const AdminBlogCreate = () => {
                   id={`file-${index}`}
                   style={{ display: "none" }}
                   accept="image/*"
-                  onChange={(e) => handleFileChange(index, e.target.files[0])}
+                  onChange={(e) =>
+                    handleFileChange(index, e.target.files[0])
+                  }
                 />
 
                 <label
@@ -352,12 +446,17 @@ const AdminBlogCreate = () => {
           >
             + Add Card
           </button>
+
           <button
             type="submit"
             disabled={isSubmitting}
             className="bg-pink-600 text-white px-6 py-2 rounded hover:bg-pink-700 disabled:opacity-50"
           >
-            {isSubmitting ? "Saving..." : editingBlog ? "Update Blog" : "Create Blog"}
+            {isSubmitting
+              ? "Saving..."
+              : editingBlog
+              ? "Update Blog"
+              : "Create Blog"}
           </button>
         </div>
       </form>

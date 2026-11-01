@@ -37,10 +37,12 @@ const AdminViewStories = () => {
   const fetchStories = async () => {
     try {
       setLoading(true);
+
       const url =
         statusFilter === "all"
           ? `${import.meta.env.VITE_API_URL}/api/stories`
           : `${import.meta.env.VITE_API_URL}/api/stories?status=${statusFilter}`;
+
       const res = await axios.get(url);
       setStories(res.data?.data || []);
     } catch (error) {
@@ -52,7 +54,13 @@ const AdminViewStories = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/stories/${id}`);
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/stories/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
       setStories(stories.filter((story) => story._id !== id));
       toast.success("Story deleted successfully");
     } catch (err) {
@@ -71,13 +79,16 @@ const AdminViewStories = () => {
   const getYouTubeId = (url) => {
     const regExp =
       /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+
     const match = url.match(regExp);
     return match && match[7].length === 11 ? match[7] : null;
   };
 
   const getYouTubeThumbnail = (url, quality = "mqdefault") => {
     const videoId = getYouTubeId(url);
+
     if (!videoId) return null;
+
     return `https://img.youtube.com/vi/${videoId}/${quality}.jpg`;
   };
 
@@ -96,6 +107,7 @@ const AdminViewStories = () => {
           title: story.title,
         });
       }
+
       setShowModal(true);
     }
   };
@@ -108,6 +120,7 @@ const AdminViewStories = () => {
   const getStatusBadge = (status) => {
     const baseClasses =
       "px-2.5 py-0.5 rounded-full text-xs font-medium inline-flex items-center";
+
     return status === "active"
       ? `${baseClasses} bg-green-100 text-green-800`
       : `${baseClasses} bg-red-100 text-red-800`;
@@ -115,6 +128,7 @@ const AdminViewStories = () => {
 
   const filteredStories = stories.filter((story) => {
     const search = searchTerm.toLowerCase();
+
     return (
       story.title?.toLowerCase().includes(search) ||
       story.author?.name?.toLowerCase().includes(search)
@@ -132,12 +146,15 @@ const AdminViewStories = () => {
     setCurrentPage(pageNumber);
   };
 
-  if (loading)
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <p className="text-center text-gray-500 text-lg">Loading stories...</p>
+        <p className="text-center text-gray-500 text-lg">
+          Loading stories...
+        </p>
       </div>
     );
+  }
 
   return (
     <div className="p-6 bg-white shadow-lg rounded-xl max-w-7xl mx-auto mt-6 overflow-hidden">
@@ -148,7 +165,9 @@ const AdminViewStories = () => {
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg overflow-hidden w-full max-w-3xl">
             <div className="flex justify-between items-center px-4 py-2 bg-gray-800 text-white">
-              <h3 className="text-lg font-medium">{selectedVideo.title}</h3>
+              <h3 className="text-lg font-medium">
+                {selectedVideo.title}
+              </h3>
               <button
                 onClick={closeVideoModal}
                 className="text-white hover:text-gray-300"
@@ -156,6 +175,7 @@ const AdminViewStories = () => {
                 <FaTimes size={20} />
               </button>
             </div>
+
             <div className="p-1 bg-black">
               {selectedVideo.type === "youtube" ? (
                 <div className="relative pt-[56.25%]">
@@ -186,7 +206,9 @@ const AdminViewStories = () => {
 
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-[var(--pink-dark)]">Stories</h2>
+        <h2 className="text-3xl font-bold text-[var(--pink-dark)]">
+          Stories
+        </h2>
         <button
           onClick={handleAddStory}
           className="flex items-center gap-2 bg-[var(--pink-dark)] text-white px-4 py-2 rounded-lg shadow hover:opacity-90 transition"
@@ -195,7 +217,7 @@ const AdminViewStories = () => {
         </button>
       </div>
 
-      {/* Filter + Search */}
+      {/* Filter and Search */}
       <div className="mb-6 bg-gray-50 border border-gray-200 p-4 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
           <label className="text-sm font-medium text-gray-700">
@@ -212,7 +234,6 @@ const AdminViewStories = () => {
           </select>
         </div>
 
-        {/* Search */}
         <div className="flex items-center gap-2 w-full sm:w-64">
           <input
             type="text"
@@ -234,6 +255,7 @@ const AdminViewStories = () => {
             value={storiesPerPage}
             onChange={(e) => {
               const value = Number(e.target.value);
+
               if (value > 0 && value <= 50) {
                 setStoriesPerPage(value);
                 setCurrentPage(1);
@@ -254,15 +276,24 @@ const AdminViewStories = () => {
               <th className="px-4 py-4 text-left font-semibold">Type</th>
               <th className="px-4 py-4 text-center font-semibold">Status</th>
               <th className="px-4 py-4 text-left font-semibold">Author</th>
-              <th className="px-4 py-4 text-left font-semibold">Categories</th>
+              <th className="px-4 py-4 text-left font-semibold">
+                Categories
+              </th>
               <th className="px-4 py-4 text-center font-semibold">Media</th>
               <th className="px-4 py-4 text-center font-semibold">Views</th>
-              <th className="px-4 py-4 text-center font-semibold">Read Time</th>
-              <th className="px-4 py-4 text-center font-semibold">Comments</th>
+              <th className="px-4 py-4 text-center font-semibold">
+                Read Time
+              </th>
+              <th className="px-4 py-4 text-center font-semibold">
+                Comments
+              </th>
               <th className="px-4 py-4 text-left font-semibold">Created</th>
-              <th className="px-4 py-4 text-center font-semibold">Actions</th>
+              <th className="px-4 py-4 text-center font-semibold">
+                Actions
+              </th>
             </tr>
           </thead>
+
           <tbody className="divide-y divide-gray-200">
             {currentStories.length > 0 ? (
               currentStories.map((story, index) => (
@@ -273,7 +304,9 @@ const AdminViewStories = () => {
                   <td className="px-4 py-3 text-center">
                     {(currentPage - 1) * storiesPerPage + index + 1}
                   </td>
-                  <td className="px-4 py-3 font-medium">{story.title}</td>
+                  <td className="px-4 py-3 font-medium">
+                    {story.title}
+                  </td>
                   <td className="px-4 py-3 text-gray-700 capitalize">
                     {story.type || "N/A"}
                   </td>
@@ -282,9 +315,12 @@ const AdminViewStories = () => {
                       {story.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3">{story.author?.name || "N/A"}</td>
                   <td className="px-4 py-3">
-                    {story.categories?.map((c) => c.name).join(", ") || "N/A"}
+                    {story.author?.name || "N/A"}
+                  </td>
+                  <td className="px-4 py-3">
+                    {story.categories?.map((c) => c.name).join(", ") ||
+                      "N/A"}
                   </td>
                   <td className="px-4 py-3 text-center">
                     {story.type === "video" ? (

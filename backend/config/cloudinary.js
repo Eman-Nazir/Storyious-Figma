@@ -1,9 +1,24 @@
+import "dotenv/config";
 import { v2 as cloudinary } from "cloudinary";
 
+const {
+  CLOUDINARY_NAME,
+  CLOUDINARY_API_KEY,
+  CLOUDINARY_SECRET_KEY,
+} = process.env;
+
+if (
+  !CLOUDINARY_NAME ||
+  !CLOUDINARY_API_KEY ||
+  !CLOUDINARY_SECRET_KEY
+) {
+  throw new Error("Missing Cloudinary environment variables");
+}
+
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_NAME || "dl9nti2kz",
-  api_key: process.env.CLOUDINARY_API_KEY || "929448954262188",
-  api_secret: process.env.CLOUDINARY_SECRET_KEY || "Oz8tH0s54AfrO53Dg7w89KOaUrA",
+  cloud_name: CLOUDINARY_NAME,
+  api_key: CLOUDINARY_API_KEY,
+  api_secret: CLOUDINARY_SECRET_KEY,
 });
 
 export default cloudinary;

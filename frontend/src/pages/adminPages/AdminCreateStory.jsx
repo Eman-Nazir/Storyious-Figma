@@ -25,7 +25,6 @@ const AdminCreateStory = () => {
   const [videoFile, setVideoFile] = useState(null);
   const [videoUrl, setVideoUrl] = useState(editingStory?.videoUrl || "");
   const [featuredImage, setFeaturedImage] = useState(null);
-
   const [loading, setLoading] = useState(false);
 
   const {
@@ -42,6 +41,7 @@ const AdminCreateStory = () => {
           axios.get(`${import.meta.env.VITE_API_URL}/api/authors`),
           axios.get(`${import.meta.env.VITE_API_URL}/api/categories`),
         ]);
+
         setAuthors(authorsRes.data?.data || []);
         setCategories(categoriesRes.data?.data || []);
       } catch (err) {
@@ -49,6 +49,7 @@ const AdminCreateStory = () => {
         toast.error("Failed to load authors or categories");
       }
     };
+
     fetchData();
   }, []);
 
@@ -64,6 +65,7 @@ const AdminCreateStory = () => {
 
     try {
       const formData = new FormData();
+
       formData.append("title", title);
       formData.append("introText", introText);
       formData.append("content", content);
@@ -76,6 +78,7 @@ const AdminCreateStory = () => {
       if (featuredImage) {
         formData.append("featuredImage", featuredImage);
       }
+
       if (videoFile) {
         formData.append("videoFile", videoFile);
       }
@@ -84,13 +87,23 @@ const AdminCreateStory = () => {
         await axios.put(
           `${import.meta.env.VITE_API_URL}/api/stories/${editingStory._id}`,
           formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          {
+            withCredentials: true,
+            headers: { "Content-Type": "multipart/form-data" },
+          }
         );
+
         toast.success("Story updated successfully");
       } else {
-        await axios.post(`${import.meta.env.VITE_API_URL}/api/stories/create`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/stories/create`,
+          formData,
+          {
+            withCredentials: true,
+            headers: { "Content-Type": "multipart/form-data" },
+          }
+        );
+
         toast.success("Story created successfully");
       }
 
@@ -106,6 +119,7 @@ const AdminCreateStory = () => {
   return (
     <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-6 mt-6">
       <ToastContainer position="top-right" autoClose={3000} />
+
       <h2 className="text-2xl font-bold text-pink-600 mb-6">
         {editingStory ? "Edit Story" : "Create Story"}
       </h2>
@@ -122,7 +136,7 @@ const AdminCreateStory = () => {
             onChange={(e) => setTitle(e.target.value)}
             required
             maxLength={100}
-            className="w-full border-2 border-gray-300 rounded-lg px-4 py-3 
+            className="w-full border-2 border-gray-300 rounded-lg px-4 py-3
                        text-lg font-medium placeholder-gray-400
                        focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400
                        transition duration-200"
@@ -184,9 +198,11 @@ const AdminCreateStory = () => {
                           `${import.meta.env.VITE_API_URL}/api/uploads`,
                           formData,
                           {
+                            withCredentials: true,
                             headers: { "Content-Type": "multipart/form-data" },
                           }
                         );
+
                         callback(res.data.url, { title: file.name });
                       } catch (err) {
                         console.error(err);
@@ -209,9 +225,11 @@ const AdminCreateStory = () => {
                         `${import.meta.env.VITE_API_URL}/api/uploads`,
                         formData,
                         {
+                          withCredentials: true,
                           headers: { "Content-Type": "multipart/form-data" },
                         }
                       );
+
                       success(res.data.url);
                     } catch (err) {
                       console.error(err);
@@ -367,8 +385,3 @@ const AdminCreateStory = () => {
 };
 
 export default AdminCreateStory;
-
-
-
-
-

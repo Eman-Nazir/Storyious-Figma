@@ -7,11 +7,15 @@ const AdminViewAd = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [adsPerPage, setAdsPerPage] = useState(3);
+
   const navigate = useNavigate();
 
   const fetchAds = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/stories/ads`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/stories/ads`
+      );
+
       setAds(res.data.data || []);
     } catch (err) {
       console.error("Error fetching ads:", err);
@@ -26,7 +30,13 @@ const AdminViewAd = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/stories/ads/${id}`);
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/stories/ads/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
       setAds((prev) => prev.filter((ad) => ad._id !== id));
     } catch (err) {
       console.error("Error deleting ad:", err);
@@ -50,14 +60,20 @@ const AdminViewAd = () => {
 
   return (
     <div className="p-6 flex flex-col min-h-screen">
-      <h2 className="text-2xl font-bold mb-6 text-pink-600">All Ads</h2>
+      <h2 className="text-2xl font-bold mb-6 text-pink-600">
+        All Ads
+      </h2>
 
       <div className="flex justify-between items-center mb-4">
-        <p className="text-gray-700 font-medium">Total Ads: {ads.length}</p>
+        <p className="text-gray-700 font-medium">
+          Total Ads: {ads.length}
+        </p>
 
         <div className="flex items-center space-x-2">
-          <span className="text-gray-700 text-sm"> Ads per page:</span>
-          
+          <span className="text-gray-700 text-sm">
+            Ads per page:
+          </span>
+
           <input
             type="number"
             min="1"
@@ -65,6 +81,7 @@ const AdminViewAd = () => {
             value={adsPerPage}
             onChange={(e) => {
               const val = Number(e.target.value);
+
               if (val >= 1 && val <= 10) {
                 setAdsPerPage(val);
                 setCurrentPage(1);
@@ -72,14 +89,15 @@ const AdminViewAd = () => {
             }}
             className="border border-pink-400 rounded w-16 text-center py-1"
           />
-          
         </div>
       </div>
 
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>
       ) : currentAds.length === 0 ? (
-        <p className="text-center text-gray-500">No ads available.</p>
+        <p className="text-center text-gray-500">
+          No ads available.
+        </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow">
           {currentAds.map((ad) => (
@@ -105,11 +123,13 @@ const AdminViewAd = () => {
                     {ad.title}
                   </h2>
                 )}
+
                 {ad.description && (
                   <p className="text-gray-600 text-sm flex-grow">
                     {ad.description}
                   </p>
                 )}
+
                 {ad.buttonText && (
                   <button className="mt-2 bg-pink-600 text-white px-4 py-2 text-sm rounded hover:bg-pink-700">
                     {ad.buttonText}
@@ -126,6 +146,7 @@ const AdminViewAd = () => {
                   >
                     Edit
                   </button>
+
                   <button
                     onClick={() => handleDelete(ad._id)}
                     className="bg-red-600 text-white px-3 py-1 text-sm rounded hover:bg-red-700"

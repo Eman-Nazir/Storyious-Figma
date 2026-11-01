@@ -6,7 +6,7 @@ const AdminCreateAd = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const editingAd = location.state; 
+  const editingAd = location.state;
 
   const [formData, setFormData] = useState({
     title: "",
@@ -14,7 +14,7 @@ const AdminCreateAd = () => {
     buttonText: "",
   });
   const [imageFile, setImageFile] = useState(null);
-  const [imageName, setImageName] = useState("No file chosen"); 
+  const [imageName, setImageName] = useState("No file chosen");
 
   const fileInputRef = useRef(null);
 
@@ -31,20 +31,24 @@ const AdminCreateAd = () => {
 
       if (editingAd.imageUrl) {
         const urlParts = editingAd.imageUrl.split("/");
-        setImageName(urlParts[urlParts.length - 1]); 
+        setImageName(urlParts[urlParts.length - 1]);
       }
     }
   }, [editingAd]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+
     if (file) {
       setImageFile(file);
-      setImageName(file.name); 
+      setImageName(file.name);
     }
   };
 
@@ -55,28 +59,46 @@ const AdminCreateAd = () => {
 
     try {
       const form = new FormData();
+
       form.append("title", formData.title);
       form.append("description", formData.description);
       form.append("buttonText", formData.buttonText);
-      if (imageFile) form.append("image", imageFile);
+
+      if (imageFile) {
+        form.append("image", imageFile);
+      }
 
       if (editingAd) {
         await axios.put(
           `${import.meta.env.VITE_API_URL}/api/stories/ads/${editingAd._id}`,
           form,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
-        setMessage(" Ad updated successfully!");
+
+        setMessage("Ad updated successfully!");
       } else {
-        await axios.post(`${import.meta.env.VITE_API_URL}/api/stories/ads`, form, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/stories/ads`,
+          form,
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
         setMessage("Ad created successfully!");
       }
 
       navigate("/admin/ad");
     } catch (err) {
-      setMessage(" Error saving ad");
+      setMessage("Error saving ad");
       console.error(err);
     } finally {
       setLoading(false);
@@ -117,16 +139,22 @@ const AdminCreateAd = () => {
         />
 
         <div className="w-full">
-          <label className="block text-gray-700 text-sm mb-1">Upload Image</label>
+          <label className="block text-gray-700 text-sm mb-1">
+            Upload Image
+          </label>
+
           <div
             className="flex items-center border p-2 rounded cursor-pointer bg-gray-50 hover:bg-gray-100"
             onClick={() => fileInputRef.current.click()}
           >
-            <span className="flex-1 text-gray-600 truncate">{imageName}</span>
+            <span className="flex-1 text-gray-600 truncate">
+              {imageName}
+            </span>
             <span className="ml-2 bg-gray-400 text-white px-3 py-1 rounded">
               Choose File
             </span>
           </div>
+
           <input
             ref={fileInputRef}
             type="file"
@@ -146,7 +174,9 @@ const AdminCreateAd = () => {
         </button>
       </form>
 
-      {message && <p className="mt-4 text-center">{message}</p>}
+      {message && (
+        <p className="mt-4 text-center">{message}</p>
+      )}
     </div>
   );
 };
