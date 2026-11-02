@@ -25,22 +25,25 @@ const AdminViewBlogs = () => {
   }, [statusFilter]);
 
   const fetchBlogs = async () => {
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const url =
-        statusFilter === "all"
-          ? `${import.meta.env.VITE_API_URL}/api/blogs`
-          : `${import.meta.env.VITE_API_URL}/api/blogs?status=${statusFilter}`;
+    const url =
+      statusFilter === "all"
+        ? `${import.meta.env.VITE_API_URL}/api/blogs/admin/all`
+        : `${import.meta.env.VITE_API_URL}/api/blogs/admin/all?status=${statusFilter}`;
 
-      const res = await axios.get(url);
-      setBlogs(res.data.data?.blogs || []);
-    } catch (error) {
-      toast.error("Failed to load blogs");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const res = await axios.get(url, {
+      withCredentials: true,
+    });
+
+    setBlogs(res.data.data?.blogs || []);
+  } catch (error) {
+    toast.error("Failed to load blogs");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this blog?")) {

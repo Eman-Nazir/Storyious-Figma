@@ -1,44 +1,56 @@
 import express from "express";
 import Upload from "../../middleware_temp/multerMiddleware.js";
-import { 
-  addSubmission, 
-  getAllSubmissions, 
-  getSubmissionById, 
-  updateSubmission, 
-  deleteSubmission 
+import {
+  auth,
+  requireRole,
+} from "../../middleware_temp/authMiddleware.js";
+import {
+  addSubmission,
+  getAllSubmissions,
+  getSubmissionById,
+  updateSubmission,
+  deleteSubmission,
 } from "./submission.controller.js";
 
 const router = express.Router();
 
-
+// Parse and check the file, then validate the form in the controller.
+// Cloudinary upload happens only after form validation succeeds.
 router.post(
   "/create",
-  (req, res, next) => {
-    const upload = Upload("submissions").single("file");
-    
-    upload(req, res, function (err) {
-      if (err) {
-        return res.status(400).json({
-          status: "error",
-          message: err.message || "File upload failed",
-        });
-      }
-      next();
-    });
-  },
+  Upload("submissions", {
+    deferUpload: true,
+  }).single("file"),
   addSubmission
 );
 
-// Get all submissions
-router.get("/", getAllSubmissions);
+// Private administration.
+router.get(
+  "/",
+  auth,
+  requireRole("admin"),
+  getAllSubmissions
+);
 
-// Get submission by ID
-router.get("/:id", getSubmissionById);
+router.get(
+  "/:id",
+  auth,
+  requireRole("admin"),
+  getSubmissionById
+);
 
-// Update submission
-router.put("/:id", updateSubmission);
+router.put(
+  "/:id",
+  auth,
+  requireRole("admin"),
+  updateSubmission
+);
 
-// Delete submission
-router.delete("/:id", deleteSubmission);
+router.delete(
+  "/:id",
+  auth,
+  requireRole("admin"),
+  deleteSubmission
+);
 
 export default router;

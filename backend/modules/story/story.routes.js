@@ -7,6 +7,8 @@ import {
 import {
   getAllStories,
   getStoryById,
+  getAdminStories,
+  getAdminStoryById,
   addStory,
   updateStory,
   deleteStory,
@@ -15,18 +17,18 @@ import {
   addAd,
   updateAd,
   deleteAd,
-} from "../story/story.controller.js";
+} from "./story.controller.js";
 
 const router = express.Router();
 
 const uploadStories = Upload("stories");
 const uploadAds = Upload("ads");
 
-// Public ad routes
+// Public advertisements
 router.get("/ads", getAllAds);
 router.get("/ads/:id", getAdById);
 
-// Admin ad routes
+// Admin advertisement management
 router.post(
   "/ads",
   auth,
@@ -50,11 +52,26 @@ router.delete(
   deleteAd
 );
 
-// Public story routes
+// Register admin reads before public /:id.
+router.get(
+  "/admin/all",
+  auth,
+  requireRole("admin"),
+  getAdminStories
+);
+
+router.get(
+  "/admin/:id",
+  auth,
+  requireRole("admin"),
+  getAdminStoryById
+);
+
+// Public stories
 router.get("/", getAllStories);
 router.get("/:id", getStoryById);
 
-// Admin story routes
+// Admin story management
 router.post(
   "/create",
   auth,

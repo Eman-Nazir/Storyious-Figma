@@ -25,12 +25,16 @@ const UserProfilePage = () => {
   const fetchUserBookmarks = async () => {
     try {
       setLoading(true);
+
       const url =
         activeTab === "all"
           ? `${import.meta.env.VITE_API_URL}/api/bookmarks/my-bookmarks`
           : `${import.meta.env.VITE_API_URL}/api/bookmarks/my-bookmarks?type=${activeTab}`;
 
-      const response = await axios.get(url, { withCredentials: true });
+      const response = await axios.get(url, {
+        withCredentials: true,
+      });
+
       if (response.data.success) {
         setBookmarks(response.data.data.bookmarks || []);
       } else {
@@ -48,10 +52,18 @@ const UserProfilePage = () => {
   const removeBookmark = async (bookmarkId) => {
     try {
       setRemovingBookmark(bookmarkId);
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/bookmarks/${bookmarkId}`, {
-        withCredentials: true,
-      });
-      setBookmarks((prev) => prev.filter((b) => b._id !== bookmarkId));
+
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/bookmarks/${bookmarkId}`,
+        {
+          withCredentials: true,
+        }
+      );
+
+      setBookmarks((prev) =>
+        prev.filter((bookmark) => bookmark._id !== bookmarkId)
+      );
+
       toast.success("Bookmark removed successfully!");
     } catch (error) {
       console.error("Error removing bookmark:", error);
@@ -64,21 +76,29 @@ const UserProfilePage = () => {
 
   const getYouTubeId = (url) => {
     if (!url) return null;
+
     const regExp =
       /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+
     const match = url.match(regExp);
+
     return match && match[7].length === 11 ? match[7] : null;
   };
 
   const getBlogImage = (blog) => {
-    if (!blog || !blog.cards || !Array.isArray(blog.cards)) return null;
+    if (!blog || !blog.cards || !Array.isArray(blog.cards)) {
+      return null;
+    }
+
     const cardWithImage = blog.cards.find((card) => card.image);
+
     return cardWithImage ? cardWithImage.image : null;
   };
 
   const formatImageUrl = (imagePath) => {
     if (!imagePath) return null;
     if (imagePath.startsWith("http")) return imagePath;
+
     return `${import.meta.env.VITE_API_URL}/${imagePath.replace(/\\/g, "/")}`;
   };
 
@@ -93,6 +113,7 @@ const UserProfilePage = () => {
     const content = bookmark.story || bookmark.blog;
     const type = bookmark.story ? "story" : "blog";
     const isVideo = bookmark.story?.type === "video";
+
     let imageUrl = null;
 
     if (type === "story") {
@@ -107,6 +128,7 @@ const UserProfilePage = () => {
                 alt={content.title}
                 className="w-full h-full object-cover"
               />
+
               <div className="absolute inset-0 flex items-center justify-center">
                 <PlayCircle className="w-8 h-8 text-white opacity-80" />
               </div>
@@ -145,8 +167,11 @@ const UserProfilePage = () => {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="flex flex-col items-center">
-          <div className="w-12 h-12 border-4 border-t-4 border-gray-300 rounded-full animate-spin border-t-pink-500"></div>
-          <p className="mt-4 text-gray-500 text-lg">Loading bookmarks...</p>
+          <div className="w-12 h-12 border-4 border-t-4 border-gray-300 rounded-full animate-spin border-t-pink-500" />
+
+          <p className="mt-4 text-gray-500 text-lg">
+            Loading bookmarks...
+          </p>
         </div>
       </div>
     );
@@ -154,17 +179,16 @@ const UserProfilePage = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
       <div className="mb-8 text-center sm:text-left">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
           My Bookmarks
         </h1>
+
         <p className="text-gray-600 text-sm sm:text-base">
           Your saved stories and blogs
         </p>
       </div>
 
-      {/* Tabs */}
       <div className="border-b border-gray-200 mb-6 overflow-x-auto">
         <nav className="flex space-x-6 min-w-max sm:min-w-0 justify-center sm:justify-start">
           {[
@@ -183,8 +207,8 @@ const UserProfilePage = () => {
             >
               {tab.label} (
               {
-                bookmarks.filter((b) =>
-                  tab.key === "all" ? true : b.type === tab.key
+                bookmarks.filter((bookmark) =>
+                  tab.key === "all" ? true : bookmark.type === tab.key
                 ).length
               }
               )
@@ -193,13 +217,14 @@ const UserProfilePage = () => {
         </nav>
       </div>
 
-      {/* Bookmarks */}
       {bookmarks.length === 0 ? (
         <div className="text-center py-16 px-4">
           <Bookmark className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+
           <h3 className="text-lg sm:text-xl font-medium text-gray-900 mb-2">
             No bookmarks yet
           </h3>
+
           <p className="text-gray-500 mb-4 text-sm sm:text-base">
             {activeTab === "all"
               ? "You haven't bookmarked any stories or blogs yet."
@@ -207,8 +232,9 @@ const UserProfilePage = () => {
                   activeTab === "story" ? "stories" : "blogs"
                 } yet.`}
           </p>
+
           <Link
-            to={activeTab === "blog" ? "/blogs" : "/stories"}
+            to={activeTab === "blog" ? "/Blog-Page" : "/allstories"}
             className="inline-flex items-center px-4 py-2 text-sm sm:text-base font-medium rounded-md shadow-sm text-white bg-pink-600 hover:bg-pink-700"
           >
             Explore{" "}
@@ -223,7 +249,9 @@ const UserProfilePage = () => {
         <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
           {bookmarks.map((bookmark) => {
             const content = bookmark.story || bookmark.blog;
+
             if (!content) return null;
+
             const isVideo = bookmark.story?.type === "video";
             const type = bookmark.story ? "story" : "blog";
 
@@ -232,12 +260,10 @@ const UserProfilePage = () => {
                 key={bookmark._id}
                 className="bg-white rounded-lg border border-gray-200 overflow-hidden flex flex-col hover:shadow-md transition-shadow"
               >
-                {/* Thumbnail */}
                 <div className="relative w-full h-40 sm:h-48 md:h-44">
                   {renderThumbnail(bookmark)}
                 </div>
 
-                {/* Content */}
                 <div className="p-4 flex flex-col justify-between flex-grow">
                   <div>
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -250,6 +276,7 @@ const UserProfilePage = () => {
                       >
                         {type === "story" ? "Story" : "Blog"}
                       </span>
+
                       {type === "story" && isVideo && (
                         <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                           Video
@@ -270,19 +297,21 @@ const UserProfilePage = () => {
                     )}
                   </div>
 
-                  {/* Meta Info + Remove */}
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-gray-500 mt-3 gap-2">
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="flex items-center">
                         <CalendarRange className="w-3 h-3 mr-1" />
                         {formatDate(content.createdAt)}
                       </span>
+
                       <span className="flex items-center">
                         <Clock7 className="w-3 h-3 mr-1" />
+
                         {type === "story" && isVideo
                           ? `${content.meta?.duration || "5 Min"} Watch`
                           : `${content.meta?.readTime || "5 Min"} Read`}
                       </span>
+
                       <span className="flex items-center">
                         <Eye className="w-3 h-3 mr-1" />
                         {content.meta?.views || 0} views
@@ -295,7 +324,7 @@ const UserProfilePage = () => {
                       className="flex items-center gap-1 text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50"
                     >
                       {removingBookmark === bookmark._id ? (
-                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
                       ) : (
                         <>
                           <Trash2 className="w-4 h-4" />

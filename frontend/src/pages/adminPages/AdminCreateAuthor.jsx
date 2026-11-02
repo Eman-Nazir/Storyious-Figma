@@ -3,8 +3,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createAuthorSchema } from "../../schemas/authorSchema.js";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify"; 
-import "react-toastify/dist/ReactToastify.css"; 
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   FaFacebookF,
@@ -57,13 +57,15 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
       setValue("isVerified", authorToEdit.isVerified || false);
 
       const initialSocials = {};
+
       if (authorToEdit.socials) {
-        authorToEdit.socials.forEach(social => {
+        authorToEdit.socials.forEach((social) => {
           if (social.platform) {
             initialSocials[social.platform] = social.url || "";
           }
         });
       }
+
       setSocialInputs(initialSocials);
 
       if (authorToEdit.image) {
@@ -79,6 +81,7 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
         image: null,
         socials: [],
       });
+
       setSelectedImageName("");
       setSocialInputs({});
     }
@@ -86,30 +89,37 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+
     if (file) {
       setSelectedImageName(file.name);
     }
   };
 
   const handleSocialChange = (platform, url) => {
-    setSocialInputs(prev => ({ ...prev, [platform]: url }));
+    setSocialInputs((prev) => ({
+      ...prev,
+      [platform]: url,
+    }));
   };
 
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
+
       formData.append("name", data.name);
       formData.append("shortBio", data.shortBio);
       formData.append("fullBio", data.fullBio);
       formData.append("isVerified", data.isVerified);
 
-      const socialsWithUrls = platforms.map(platform => ({
+      const socialsWithUrls = platforms.map((platform) => ({
         platform: platform.name,
-        url: socialInputs[platform.name] || ""
+        url: socialInputs[platform.name] || "",
       }));
+
       formData.append("socials", JSON.stringify(socialsWithUrls));
 
       const fileInput = document.querySelector('input[name="image"]');
+
       if (fileInput && fileInput.files[0]) {
         formData.append("image", fileInput.files[0]);
       }
@@ -118,14 +128,29 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
         await axios.put(
           `${import.meta.env.VITE_API_URL}/api/authors/${authorToEdit._id}`,
           formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
+
         toast.success("Author updated successfully!");
       } else {
-        await axios.post(`${import.meta.env.VITE_API_URL}/api/authors`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
+        await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/authors`,
+          formData,
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+
         toast.success("Author created successfully!");
+
         reset({
           name: "",
           shortBio: "",
@@ -133,11 +158,14 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
           isVerified: false,
           image: null,
         });
+
         setSelectedImageName("");
         setSocialInputs({});
       }
 
-      if (refreshAuthors) refreshAuthors();
+      if (refreshAuthors) {
+        refreshAuthors();
+      }
 
       setTimeout(() => {
         navigate("/admin/authors");
@@ -198,6 +226,7 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
           <label className="block font-semibold text-[var(--pink-dark)] mb-1">
             Author Image
           </label>
+
           <div className="relative">
             <input
               type="text"
@@ -209,6 +238,7 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
                 document.getElementById("hiddenFileInput").click()
               }
             />
+
             <input
               id="hiddenFileInput"
               type="file"
@@ -219,16 +249,17 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
               className="hidden"
             />
           </div>
+
           {errors.image && (
             <p className="text-red-500 text-sm">{errors.image.message}</p>
           )}
         </div>
 
-        {/* Social Links with URLs */}
         <div>
           <label className="font-semibold text-[var(--pink-dark)]">
             Social Links
           </label>
+
           <div className="flex flex-col gap-3 mt-2">
             {platforms.map((platformObj) => {
               const Icon = platformObj.icon;
@@ -240,11 +271,14 @@ const AdminCreateAuthor = ({ refreshAuthors }) => {
                   className="flex items-center gap-3 border p-2 rounded"
                 >
                   <Icon className="text-xl text-[var(--pink-dark)]" />
+
                   <input
                     type="url"
                     placeholder={`Enter ${platformObj.name} link`}
                     value={urlValue}
-                    onChange={(e) => handleSocialChange(platformObj.name, e.target.value)}
+                    onChange={(e) =>
+                      handleSocialChange(platformObj.name, e.target.value)
+                    }
                     className="flex-1 border rounded px-2 py-1"
                   />
                 </div>

@@ -1,23 +1,79 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const commentReplySchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  showEmail: { type: Boolean, default: true },
-  phoneNumber: String,
-  countryCode: String,
-  replyText: { type: String, required: true },
-  saveDetails: { type: Boolean, default: true },
-  agreeTerms: { type: Boolean, required: true },
-  isHuman: Boolean,
-  parentCommentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Comment', required: true },
-  storyId: String,
-  blogId: String,
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  likesCount: { type: Number, default: 0 },
-  dislikesCount: { type: Number, default: 0 }
-}, {
-  timestamps: true
-});
+const commentReplySchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    showEmail: {
+      type: Boolean,
+      default: false,
+    },
+    phoneNumber: String,
+    countryCode: String,
+    replyText: {
+      type: String,
+      required: true,
+    },
+    saveDetails: {
+      type: Boolean,
+      default: true,
+    },
+    agreeTerms: {
+      type: Boolean,
+      required: true,
+    },
+    isHuman: Boolean,
+    parentCommentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment",
+      required: true,
+    },
+    storyId: String,
+    blogId: String,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    likesCount: {
+      type: Number,
+      default: 0,
+    },
+    dislikesCount: {
+      type: Number,
+      default: 0,
+    },
 
-export default mongoose.model('CommentReply', commentReplySchema);
+    // Internal voting records; excluded from normal queries.
+    likedBy: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
+      default: [],
+      select: false,
+    },
+    dislikedBy: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+      ],
+      default: [],
+      select: false,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+export default mongoose.model("CommentReply", commentReplySchema);

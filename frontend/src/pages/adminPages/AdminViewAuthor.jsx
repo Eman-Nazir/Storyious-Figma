@@ -45,6 +45,7 @@ const AdminViewAuthor = () => {
         verifiedFilter === "all"
           ? `${import.meta.env.VITE_API_URL}/api/authors`
           : `${import.meta.env.VITE_API_URL}/api/authors?verified=${verifiedFilter}`;
+
       const res = await axios.get(url);
       setAuthors(res.data.data || []);
     } catch (err) {
@@ -55,9 +56,18 @@ const AdminViewAuthor = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this author?")) return;
+    if (!window.confirm("Are you sure you want to delete this author?")) {
+      return;
+    }
+
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/authors/${id}`);
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/authors/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
       toast.success("Author deleted successfully");
       setAuthors(authors.filter((a) => a._id !== id));
     } catch (err) {
@@ -76,6 +86,7 @@ const AdminViewAuthor = () => {
 
   const filteredAuthors = authors.filter((author) => {
     const search = searchTerm.toLowerCase();
+
     return (
       author.name?.toLowerCase().includes(search) ||
       author.shortBio?.toLowerCase().includes(search)
@@ -93,20 +104,24 @@ const AdminViewAuthor = () => {
     setCurrentPage(pageNumber);
   };
 
-  if (loading)
+  if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <p className="text-center text-gray-500 text-lg">Loading authors...</p>
+        <p className="text-center text-gray-500 text-lg">
+          Loading authors...
+        </p>
       </div>
     );
+  }
 
   return (
     <div className="p-6 bg-white shadow-lg rounded-xl max-w-7xl mx-auto mt-6">
       <ToastContainer position="top-right" autoClose={2000} />
 
-      {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-[var(--pink-dark)]">Authors</h2>
+        <h2 className="text-3xl font-bold text-[var(--pink-dark)]">
+          Authors
+        </h2>
         <button
           onClick={() => navigate("/admin/authors/create")}
           className="bg-[var(--pink-dark)] text-white font-medium py-2 px-5 rounded-lg shadow hover:opacity-90 transition"
@@ -118,9 +133,11 @@ const AdminViewAuthor = () => {
       <div className="mb-6 bg-gray-50 border border-gray-200 p-4 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
           <FaFilter className="text-gray-600" />
+
           <label className="text-sm font-medium text-gray-700">
             Filter by Verification:
           </label>
+
           <select
             value={verifiedFilter}
             onChange={(e) => setVerifiedFilter(e.target.value)}
@@ -132,7 +149,6 @@ const AdminViewAuthor = () => {
           </select>
         </div>
 
-        {/* Search input */}
         <div className="flex items-center gap-2 w-full sm:w-64">
           <input
             type="text"
@@ -143,11 +159,11 @@ const AdminViewAuthor = () => {
           />
         </div>
 
-        {/* Authors per page */}
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium text-gray-700">
             Per page:
           </label>
+
           <input
             type="number"
             min="1"
@@ -155,6 +171,7 @@ const AdminViewAuthor = () => {
             value={authorsPerPage}
             onChange={(e) => {
               const value = Number(e.target.value);
+
               if (value > 0 && value <= 50) {
                 setAuthorsPerPage(value);
                 setCurrentPage(1);
@@ -165,7 +182,6 @@ const AdminViewAuthor = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow">
         <table className="w-full border-collapse">
           <thead>
@@ -177,6 +193,7 @@ const AdminViewAuthor = () => {
               <th className="px-6 py-4 text-center font-semibold">Actions</th>
             </tr>
           </thead>
+
           <tbody className="divide-y divide-gray-200">
             {currentAuthors.length > 0 ? (
               currentAuthors.map((author) => {
@@ -211,6 +228,7 @@ const AdminViewAuthor = () => {
                             </div>
                           )}
                         </div>
+
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
                             {author.name}
@@ -242,7 +260,9 @@ const AdminViewAuthor = () => {
                       <div className="flex justify-center space-x-2">
                         {validSocials.length > 0 ? (
                           validSocials.map((social) => {
-                            const Icon = iconMap[social.platform.toLowerCase()];
+                            const Icon =
+                              iconMap[social.platform.toLowerCase()];
+
                             return Icon ? (
                               <a
                                 key={social._id || social.platform}
@@ -256,18 +276,23 @@ const AdminViewAuthor = () => {
                             ) : null;
                           })
                         ) : (
-                          <span className="text-xs text-gray-400">No socials</span>
+                          <span className="text-xs text-gray-400">
+                            No socials
+                          </span>
                         )}
                       </div>
                     </td>
 
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {author.createdAt
-                        ? new Date(author.createdAt).toLocaleDateString("en-GB", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })
+                        ? new Date(author.createdAt).toLocaleDateString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            }
+                          )
                         : "—"}
                     </td>
 
@@ -279,6 +304,7 @@ const AdminViewAuthor = () => {
                         >
                           <FaEdit className="text-sm" />
                         </button>
+
                         <button
                           onClick={() => handleDelete(author._id)}
                           className="h-8 w-8 flex items-center justify-center rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
@@ -292,10 +318,15 @@ const AdminViewAuthor = () => {
               })
             ) : (
               <tr>
-                <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                <td
+                  colSpan="5"
+                  className="px-6 py-12 text-center text-gray-500"
+                >
                   <div className="flex flex-col items-center">
                     <FaUser className="h-12 w-12 text-gray-300 mb-2" />
-                    <p className="text-lg font-medium">No authors found</p>
+                    <p className="text-lg font-medium">
+                      No authors found
+                    </p>
                     <p className="text-sm mt-1">
                       {verifiedFilter === "all"
                         ? "Get started by adding your first author"
@@ -313,7 +344,6 @@ const AdminViewAuthor = () => {
         </table>
       </div>
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-2 mt-6 flex-wrap">
           {Array.from({ length: totalPages }, (_, i) => (

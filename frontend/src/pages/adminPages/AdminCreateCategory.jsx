@@ -5,7 +5,10 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { categorySchema, updateCategorySchema } from "../../schemas/categorySchema.js";
+import {
+  categorySchema,
+  updateCategorySchema,
+} from "../../schemas/categorySchema.js";
 
 const AdminCreateCategory = () => {
   const location = useLocation();
@@ -43,29 +46,42 @@ const AdminCreateCategory = () => {
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
+
       formData.append("name", data.name);
       formData.append("description", data.description);
       formData.append("status", data.status);
 
       if (data.image && data.image.length > 0) {
-        formData.append("image", data.image[0]); 
+        formData.append("image", data.image[0]);
       }
 
       if (editCategory) {
         await axios.put(
           `${import.meta.env.VITE_API_URL}/api/categories/${editCategory._id}`,
           formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
+
         toast.success("Category updated successfully!");
       } else {
         await axios.post(
           `${import.meta.env.VITE_API_URL}/api/categories/create`,
           formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
+
         toast.success("Category created successfully!");
-        reset(); 
+        reset();
       }
     } catch (err) {
       console.error(err);
@@ -83,30 +99,43 @@ const AdminCreateCategory = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div>
-          <label className="block font-medium mb-1">Category Name</label>
+          <label className="block font-medium mb-1">
+            Category Name
+          </label>
+
           <input
             type="text"
             {...register("name")}
             className="w-full border p-2 rounded"
           />
+
           {errors.name && (
             <p className="text-red-500 text-sm">{errors.name.message}</p>
           )}
         </div>
 
         <div>
-          <label className="block font-medium mb-1">Description</label>
+          <label className="block font-medium mb-1">
+            Description
+          </label>
+
           <textarea
             {...register("description")}
             className="w-full border p-2 rounded"
           />
+
           {errors.description && (
-            <p className="text-red-500 text-sm">{errors.description.message}</p>
+            <p className="text-red-500 text-sm">
+              {errors.description.message}
+            </p>
           )}
         </div>
 
         <div>
-          <label className="block font-medium mb-1">Status</label>
+          <label className="block font-medium mb-1">
+            Status
+          </label>
+
           <select
             {...register("status")}
             className="w-full border p-2 rounded"
@@ -114,19 +143,24 @@ const AdminCreateCategory = () => {
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
+
           {errors.status && (
             <p className="text-red-500 text-sm">{errors.status.message}</p>
           )}
         </div>
 
         <div>
-          <label className="block font-medium mb-1">Image</label>
+          <label className="block font-medium mb-1">
+            Image
+          </label>
+
           <input
             type="file"
             accept="image/*"
             {...register("image")}
             className="w-full"
           />
+
           {errors.image && (
             <p className="text-red-500 text-sm">{errors.image.message}</p>
           )}

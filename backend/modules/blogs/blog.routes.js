@@ -5,7 +5,9 @@ import {
   updateBlog,
   deleteBlog,
   getSingleBlog,
-} from "../blogs/blog.controller.js";
+  getAdminBlogs,
+  getAdminBlogById,
+} from "./blog.controller.js";
 import Upload from "../../middleware_temp/multerMiddleware.js";
 import {
   auth,
@@ -15,11 +17,26 @@ import {
 const router = express.Router();
 const upload = Upload("blogs");
 
-// Public blog routes
+// Admin reads must come before public /:id.
+router.get(
+  "/admin/all",
+  auth,
+  requireRole("admin"),
+  getAdminBlogs
+);
+
+router.get(
+  "/admin/:id",
+  auth,
+  requireRole("admin"),
+  getAdminBlogById
+);
+
+// Public reads
 router.get("/", getBlogs);
 router.get("/:id", getSingleBlog);
 
-// Admin blog routes
+// Admin management
 router.post(
   "/",
   auth,

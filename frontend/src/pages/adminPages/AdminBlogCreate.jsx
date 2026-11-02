@@ -56,15 +56,24 @@ const AdminBlogCreate = () => {
 
   useEffect(() => {
     if (editingBlog) {
+      const authorId =
+        typeof editingBlog.author === "string"
+          ? editingBlog.author
+          : editingBlog.author?._id || "";
+
+      const existingCards = Array.isArray(editingBlog.cards)
+        ? editingBlog.cards
+        : [];
+
       setValue("title", editingBlog.title || "");
       setValue("introText", editingBlog.introText || "");
-      setValue("author", editingBlog.author?._id || "");
+      setValue("author", authorId);
       setValue("status", editingBlog.status || "active");
 
       setValue(
         "cards",
-        editingBlog.cards.length > 0
-          ? editingBlog.cards.map((card) => ({
+        existingCards.length > 0
+          ? existingCards.map((card) => ({
               title: card.title || "",
               subtitle: card.subtitle || "",
               description: card.description || "",
@@ -86,9 +95,7 @@ const AdminBlogCreate = () => {
             ]
       );
 
-      if (editingBlog.author) {
-        setSelectedAuthor(editingBlog.author._id);
-      }
+      setSelectedAuthor(authorId);
     }
   }, [editingBlog, setValue]);
 
@@ -113,15 +120,13 @@ const AdminBlogCreate = () => {
 
   const handleAuthorChange = (e) => {
     const authorId = e.target.value;
+
     setSelectedAuthor(authorId);
-    setValue("author", authorId);
-  };
 
-  const getSelectedAuthorName = () => {
-    if (!selectedAuthor) return "";
-
-    const author = authors.find((a) => a._id === selectedAuthor);
-    return author ? author.name : "";
+    setValue("author", authorId, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
   };
 
   const addCard = () => {
@@ -140,8 +145,17 @@ const AdminBlogCreate = () => {
   };
 
   const handleFileChange = (index, file) => {
-    setValue(`cards.${index}.image`, file);
-    setValue(`cards.${index}.fileName`, file.name);
+    // Cancelling the picker should keep the existing selection.
+    if (!file) return;
+
+    setValue(`cards.${index}.image`, file, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+
+    setValue(`cards.${index}.fileName`, file.name, {
+      shouldDirty: true,
+    });
   };
 
   const onSubmit = async (data) => {
@@ -166,11 +180,20 @@ const AdminBlogCreate = () => {
 
       formData.append("cards", JSON.stringify(cardsData));
 
+      // Each file has a matching position in this array.
+      const imageCardIndexes = [];
+
       data.cards.forEach((card, index) => {
-        if (card.image && card.image instanceof File) {
+        if (card.image instanceof File) {
           formData.append("images", card.image);
+          imageCardIndexes.push(index);
         }
       });
+
+      formData.append(
+        "imageCardIndexes",
+        JSON.stringify(imageCardIndexes)
+      );
 
       const res = editingBlog
         ? await axios.put(
@@ -214,13 +237,16 @@ const AdminBlogCreate = () => {
       }
     } catch (err) {
       console.error("Error saving blog:", err);
-      toast.error("Failed to save blog");
+
+      toast.error(
+        err.response?.data?.message || "Failed to save blog"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const cards = watch("cards");
+  const cards = watch("cards") || [];
 
   return (
     <div className="container mx-auto p-6 bg-white shadow rounded-lg mb-8">
@@ -235,12 +261,14 @@ const AdminBlogCreate = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Main Title
           </label>
+
           <input
             type="text"
             placeholder="Main Title"
             {...register("title")}
             className="w-full border p-2 rounded"
           />
+
           {errors.title && (
             <p className="text-red-500 text-sm mt-1">
               {errors.title.message}
@@ -252,6 +280,7 @@ const AdminBlogCreate = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Intro Text
           </label>
+
           <textarea
             placeholder="Intro Text"
             {...register("introText")}
@@ -272,6 +301,7 @@ const AdminBlogCreate = () => {
             className="w-full border p-2 rounded"
           >
             <option value="">Select Author</option>
+
             {loadingAuthors ? (
               <option value="">Loading authors...</option>
             ) : (
@@ -294,6 +324,7 @@ const AdminBlogCreate = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Status
           </label>
+
           <select
             {...register("status")}
             className="w-full border p-2 rounded"
@@ -335,6 +366,7 @@ const AdminBlogCreate = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Card Title
                 </label>
+
                 <input
                   type="text"
                   placeholder="Card Title"
@@ -353,6 +385,7 @@ const AdminBlogCreate = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Subtitle
                 </label>
+
                 <input
                   type="text"
                   placeholder="Subtitle"
@@ -366,6 +399,7 @@ const AdminBlogCreate = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Description
               </label>
+
               <textarea
                 placeholder="Description"
                 {...register(`cards.${index}.description`)}
@@ -379,6 +413,7 @@ const AdminBlogCreate = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Button Text
                 </label>
+
                 <input
                   type="text"
                   placeholder="Button Text"
@@ -391,6 +426,7 @@ const AdminBlogCreate = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Button Link
                 </label>
+
                 <input
                   type="text"
                   placeholder="Button Link"
@@ -409,9 +445,9 @@ const AdminBlogCreate = () => {
                 <input
                   type="text"
                   value={
-                    cards[index].image
-                      ? cards[index].image.name
-                      : cards[index].fileName || "No file chosen"
+                    cards[index]?.image?.name ||
+                    cards[index]?.fileName ||
+                    "No file chosen"
                   }
                   readOnly
                   className="flex-1 border rounded-l px-3 py-2 text-sm text-gray-600 bg-gray-50"
@@ -423,7 +459,7 @@ const AdminBlogCreate = () => {
                   style={{ display: "none" }}
                   accept="image/*"
                   onChange={(e) =>
-                    handleFileChange(index, e.target.files[0])
+                    handleFileChange(index, e.target.files?.[0])
                   }
                 />
 

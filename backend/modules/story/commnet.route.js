@@ -1,4 +1,5 @@
 import express from "express";
+
 import {
   getAllComments,
   createComment,
@@ -8,23 +9,83 @@ import {
   likeReply,
   dislikeReply,
   deleteComment,
-  deleteReply
-} from "../story/comment.controller.js";
+  deleteReply,
+} from "./comment.controller.js";
 
 import { auth } from "../../middleware_temp/authMiddleware.js";
 
+import {
+  requirePublishedParent,
+  requirePublishedReplyParent,
+  requirePublishedCommentForVote,
+  requirePublishedReplyForVote,
+} from "../../middleware_temp/publishedContentMiddleware.js";
+
 const router = express.Router();
 
-router.get("/", getAllComments);
+// Public comments are available only for published content.
+router.get(
+  "/",
+  requirePublishedParent("query"),
+  getAllComments
+);
 
-router.post("/", auth, createComment);
-router.post("/reply", auth, createReply);
-router.delete("/:commentId", auth, deleteComment);
-router.delete("/reply/:replyId", auth, deleteReply);
+// Creating comments and replies requires authentication.
+router.post(
+  "/",
+  auth,
+  requirePublishedParent("body"),
+  createComment
+);
 
-router.put("/like/:commentId", likeComment);
-router.put("/dislike/:commentId", dislikeComment);
-router.put("/reply/like/:replyId", likeReply);
-router.put("/reply/dislike/:replyId", dislikeReply);
+router.post(
+  "/reply",
+  auth,
+  requirePublishedReplyParent,
+  createReply
+);
+
+// Owners and admins can delete their permitted records,
+// including records attached to unpublished content.
+router.delete(
+  "/reply/:replyId",
+  auth,
+  deleteReply
+);
+
+router.delete(
+  "/:commentId",
+  auth,
+  deleteComment
+);
+
+// Authentication runs before checking the content or changing votes.
+router.put(
+  "/like/:commentId",
+  auth,
+  requirePublishedCommentForVote,
+  likeComment
+);
+
+router.put(
+  "/dislike/:commentId",
+  auth,
+  requirePublishedCommentForVote,
+  dislikeComment
+);
+
+router.put(
+  "/reply/like/:replyId",
+  auth,
+  requirePublishedReplyForVote,
+  likeReply
+);
+
+router.put(
+  "/reply/dislike/:replyId",
+  auth,
+  requirePublishedReplyForVote,
+  dislikeReply
+);
 
 export default router;

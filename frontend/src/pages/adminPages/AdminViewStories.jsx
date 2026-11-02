@@ -34,23 +34,26 @@ const AdminViewStories = () => {
     fetchStories();
   }, [statusFilter]);
 
-  const fetchStories = async () => {
-    try {
-      setLoading(true);
+ const fetchStories = async () => {
+  try {
+    setLoading(true);
 
-      const url =
-        statusFilter === "all"
-          ? `${import.meta.env.VITE_API_URL}/api/stories`
-          : `${import.meta.env.VITE_API_URL}/api/stories?status=${statusFilter}`;
+    const url =
+      statusFilter === "all"
+        ? `${import.meta.env.VITE_API_URL}/api/stories/admin/all`
+        : `${import.meta.env.VITE_API_URL}/api/stories/admin/all?status=${statusFilter}`;
 
-      const res = await axios.get(url);
-      setStories(res.data?.data || []);
-    } catch (error) {
-      toast.error("Failed to load stories");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const res = await axios.get(url, {
+      withCredentials: true,
+    });
+
+    setStories(res.data?.data || []);
+  } catch (error) {
+    toast.error("Failed to load stories");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleDelete = async (id) => {
     try {

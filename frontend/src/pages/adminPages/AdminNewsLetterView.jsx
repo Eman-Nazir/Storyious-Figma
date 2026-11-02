@@ -12,10 +12,18 @@ const AdminNewsletterView = () => {
 
   const fetchSubscribers = async () => {
     try {
-      const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/newsletter`);
+      const { data } = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/newsletter`,
+        {
+          withCredentials: true,
+        }
+      );
+
       setSubscribers(data);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Error fetching subscribers");
+      toast.error(
+        err.response?.data?.message || "Error fetching subscribers"
+      );
     } finally {
       setLoading(false);
     }
@@ -27,11 +35,19 @@ const AdminNewsletterView = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/newsletter/${id}`);
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/newsletter/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
       setSubscribers((prev) => prev.filter((s) => s._id !== id));
       toast.success("Subscriber deleted successfully!");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Error deleting subscriber");
+      toast.error(
+        err.response?.data?.message || "Error deleting subscriber"
+      );
     }
   };
 
@@ -42,20 +58,34 @@ const AdminNewsletterView = () => {
 
   const handleEditSave = async (id) => {
     try {
-      const { data } = await axios.put(`${import.meta.env.VITE_API_URL}/api/newsletter/${id}`, {
-        email: editEmail,
-      });
-      setSubscribers((prev) => prev.map((s) => (s._id === id ? data : s)));
+      const { data } = await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/newsletter/${id}`,
+        {
+          email: editEmail,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+
+      setSubscribers((prev) =>
+        prev.map((s) => (s._id === id ? data : s))
+      );
+
       toast.success("Subscriber updated successfully!");
       setEditId(null);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Error updating subscriber");
+      toast.error(
+        err.response?.data?.message || "Error updating subscriber"
+      );
     }
   };
 
   return (
     <div className="p-6 bg-white min-h-screen">
-      <h2 className="text-2xl font-bold mb-6 text-pink-600">Subscribers</h2>
+      <h2 className="text-2xl font-bold mb-6 text-pink-600">
+        Subscribers
+      </h2>
 
       <div className="overflow-x-auto bg-white shadow-lg rounded-xl">
         <table className="w-full border-collapse">
@@ -72,16 +102,23 @@ const AdminNewsletterView = () => {
               </th>
             </tr>
           </thead>
+
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="3" className="p-4 text-center text-gray-500">
+                <td
+                  colSpan="3"
+                  className="p-4 text-center text-gray-500"
+                >
                   Loading...
                 </td>
               </tr>
             ) : subscribers.length === 0 ? (
               <tr>
-                <td colSpan="3" className="p-4 text-center text-gray-500 italic">
+                <td
+                  colSpan="3"
+                  className="p-4 text-center text-gray-500 italic"
+                >
                   No subscribers found.
                 </td>
               </tr>
@@ -105,9 +142,11 @@ const AdminNewsletterView = () => {
                       sub.email
                     )}
                   </td>
+
                   <td className="p-3 border-b border-pink-200">
                     {new Date(sub.createdAt).toLocaleString()}
                   </td>
+
                   <td className="p-3 border-b border-pink-200 flex items-center gap-3">
                     {editId === sub._id ? (
                       <>
@@ -118,6 +157,7 @@ const AdminNewsletterView = () => {
                         >
                           <Save size={20} />
                         </button>
+
                         <button
                           onClick={() => setEditId(null)}
                           className="text-gray-600 hover:text-gray-800"
@@ -135,6 +175,7 @@ const AdminNewsletterView = () => {
                         >
                           <Pencil size={20} />
                         </button>
+
                         <button
                           onClick={() => handleDelete(sub._id)}
                           className="text-red-600 hover:text-red-800"

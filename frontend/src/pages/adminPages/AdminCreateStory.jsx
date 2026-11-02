@@ -31,16 +31,24 @@ const AdminCreateStory = () => {
     control,
     formState: { errors },
   } = useForm({
-    defaultValues: { content: editingStory?.content || "" },
+    defaultValues: {
+      content: editingStory?.content || "",
+    },
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [authorsRes, categoriesRes] = await Promise.all([
-          axios.get(`${import.meta.env.VITE_API_URL}/api/authors`),
-          axios.get(`${import.meta.env.VITE_API_URL}/api/categories`),
-        ]);
+  axios.get(`${import.meta.env.VITE_API_URL}/api/authors`),
+
+  axios.get(
+    `${import.meta.env.VITE_API_URL}/api/categories/admin/all`,
+    {
+      withCredentials: true,
+    }
+  ),
+]);
 
         setAuthors(authorsRes.data?.data || []);
         setCategories(categoriesRes.data?.data || []);
@@ -55,7 +63,9 @@ const AdminCreateStory = () => {
 
   const handleCategoryChange = (id) => {
     setSelectedCategories((prev) =>
-      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id]
+      prev.includes(id)
+        ? prev.filter((c) => c !== id)
+        : [...prev, id]
     );
   };
 
@@ -89,7 +99,9 @@ const AdminCreateStory = () => {
           formData,
           {
             withCredentials: true,
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           }
         );
 
@@ -100,7 +112,9 @@ const AdminCreateStory = () => {
           formData,
           {
             withCredentials: true,
-            headers: { "Content-Type": "multipart/form-data" },
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           }
         );
 
@@ -130,6 +144,7 @@ const AdminCreateStory = () => {
           <label className="block text-lg font-semibold mb-2 text-gray-700">
             Story Title
           </label>
+
           <input
             type="text"
             value={title}
@@ -142,17 +157,23 @@ const AdminCreateStory = () => {
                        transition duration-200"
             placeholder="Enter a catchy story title..."
           />
+
           <div className="flex justify-between mt-1">
             <p className="text-sm text-gray-500">
               Keep it short and engaging — max 100 characters
             </p>
-            <span className="text-sm text-gray-400">{title.length}/100</span>
+            <span className="text-sm text-gray-400">
+              {title.length}/100
+            </span>
           </div>
         </div>
 
         {/* Intro Text */}
         <div>
-          <label className="block font-medium mb-1">Intro Text</label>
+          <label className="block font-medium mb-1">
+            Intro Text
+          </label>
+
           <textarea
             value={introText}
             onChange={(e) => setIntroText(e.target.value)}
@@ -163,7 +184,10 @@ const AdminCreateStory = () => {
 
         {/* Content with Editor */}
         <div>
-          <label className="block mb-1 font-medium">Content</label>
+          <label className="block mb-1 font-medium">
+            Content
+          </label>
+
           <Controller
             name="content"
             control={control}
@@ -180,8 +204,14 @@ const AdminCreateStory = () => {
                     "undo redo | blocks | bold italic underline forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | removeformat | fullscreen preview",
                   automatic_uploads: true,
                   file_picker_types: "image media",
-                  file_picker_callback: async function (callback, value, meta) {
+
+                  file_picker_callback: async function (
+                    callback,
+                    value,
+                    meta
+                  ) {
                     const input = document.createElement("input");
+
                     input.setAttribute("type", "file");
                     input.setAttribute(
                       "accept",
@@ -191,6 +221,7 @@ const AdminCreateStory = () => {
                     input.onchange = async function () {
                       const file = this.files[0];
                       const formData = new FormData();
+
                       formData.append("file", file);
 
                       try {
@@ -199,11 +230,15 @@ const AdminCreateStory = () => {
                           formData,
                           {
                             withCredentials: true,
-                            headers: { "Content-Type": "multipart/form-data" },
+                            headers: {
+                              "Content-Type": "multipart/form-data",
+                            },
                           }
                         );
 
-                        callback(res.data.url, { title: file.name });
+                        callback(res.data.url, {
+                          title: file.name,
+                        });
                       } catch (err) {
                         console.error(err);
                         alert("Upload failed: " + err.message);
@@ -212,29 +247,33 @@ const AdminCreateStory = () => {
 
                     input.click();
                   },
-                  images_upload_handler: async function (
-                    blobInfo,
-                    success,
-                    failure
-                  ) {
+
+                  images_upload_handler: async function (blobInfo) {
                     const formData = new FormData();
-                    formData.append("file", blobInfo.blob());
 
-                    try {
-                      const res = await axios.post(
-                        `${import.meta.env.VITE_API_URL}/api/uploads`,
-                        formData,
-                        {
-                          withCredentials: true,
-                          headers: { "Content-Type": "multipart/form-data" },
-                        }
+                    formData.append(
+                      "file",
+                      blobInfo.blob(),
+                      blobInfo.filename()
+                    );
+
+                    const res = await axios.post(
+                      `${import.meta.env.VITE_API_URL}/api/uploads`,
+                      formData,
+                      {
+                        withCredentials: true,
+                      }
+                    );
+
+                    const imageUrl = res.data?.url;
+
+                    if (typeof imageUrl !== "string" || !imageUrl) {
+                      throw new Error(
+                        "Upload response did not include an image URL"
                       );
-
-                      success(res.data.url);
-                    } catch (err) {
-                      console.error(err);
-                      failure("Upload failed: " + err.message);
                     }
+
+                    return imageUrl;
                   },
                 }}
                 onEditorChange={(newValue) => {
@@ -244,14 +283,20 @@ const AdminCreateStory = () => {
               />
             )}
           />
+
           {errors.content && (
-            <p className="text-red-500">{errors.content.message}</p>
+            <p className="text-red-500">
+              {errors.content.message}
+            </p>
           )}
         </div>
 
         {/* Status */}
         <div>
-          <label className="block font-medium mb-1">Status</label>
+          <label className="block font-medium mb-1">
+            Status
+          </label>
+
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
@@ -264,7 +309,10 @@ const AdminCreateStory = () => {
 
         {/* Type */}
         <div>
-          <label className="block font-medium mb-1">Story Type</label>
+          <label className="block font-medium mb-1">
+            Story Type
+          </label>
+
           <select
             value={type}
             onChange={(e) => setType(e.target.value)}
@@ -279,13 +327,17 @@ const AdminCreateStory = () => {
         {type === "video" && (
           <>
             <div>
-              <label className="block font-medium mb-1">Video File</label>
+              <label className="block font-medium mb-1">
+                Video File
+              </label>
+
               <input
                 type="file"
                 accept="video/*"
                 onChange={(e) => setVideoFile(e.target.files[0])}
                 className="w-full border rounded-lg px-3 py-2"
               />
+
               {editingStory?.videoFile && (
                 <video
                   src={editingStory.videoFile}
@@ -299,6 +351,7 @@ const AdminCreateStory = () => {
               <label className="block font-medium mb-1">
                 YouTube / Vimeo URL
               </label>
+
               <input
                 type="url"
                 value={videoUrl}
@@ -312,13 +365,17 @@ const AdminCreateStory = () => {
 
         {/* Featured Image */}
         <div>
-          <label className="block font-medium mb-1">Featured Image</label>
+          <label className="block font-medium mb-1">
+            Featured Image
+          </label>
+
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setFeaturedImage(e.target.files[0])}
             className="w-full border rounded-lg px-3 py-2"
           />
+
           {editingStory?.featuredImage && (
             <img
               src={editingStory.featuredImage}
@@ -330,13 +387,17 @@ const AdminCreateStory = () => {
 
         {/* Author */}
         <div>
-          <label className="block font-medium mb-1">Author</label>
+          <label className="block font-medium mb-1">
+            Author
+          </label>
+
           <select
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
             className="w-full border rounded-lg px-3 py-2 focus:ring focus:ring-pink-300"
           >
             <option value="">Select Author</option>
+
             {authors.map((a) => (
               <option key={a._id} value={a._id}>
                 {a.name}
@@ -347,7 +408,10 @@ const AdminCreateStory = () => {
 
         {/* Categories */}
         <div>
-          <label className="block font-medium mb-2">Categories</label>
+          <label className="block font-medium mb-2">
+            Categories
+          </label>
+
           <div className="flex flex-wrap gap-2">
             {categories.map((cat) => (
               <label

@@ -6,6 +6,7 @@ const AdminViewFAQs = () => {
   const [faqs, setFaqs] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+
   const [editId, setEditId] = useState(null);
   const [editQuestion, setEditQuestion] = useState("");
   const [editAnswer, setEditAnswer] = useState("");
@@ -14,15 +15,19 @@ const AdminViewFAQs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [searchTerm, setSearchTerm] = useState("");
-
   const [expanded, setExpanded] = useState({});
 
   const fetchFAQs = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/faqs`);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/faqs`
+      );
+
       setFaqs(response.data?.data || []);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error fetching FAQs");
+      toast.error(
+        error.response?.data?.message || "Error fetching FAQs"
+      );
     } finally {
       setLoading(false);
     }
@@ -30,10 +35,15 @@ const AdminViewFAQs = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/faqs/categories`);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/api/faqs/categories`
+      );
+
       setCategories(response.data?.data || []);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error fetching categories");
+      toast.error(
+        error.response?.data?.message || "Error fetching categories"
+      );
     }
   };
 
@@ -43,13 +53,24 @@ const AdminViewFAQs = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this FAQ?")) return;
+    if (!window.confirm("Are you sure you want to delete this FAQ?")) {
+      return;
+    }
+
     try {
-      await axios.delete(`${import.meta.env.VITE_API_URL}/api/faqs/${id}`);
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/faqs/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+
       toast.success("FAQ deleted successfully");
       setFaqs(faqs.filter((faq) => faq._id !== id));
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error deleting FAQ");
+      toast.error(
+        error.response?.data?.message || "Error deleting FAQ"
+      );
     }
   };
 
@@ -62,22 +83,38 @@ const AdminViewFAQs = () => {
 
   const handleEditSave = async (id) => {
     try {
-      const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/faqs/${id}`, {
-        question: editQuestion,
-        answer: editAnswer,
-        category: editCategory,
-      });
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_URL}/api/faqs/${id}`,
+        {
+          question: editQuestion,
+          answer: editAnswer,
+          category: editCategory,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       toast.success("FAQ updated successfully");
-      setFaqs(faqs.map((faq) => (faq._id === id ? response.data.data : faq)));
+
+      setFaqs(
+        faqs.map((faq) =>
+          faq._id === id ? response.data.data : faq
+        )
+      );
+
       setEditId(null);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error updating FAQ");
+      toast.error(
+        error.response?.data?.message || "Error updating FAQ"
+      );
     }
   };
 
   const getCategoryLabel = (category) => {
-    return category.replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    return category
+      .replace("-", " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
   };
 
   const filteredFaqs = faqs.filter((faq) =>
@@ -87,10 +124,16 @@ const AdminViewFAQs = () => {
   const totalPages = Math.ceil(filteredFaqs.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentFaqs = filteredFaqs.slice(indexOfFirstItem, indexOfLastItem);
+  const currentFaqs = filteredFaqs.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
 
   const toggleExpand = (id) => {
-    setExpanded((prev) => ({ ...prev, [id]: !prev[id] }));
+    setExpanded((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
   return (
@@ -111,6 +154,7 @@ const AdminViewFAQs = () => {
 
         <div className="flex items-center space-x-2">
           <label className="text-gray-700">Que per page:</label>
+
           <input
             type="number"
             min="1"
@@ -118,6 +162,7 @@ const AdminViewFAQs = () => {
             value={itemsPerPage}
             onChange={(e) => {
               const value = Number(e.target.value);
+
               if (value > 0 && value <= 50) {
                 setItemsPerPage(value);
                 setCurrentPage(1);
@@ -170,6 +215,7 @@ const AdminViewFAQs = () => {
                   >
                     Save
                   </button>
+
                   <button
                     onClick={() => setEditId(null)}
                     className="bg-gray-400 text-white px-3 py-1 rounded"
@@ -180,7 +226,10 @@ const AdminViewFAQs = () => {
               ) : (
                 <div>
                   <div className="flex justify-between items-start">
-                    <h3 className="font-semibold">{faq.question}</h3>
+                    <h3 className="font-semibold">
+                      {faq.question}
+                    </h3>
+
                     <span className="text-xs bg-gray-200 px-2 py-1 rounded">
                       {getCategoryLabel(faq.category)}
                     </span>
@@ -204,6 +253,7 @@ const AdminViewFAQs = () => {
                   <span className="text-xs text-gray-400 block mt-1">
                     Slug: {faq.slug}
                   </span>
+
                   <div className="mt-2 space-x-2">
                     <button
                       onClick={() => startEdit(faq)}
@@ -211,6 +261,7 @@ const AdminViewFAQs = () => {
                     >
                       Edit
                     </button>
+
                     <button
                       onClick={() => handleDelete(faq._id)}
                       className="bg-red-500 text-white px-3 py-1 rounded"
@@ -225,7 +276,6 @@ const AdminViewFAQs = () => {
         </ul>
       )}
 
-      {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center mt-6 space-x-2">
           {Array.from({ length: totalPages }, (_, index) => (
