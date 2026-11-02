@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-labelledby="title description">
+  <title id="title">Storyious — A home for stories. A space for writers.</title>
+  <desc id="description">A dark plum banner with rose accents, the Storyious wordmark, and a gently floating open book. Read, discover, and connect.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1200" y2="320" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#100b1a"/>
+      <stop offset="0.56" stop-color="#211023"/>
+      <stop offset="1" stop-color="#171023"/>
+    </linearGradient>
+    <radialGradient id="roseGlow">
+      <stop stop-color="#ec4899" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ec4899" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="violetGlow">
+      <stop stop-color="#a78bfa" stop-opacity="0.15"/>
+      <stop offset="1" stop-color="#a78bfa" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="180" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fb7185"/>
+      <stop offset="1" stop-color="#f9a8d4"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="240" y2="200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#422037"/>
+      <stop offset="1" stop-color="#26172f"/>
+    </linearGradient>
+    <linearGradient id="pages" x1="40" y1="60" x2="205" y2="165" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffb2c7"/>
+      <stop offset="1" stop-color="#e9c1ff"/>
+    </linearGradient>
+    <clipPath id="frame">
+      <rect width="1200" height="320" rx="24"/>
+    </clipPath>
+    <style>
+      .book-float { animation: float 7s ease-in-out infinite; }
+      .spark { animation: glow 5s ease-in-out infinite; }
+      .spark-delayed { animation-delay: -2.5s; }
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-7px); }
+      }
+      @keyframes glow {
+        0%, 100% { opacity: 0.35; }
+        50% { opacity: 0.9; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .book-float, .spark { animation: none; }
+      }
+    </style>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <rect width="1200" height="320" fill="url(#background)"/>
+    <ellipse cx="1050" cy="146" rx="360" ry="330" fill="url(#roseGlow)"/>
+    <ellipse cx="260" cy="350" rx="520" ry="290" fill="url(#violetGlow)"/>
+
+    <g fill="none" stroke="#f9a8d4" stroke-opacity="0.1">
+      <circle cx="992" cy="161" r="124"/>
+      <circle cx="992" cy="161" r="170"/>
+      <circle cx="992" cy="161" r="216"/>
+    </g>
+    <path d="M820 320 1139 0" stroke="#f9a8d4" stroke-opacity="0.05"/>
+    <path d="M927 320 1200 45" stroke="#f9a8d4" stroke-opacity="0.05"/>
+
+    <g font-family="Inter, 'Segoe UI', Arial, sans-serif">
+      <rect x="72" y="46" width="34" height="3" rx="1.5" fill="url(#accent)"/>
+      <text x="120" y="55" fill="#f9a8d4" font-size="15" font-weight="600" letter-spacing="3">STORIES WORTH SHARING</text>
+      <text x="68" y="155" fill="#fff5f8" font-size="92" font-weight="750" letter-spacing="-3">Storyious</text>
+      <text x="73" y="207" fill="#d8cbdc" font-size="27">A home for stories. A space for writers.</text>
+
+      <g transform="translate(72 249)">
+        <rect width="322" height="35" rx="17.5" fill="#ffffff" fill-opacity="0.035" stroke="#f9a8d4" stroke-opacity="0.18"/>
+        <circle cx="19" cy="17.5" r="3.5" fill="#fb7185"/>
+        <text x="34" y="23" fill="#e9dce9" font-size="14" font-weight="600" letter-spacing="1.4">READ · DISCOVER · CONNECT</text>
+      </g>
+    </g>
+
+    <g transform="translate(869 60)">
+      <g class="book-float">
+        <rect x="-3" y="9" width="246" height="202" rx="29" fill="#0d0714" fill-opacity="0.3"/>
+        <rect width="240" height="200" rx="28" fill="url(#card)" stroke="#f9a8d4" stroke-opacity="0.27"/>
+        <path d="M20 0H207C225 0 240 14 240 32" fill="none" stroke="#ffd4e3" stroke-opacity="0.22"/>
+        <g fill="none" stroke="url(#pages)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+          <path d="M120 72C96 58 72 57 46 63V151C72 145 97 148 120 162V72Z" fill="#fda4bf" fill-opacity="0.05"/>
+          <path d="M120 72C144 58 168 57 194 63V151C168 145 143 148 120 162V72Z" fill="#d8b4fe" fill-opacity="0.05"/>
+          <path d="M66 84C77 83 88 85 100 90M66 101C77 100 88 102 100 107M66 118C77 117 88 119 100 124" stroke-width="2" stroke-opacity="0.62"/>
+          <path d="M140 90C152 85 163 83 174 84M140 107C152 102 163 100 174 101M140 124C152 119 163 117 174 118" stroke-width="2" stroke-opacity="0.62"/>
+        </g>
+        <path d="m119 32 3 7 7 3-7 3-3 7-3-7-7-3 7-3Z" fill="#fda4bf"/>
+      </g>
+    </g>
+
+    <g class="spark" fill="#f9a8d4">
+      <circle cx="843" cy="74" r="3"/>
+      <path d="m1128 255 3 7 7 3-7 3-3 7-3-7-7-3 7-3Z"/>
+    </g>
+    <g class="spark spark-delayed" fill="#c4b5fd">
+      <circle cx="1139" cy="80" r="3"/>
+      <path d="m831 246 2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>
+    </g>
+  </g>
+  <rect x="0.5" y="0.5" width="1199" height="319" rx="23.5" fill="none" stroke="#f9a8d4" stroke-opacity="0.15"/>
+</svg>
