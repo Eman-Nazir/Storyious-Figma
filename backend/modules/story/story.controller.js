@@ -134,7 +134,7 @@ export const deleteStory = asyncHandler(async (req, res) => {
 export const addAd = async (req, res) => {
   try {
     const { title, description, buttonText } = req.body;
-    const imageUrl = req.file ? `/uploads/${req.file.filename}` : null;
+    const imageUrl = req.file ? req.file.path : null;
 
     const newAd = new Ads({ title, description, buttonText, imageUrl });
     await newAd.save();
@@ -173,7 +173,7 @@ export const updateAd = async (req, res) => {
     const updateData = { title, description, buttonText };
 
     if (req.file) {
-      updateData.imageUrl = `/uploads/${req.file.filename}`;
+      updateData.imageUrl = req.file.path;
     }
 
     const updatedAd = await Ads.findByIdAndUpdate(req.params.id, updateData, {
