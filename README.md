@@ -1,461 +1,370 @@
 <div align="center">
 
-<img src="frontend/src/assets/images/storyiousLogo.png" alt="Storyious logo" width="220" />
+<a href="https://storyious-figma.vercel.app/">
+  <img src="docs/assets/storyious-banner.svg" alt="Storyious — A home for stories. A space for writers." width="100%" />
+</a>
 
 # Storyious
 
-### A home for stories. A space for writers.
+**Discover a story. Find a new perspective. Stay for the next chapter.**
 
-<img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=21&duration=2800&pause=1100&color=8B5CF6&center=true&vCenter=true&width=700&lines=Discover+stories.+Explore+new+perspectives.;Read.+Write.+Connect.;A+full-stack+MERN+storytelling+platform." alt="Animated text: Discover stories, explore new perspectives. Read, write, connect." />
+A full-stack storytelling platform for readers, writers, and the people who bring their stories to life.
 
 <p>
-  <img src="https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React 19" />
-  <img src="https://img.shields.io/badge/Vite_6-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite 6" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS_4-0F172A?style=for-the-badge&logo=tailwindcss&logoColor=38BDF8" alt="Tailwind CSS 4" />
-</p>
-<p>
-  <img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white" alt="Node.js" />
-  <img src="https://img.shields.io/badge/Express_5-111827?style=for-the-badge&logo=express&logoColor=white" alt="Express 5" />
-  <img src="https://img.shields.io/badge/MongoDB-00684A?style=for-the-badge&logo=mongodb&logoColor=white" alt="MongoDB" />
-  <img src="https://img.shields.io/badge/Cloudinary-3448C5?style=for-the-badge&logo=cloudinary&logoColor=white" alt="Cloudinary" />
+  <a href="https://storyious-figma.vercel.app/"><img src="https://img.shields.io/badge/Explore_the_Live_Website-EC4899?style=for-the-badge&logo=vercel&logoColor=white" alt="Explore the live Storyious website" /></a>
+  <a href="#run-locally"><img src="https://img.shields.io/badge/Run_Locally-21132D?style=for-the-badge&logo=github&logoColor=white" alt="Run Storyious locally" /></a>
 </p>
 
-[Explore Features](#-features) · [Run Locally](#-run-locally) · [Deployment Guide](#-deployment-guide) · [Author](#-author)
+<p>
+  <img src="https://img.shields.io/badge/React_19-20232A?style=flat-square&logo=react&logoColor=61DAFB" alt="React 19" />
+  <img src="https://img.shields.io/badge/Vite_6-646CFF?style=flat-square&logo=vite&logoColor=white" alt="Vite 6" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS_4-0F172A?style=flat-square&logo=tailwindcss&logoColor=38BDF8" alt="Tailwind CSS 4" />
+  <img src="https://img.shields.io/badge/Node.js_24-339933?style=flat-square&logo=nodedotjs&logoColor=white" alt="Node.js 24 recommended" />
+  <img src="https://img.shields.io/badge/Express_5-111827?style=flat-square&logo=express&logoColor=white" alt="Express 5" />
+  <img src="https://img.shields.io/badge/MongoDB-00684A?style=flat-square&logo=mongodb&logoColor=white" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/Cloudinary-3448C5?style=flat-square&logo=cloudinary&logoColor=white" alt="Cloudinary" />
+</p>
+
+[Live Demo](#live-demo) · [Features](#features) · [Tech Stack](#tech-stack) · [Run Locally](#run-locally) · [Deployment](#deployment) · [Author](#author)
 
 </div>
 
 ---
 
-## ✨ Overview
+## The idea
 
-**Storyious** is a full-stack storytelling and content-management project built with React, Express, Node.js, and MongoDB. It brings together story discovery, writer profiles, blog content, reader accounts, and an administration interface in one application.
+A bedtime tale, a thoughtful blog, a writer worth following—good content deserves a place where it is easy to discover.
 
-The frontend includes dedicated sections for moral stories, bedtime stories, classic stories, fables, fairy tales, and scary stories. The backend organizes its APIs into feature modules for content, users, community interactions, and submissions.
+**Storyious** brings story collections, video stories, blogs, author profiles, and reader interaction into one application. Readers can explore and save what interests them, while administrators curate the content through a dedicated dashboard.
 
-> **Project status:** The source includes the features below. Deployment preparation is still required; see the checklist before publishing. A working end-to-end live deployment has not been verified for this README.
+The project combines a React frontend with an Express API, MongoDB persistence, and Cloudinary media storage.
 
-## 📚 Contents
+## Live demo
 
-- [Features](#-features)
-- [Technology stack](#-technology-stack)
-- [Architecture](#-architecture)
-- [Project structure](#-project-structure)
-- [Run locally](#-run-locally)
-- [API overview](#-api-overview)
-- [Deployment guide](#-deployment-guide)
-- [Troubleshooting](#-troubleshooting)
-- [Development roadmap](#-development-roadmap)
-- [Author](#-author)
-
-## 🌟 Features
-
-### For readers
-
-- **Story discovery:** Browse story collections and category pages.
-- **Detailed reading pages:** Explore individual stories and related content.
-- **Writer profiles:** Discover authors and visit their detail pages.
-- **Blog browsing:** Read blog listings and individual articles.
-- **Accounts:** Sign up, sign in, sign out, and access a profile page.
-- **Community modules:** Backend support for comments, replies, and bookmarks.
-- **Search:** A dedicated search page backed by a search API module.
-- **Writer submissions:** A Write for Us page and submission form.
-- **Additional content:** Video-story, FAQ, About Us, and Contact Us pages.
-- **Newsletter subscriptions:** Subscription UI and a backend subscriber module.
-
-### For content administration
-
-The admin interface includes dashboard, creation, and listing pages for:
-
-| Content area | Included interface |
+| Experience | Link |
 | --- | --- |
-| Stories | Story creation and listing |
-| Categories | Category creation and listing |
-| Authors | Author creation and listing |
-| Blogs | Blog creation and listing |
-| FAQs | FAQ creation and listing |
-| Advertisements | Ad creation and listing |
-| Newsletter | Subscriber listing |
+| 🌐 **Storyious website** | **[storyious-figma.vercel.app](https://storyious-figma.vercel.app/)** |
+| ⚙️ Backend service | [storyious-figma.onrender.com](https://storyious-figma.onrender.com/) |
+| 💻 Source code | [Eman-Nazir/Storyious-Figma](https://github.com/Eman-Nazir/Storyious-Figma) |
 
-> An admin interface is not itself an authorization boundary. The current story, blog, ad, and upload routes need server-side permission checks before public deployment.
+The frontend is hosted on **Vercel** and the backend on **Render**. The backend root is a service-status endpoint; the reader experience is on the website.
 
-## 🧰 Technology Stack
+## Features
 
-| Layer | Technologies |
+### 📖 A place to discover
+
+- **Story collections:** Explore moral stories, bedtime stories, fairy tales, fables, classics, and scary stories.
+- **Written and video content:** Browse reading pages and video-story pages.
+- **Blogs with flexible cards:** Present articles through multiple content cards, each with its own text and image.
+- **Author profiles:** Explore writers and their published content.
+- **Search:** Find stories, blogs, authors, and categories through a dedicated search experience.
+- **FAQs and platform pages:** Visit About, Contact, and Write for Us sections.
+
+### 💬 A place to participate
+
+- **Reader accounts:** Register, sign in, and sign out.
+- **Personal bookmarks:** Save stories and blogs to revisit from your profile.
+- **Comments and replies:** Join conversations on published content.
+- **Account-based voting:** Like or dislike comments and replies; repeated requests do not add duplicate votes.
+- **Writer submissions:** Send an application with one optional attachment, up to **5 MiB**.
+- **Newsletter subscriptions:** Subscribe through the public newsletter form.
+
+> Signup creates an account and then takes you to the login page. Contact is available through an email link.
+
+### 🛠 A place to manage
+
+The admin interface provides creation and management screens for:
+
+| Area | What administrators manage |
 | --- | --- |
-| Frontend | React 19, Vite 6, React Router 7 |
+| Stories | Written/video content, rich text, media, and publication status |
+| Blogs | Multi-card content, card-specific images, authors, and status |
+| Authors and categories | Writer information and content organization |
+| FAQs | Questions, answers, and FAQ categories |
+| Advertisements | Ad content and Cloudinary-hosted images |
+| Newsletter | Subscriber records |
+
+Admin APIs also support managing writer submissions. A dedicated submission-management screen is not currently included in the frontend.
+
+## Tech stack
+
+| Layer | Tools |
+| --- | --- |
+| Interface | React 19, Vite 6, React Router 7 |
 | Styling | Tailwind CSS 4, Tailwind Typography |
-| Forms | React Hook Form, Zod, Hook Form resolvers |
-| API requests | Axios |
-| UI feedback and icons | React Toastify, React Hot Toast, Lucide React, React Icons |
-| Rich-content dependencies | Tiptap, Jodit React, TinyMCE React, DOMPurify |
-| Backend | Node.js, Express 5, ES modules |
-| Database | MongoDB, Mongoose 8 |
-| Authentication | JSON Web Tokens, bcryptjs, cookie-parser |
-| Media | Multer, Cloudinary, multer-storage-cloudinary |
-| Development | ESLint, Nodemon |
+| Forms | React Hook Form, Zod |
+| Requests and feedback | Axios, Fetch API, React Toastify |
+| Rich content | TinyMCE, DOMPurify |
+| API | Node.js, Express 5, ES modules |
+| Data | MongoDB, Mongoose 8 |
+| Authentication | JWT, HTTP-only cookies, bcryptjs |
+| Uploads | Multer, Cloudinary, file-type, CFB |
+| UI assets | Lucide React, React Icons |
 
-The table reflects repository dependencies; it does not imply every installed editor is used on every page.
+## How it fits together
 
-## 🏗 Architecture
+~~~mermaid
+flowchart LR
+    Reader["Readers & writers"] --> Web["React frontend · Vercel"]
+    Admin["Content administrators"] --> Web
+    Web -->|"HTTPS requests + session cookies"| API["Express API · Render"]
+    API -->|"Accounts, content & interactions"| DB[("MongoDB")]
+    API -->|"Validated media uploads"| Media["Cloudinary"]
+~~~
 
-```mermaid
-flowchart TD
-    Reader["Reader or writer"] --> UI["React frontend"]
-    Admin["Content administrator"] --> UI
-    UI -->|"HTTPS API requests"| API["Express backend"]
-    API -->|"Users and content"| DB[("MongoDB")]
-    API -->|"Media uploads"| Media["Cloudinary"]
-```
+The backend enforces publication rules and admin permissions. Public lists return active content, while protected admin endpoints can retrieve all statuses.
 
-The frontend renders public and admin pages. The backend exposes `/api/*` routes, uses MongoDB for application data, and integrates with Cloudinary for uploaded media. Authentication uses a JWT stored in an HTTP-only cookie.
+## Project structure
 
-## 🗂 Project Structure
+~~~text
+Storyious-Figma/
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── assets/             # Images, icons, and videos
+│   │   ├── components/         # Shared UI
+│   │   ├── context/            # User and admin state
+│   │   ├── pages/              # Public pages and admin screens
+│   │   ├── schemas/            # Frontend validation
+│   │   ├── sections/           # Page sections and story collections
+│   │   └── App.jsx             # Client-side routes
+│   └── vercel.json             # SPA route rewrites
+├── backend/
+│   ├── config/                # Database and Cloudinary setup
+│   ├── middleware_temp/       # Auth, publication, and upload checks
+│   ├── modules/               # Models, controllers, and routes
+│   ├── routes/                # Shared upload route
+│   ├── utils/                 # Validation, tokens, and helpers
+│   └── server.js              # Express entry point
+├── docs/assets/               # README visuals
+└── README.md
+~~~
 
-| Path | Purpose |
-| --- | --- |
-| `frontend/src/App.jsx` | Public and admin route definitions |
-| `frontend/src/pages/` | Public pages and admin screens |
-| `frontend/src/components/` | Shared UI components |
-| `frontend/src/sections/` | Story collections and page sections |
-| `frontend/src/context/` | User and admin context providers |
-| `frontend/src/schemas/` | Form-validation schemas |
-| `frontend/src/assets/` | Images, icons, and videos |
-| `frontend/public/` | Public static files |
-| `frontend/vercel.json` | SPA rewrites for frontend routes |
-| `backend/server.js` | Express setup and API route mounting |
-| `backend/config/` | MongoDB and Cloudinary configuration |
-| `backend/modules/` | Feature-specific models, controllers, and routes |
-| `backend/middleware_temp/` | Authentication and upload middleware |
-| `backend/routes/` | Shared upload route |
-| `backend/utils/` | Tokens, responses, slugs, and reading-time utilities |
-| `backend/.env.sample` | Backend environment-variable template |
+## Run locally
 
-## 💻 Run Locally
+### 1. Prepare your tools
 
-### 1. Requirements
+Use **Node.js 24** and npm. The backend requires Node.js **22 or newer** for its file-detection dependency.
 
-Install Git and a supported Node.js LTS release compatible with the dependencies. You also need a MongoDB database and Cloudinary credentials for media uploads.
+You will also need Git, a MongoDB database, and a Cloudinary account for uploads.
 
-### 2. Clone the project
+### 2. Clone the repository
 
-The reviewed default branch is `development`.
-
-```bash
+~~~bash
 git clone --branch development https://github.com/Eman-Nazir/Storyious-Figma.git
 cd Storyious-Figma
-```
+~~~
 
-### 3. Configure the backend
+### 3. Configure and start the backend
 
-Create `backend/.env` using `backend/.env.sample` as the template:
+~~~bash
+cd backend
+cp .env.sample .env
+npm ci
+~~~
 
-```dotenv
+Edit `backend/.env` with your own values:
+
+~~~dotenv
 PORT=8000
 NODE_ENV=development
-MONGO_URI=mongodb://127.0.0.1:27017
+MONGO_URI=mongodb+srv://YOUR_USER:YOUR_PASSWORD@YOUR_CLUSTER.mongodb.net
 JWT_SECRET=replace_with_a_long_random_secret
 CLOUDINARY_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_SECRET_KEY=your_api_secret
 ADMIN_EMAIL=your_admin_email
 ADMIN_PASSWORD=replace_with_a_strong_unique_password
-```
+FRONTEND_URL=http://localhost:5173
+TRUST_PROXY_HOPS=0
+~~~
 
-**MongoDB URI format matters:** The current `backend/config/mongodb.js` appends `/storyious?retryWrites=true&w=majority` to `MONGO_URI`. For Atlas, supply the base URI only, such as `mongodb+srv://USERNAME:PASSWORD@CLUSTER_HOST`, without a trailing slash, database name, or query string. URL-encode special characters in the password. Alternatively, refactor the connector to accept a complete URI and update the environment value accordingly.
+**MongoDB configuration:** Supply the base connection URI without a database name, trailing slash, or query string. The current connector appends `/storyious?retryWrites=true&w=majority`. URL-encode special characters in database credentials.
 
-Load dotenv before modules read environment variables. In particular, add `import "dotenv/config";` at the top of `backend/config/cloudinary.js`, and replace hardcoded credential fallbacks with environment-only values. See the deployment checklist.
-
-Then start the backend:
-
-```bash
-cd backend
-npm install
+~~~bash
 npm run dev
-```
+~~~
 
-Open `http://localhost:8000/` to check the server response. This response alone does not verify the database connection.
+The API runs at `http://localhost:8000` by default. Startup connects to MongoDB before listening.
 
-### 4. Configure the frontend
+### 4. Configure and start the frontend
 
-In `frontend/.env`, use:
+In a second terminal, from the repository root:
 
-```dotenv
+~~~bash
+cd frontend
+cp .env.sample .env
+npm install
+~~~
+
+Set `frontend/.env`:
+
+~~~dotenv
 VITE_API_URL=http://localhost:8000
 VITE_BACKEND_URL=http://localhost:8000/api/users
-```
+~~~
 
-`Login.jsx` appends `/api/users/login` to `VITE_API_URL`. `AdminContext.jsx` appends `/login` or `/dashboard` to `VITE_BACKEND_URL`. Their current meanings differ, so do not give both variables the same value.
-
-Several other requests still contain literal localhost URLs. They work only against the local backend until updated as described below.
-
-In a second terminal, starting from the repository root:
-
-```bash
-cd frontend
-npm install
+~~~bash
 npm run dev
-```
+~~~
 
 Open the local URL printed by Vite, normally `http://localhost:5173`.
 
-### 5. Available commands
+**Why two URLs?** `VITE_API_URL` is the backend origin. `VITE_BACKEND_URL` includes `/api/users` because the admin context appends authentication paths to it.
+
+Keep local `.env` files out of Git. Only the public API URLs belong in `VITE_*` variables.
+
+### Admin access
+
+Set `ADMIN_EMAIL` and `ADMIN_PASSWORD` before the first backend startup. The application creates the admin account when it is missing.
+
+Changing these environment values does not reset an existing account's password. Do not publish admin login details in issues or documentation.
+
+## Useful commands
 
 | Directory | Command | Purpose |
 | --- | --- | --- |
-| `frontend` | `npm run dev` | Start Vite development server |
-| `frontend` | `npm run build` | Generate the production `dist` directory |
-| `frontend` | `npm run preview` | Preview the frontend build locally |
+| `frontend` | `npm run dev` | Start the local Vite server |
+| `frontend` | `npm run build` | Generate the production `dist` folder |
+| `frontend` | `npm run preview` | Preview a frontend build |
 | `frontend` | `npm run lint` | Run ESLint |
-| `backend` | `npm run dev` | Run the API with Nodemon |
-| `backend` | `npm start` | Execute `server.js` |
+| `backend` | `npm run dev` | Start the API with Nodemon |
+| `backend` | `npm start` | Start the API with Node.js |
 
-The frontend includes a pnpm lockfile. If standardizing on npm, generate and commit an npm lockfile after validating installation; use one package manager consistently. Neither package currently defines a test script.
+Use npm consistently with these instructions and commit lockfile updates when dependencies change. The repository does not currently define an `npm test` script.
 
-## 🔌 API Overview
+## API map
 
-These base paths are mounted in `backend/server.js`:
-
-| Base path | Purpose |
+| Base path | Responsibility |
 | --- | --- |
 | `/api/users` | Signup, login, logout, current user, admin dashboard |
-| `/api/stories` | Stories and nested ad routes |
-| `/api/authors` | Authors |
-| `/api/categories` | Story categories |
+| `/api/stories` | Stories and nested advertisement routes |
 | `/api/blogs` | Blog content |
+| `/api/authors` | Author profiles |
+| `/api/categories` | Content categories |
 | `/api/faqs` | FAQ content |
-| `/api/submissions` | Writer submissions |
-| `/api/uploads` | Media upload |
-| `/api/comments` | Comments and replies |
-| `/api/newsLetter` | Newsletter subscriptions |
-| `/api/search` | Search |
-| `/api/bookmarks` | Bookmarks |
+| `/api/comments` | Comments, replies, and votes |
+| `/api/bookmarks` | A reader's saved content |
+| `/api/submissions` | Writer applications and protected management |
+| `/api/newsLetter` | Newsletter subscriptions and protected records |
+| `/api/uploads` | Admin media uploads |
+| `/api/search` | Public search |
 
-Examples:
+Story and blog admin reads use `/admin/all` and `/admin/:id`; categories use `/admin/all`. These endpoints require an admin session. Authenticated browser requests send cookies through `withCredentials: true` or Fetch's equivalent.
 
-```http
-POST /api/users/signup
-POST /api/users/login
-POST /api/users/logout
-GET  /api/users/me
-GET  /api/users/dashboard
-GET  /api/stories
-GET  /api/stories/:id
-POST /api/stories/create
-GET  /api/blogs
-```
+## Deployment
 
-Authenticated browser requests must send cookies with `withCredentials: true`. The dashboard route requires the admin role. Review individual route files for payloads and permissions; authentication is not uniformly applied across the current API.
-
-## 🚀 Deployment Guide
-
-**Suggested setup:** Vercel for the frontend, Render for the backend, MongoDB Atlas for the database, and Cloudinary for media.
-
-### Step 1 — Prepare the code before deploying
-
-These are required changes to the current source, not changes already made by this README.
-
-#### A. Replace localhost API requests
-
-Search the entire `frontend/src` directory for `localhost:8000`, `VITE_API_URL`, and `VITE_BACKEND_URL`. Confirm every API request uses the intended deployed backend.
-
-For example, in `UserContext.jsx`, replace:
-
-```js
-axios.get("http://localhost:8000/api/users/me", {
-  withCredentials: true,
-});
-```
-
-with:
-
-```js
-const API_ORIGIN = import.meta.env.VITE_API_URL;
-
-axios.get(`${API_ORIGIN}/api/users/me`, {
-  withCredentials: true,
-});
-```
-
-Apply the same approach to logout, admin content requests, and all other hardcoded requests. A Vercel environment variable cannot change a literal localhost URL in source code.
-
-#### B. Allow the backend to listen on Render
-
-The current server skips `app.listen()` when `NODE_ENV=production`. For a Render web service, replace the conditional startup block at the bottom of `backend/server.js` with:
-
-```js
-const PORT = process.env.PORT || 8000;
-
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Storyious API listening on port ${PORT}`);
-});
-
-export default app;
-```
-
-This startup change is for the Render deployment path described here. Do not work around it by using development mode in production: the login controller uses `NODE_ENV` to configure secure cookies.
-
-#### C. Remove exposed credentials
-
-The reviewed Cloudinary configuration contains a hardcoded API secret. Rotate that credential in Cloudinary, remove the fallback values from the source, and use:
-
-```js
-import "dotenv/config";
-import { v2 as cloudinary } from "cloudinary";
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_SECRET_KEY,
-});
-
-export default cloudinary;
-```
-
-Deleting a value from the latest file does not invalidate a credential exposed in Git history. Keep database credentials, JWT secrets, and Cloudinary secrets in backend environment settings only. Vite-prefixed values are public client configuration.
-
-#### D. Protect content-management routes
-
-Story, ad, blog, and upload routes currently lack route-level authentication and role middleware. Apply the existing middleware before the upload/controller handlers for operations intended only for administrators:
-
-```js
-import { auth, requireRole } from "../../middleware_temp/authMiddleware.js";
-
-// Example inside backend/modules/blogs/blog.routes.js:
-router.post(
-  "/",
-  auth,
-  requireRole("admin"),
-  upload.array("images"),
-  createBlog
-);
-```
-
-Apply equivalent checks to admin update/delete operations and audit the remaining modules. Decide separately which uploads should be available to authenticated writers. Keep public read routes accessible as intended. For cookie-authenticated writes, also implement appropriate CSRF defenses, such as validated request origins and CSRF tokens.
-
-#### E. Finish startup and logging cleanup
-
-- Initialize the admin once, after a successful database connection; remove the extra initialization call from `user.routes.js`.
-- Make `connectDB()` rethrow connection errors so startup does not proceed as though a failed connection succeeded.
-- Remove the middleware that logs whole request bodies and cookies.
-- Build the frontend and resolve any build failures before publishing.
-
-### Step 2 — Prepare MongoDB Atlas
-
-1. Create or select an Atlas cluster.
-2. Create a database user with the permissions the application needs.
-3. Configure Atlas network access for the backend's outbound IP addresses.
-4. Set the backend `MONGO_URI` using the base-only format described above, unless you changed the connector to accept a full URI.
-5. Keep database credentials out of the frontend and repository.
-
-A new database starts empty. Create categories, authors, and stories through the protected admin workflow before expecting populated content pages.
-
-### Step 3 — Deploy the backend on Render
-
-Create a **Web Service**, connect this GitHub repository, and use:
+### Backend · Render
 
 | Setting | Value |
 | --- | --- |
+| Service type | Web Service |
 | Branch | `development` |
 | Root directory | `backend` |
-| Runtime | Node |
-| Build command | `npm install` |
+| Build command | `npm ci` |
 | Start command | `npm start` |
-| Environment | `NODE_ENV=production` plus backend secrets |
+| `NODE_VERSION` | `24` |
+| `NODE_ENV` | `production` |
 
-Add `MONGO_URI`, `JWT_SECRET`, `CLOUDINARY_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_SECRET_KEY`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`. Let Render provide its port.
+Configure database, JWT, Cloudinary, and admin credentials in Render's environment settings. Let Render supply its port.
 
-Choose the hosting plan shown in your account. Deploy and inspect the logs for both database connection and server startup. Copy the assigned HTTPS backend URL; do not append `/api` when using it as `VITE_API_URL`.
+Set the frontend origin:
 
-### Step 4 — Deploy the frontend on Vercel
+~~~dotenv
+FRONTEND_URL=https://storyious-figma.vercel.app
+~~~
 
-Import the same repository as a separate frontend project:
+Configure `TRUST_PROXY_HOPS` to the hosting setup's verified proxy count. The default rate-limit store is process memory; multiple backend instances need a shared store.
+
+### Frontend · Vercel
 
 | Setting | Value |
 | --- | --- |
 | Production branch | `development` |
 | Root directory | `frontend` |
 | Framework preset | Vite |
-| Install command | `npm install` if using the npm workflow above |
+| Install command | `npm install` |
 | Build command | `npm run build` |
 | Output directory | `dist` |
 
-Set these production environment variables, replacing the example hostname with the actual Render URL:
+Add these public environment variables as **Config** values:
 
-```dotenv
-VITE_API_URL=https://YOUR-BACKEND.onrender.com
-VITE_BACKEND_URL=https://YOUR-BACKEND.onrender.com/api/users
-```
+~~~dotenv
+VITE_API_URL=https://storyious-figma.onrender.com
+VITE_BACKEND_URL=https://storyious-figma.onrender.com/api/users
+~~~
 
-Do not include a trailing slash. Keep `frontend/vercel.json`; it already rewrites browser routes to `index.html`. Deploy the frontend and copy its assigned URL. Redeploy after changing Vite environment variables because they are incorporated during the build.
+Select Production and, if needed, Preview. **Redeploy after changing Vite environment values** because they are included during the build.
 
-### Step 5 — Connect CORS and verify login
+The existing `frontend/vercel.json` sends nested browser routes to `index.html`. When deploying your own fork, replace the frontend and backend URLs with your own domains.
 
-Add the exact frontend origin to `allowedOrigins` in `backend/server.js`, with no trailing slash. Keep `credentials: true`; do not replace the origin allowlist with `*` for cookie-authenticated requests. Redeploy the backend.
+## Access and data handling
 
-The existing login/logout controller uses `Secure` and `SameSite=None` cookies in production. Keep `withCredentials: true` on authenticated frontend calls. Browsers may still block cross-site cookies between unrelated Vercel and Render domains. If login fails only under those browser settings, use frontend/API subdomains under the same custom domain or a correctly configured same-origin API proxy.
+- Admin writes require authentication and the admin role before upload processing.
+- Public content requests enforce active status, including search, bookmarks, and comment visibility.
+- Comment responses omit phone numbers and private account details. Submitted contact email is displayed only with explicit consent.
+- Voting stores each account's choice and updates counts atomically.
+- Signup and public forms have server-side validation and application rate limits.
+- Uploads have file-size/count limits, extension checks, and content-signature validation. Writer submissions validate required fields before committing files to Cloudinary.
+- Story HTML is sanitized with DOMPurify before rendering.
 
-### Step 6 — Test the live application
+Review dependency audit reports before releases. Keep credentials in backend environment settings and revoke any that were previously exposed. These safeguards do not replace testing the deployed application.
 
-- [ ] Backend root responds and database queries succeed.
-- [ ] Homepage, categories, stories, and blogs load.
-- [ ] Signup, login, refresh, profile, and logout work.
-- [ ] A non-admin cannot create, edit, delete, or upload admin content through direct API requests.
-- [ ] Admin content operations succeed with a valid admin session.
-- [ ] Media uploads and image URLs work.
-- [ ] Search, comments, bookmarks, and submissions behave as expected.
-- [ ] Refreshing a nested frontend route does not return a hosting 404.
-- [ ] Browser Network requests contain no localhost API destinations.
-- [ ] Phone and desktop layouts are checked.
+## Troubleshooting
 
-After verification, add the actual frontend URL near the top of this README as a **Live Demo** link. Do not publish admin credentials in the README.
-
-### Official deployment references
-
-- [Render: Deploy a Node Express App](https://render.com/docs/deploy-node-express-app)
-- [Render: Web Services](https://render.com/docs/web-services)
-- [Vercel: Vite](https://vercel.com/docs/frameworks/frontend/vite)
-- [Vercel: Environment Variables](https://vercel.com/docs/environment-variables)
-
-## 🛠 Troubleshooting
+<details>
+<summary><strong>Open setup and deployment tips</strong></summary>
 
 | Symptom | What to check |
 | --- | --- |
-| Render reports no open port | Remove the production-only listener guard and bind to the provided port on `0.0.0.0`. |
-| Login works but refresh logs out | Inspect `/api/users/me`; `UserContext.jsx` currently uses a literal localhost URL. Check cookie blocking too. |
-| CORS error | Match the exact frontend origin in the backend allowlist and redeploy. |
-| Admin content stays empty | Replace hardcoded URLs in `AdminContext.jsx`; check database records and API responses. |
-| MongoDB connection error | Check credentials, network access, and the URI suffix appended by `mongodb.js`. |
-| Upload fails | Check rotated Cloudinary credentials, authorization, and the current 5 MB per-file upload limit. |
-| Environment change has no effect | Restart the local Vite server or redeploy the production frontend. |
-| Nested route returns 404 | Confirm Vercel deploys from `frontend` and reads its `vercel.json`. |
+| Signup opens the login page | This is the intended flow. Sign in with the newly created account. |
+| Browser requests still use localhost | Update Vercel's two `VITE_*` URLs and redeploy. |
+| CORS blocks a request | Match `FRONTEND_URL` to the exact deployed frontend origin. |
+| Login succeeds but the session disappears | Check cookie credentials, HTTPS, and the browser's cross-site cookie policy. |
+| MongoDB does not connect | Check the base URI format, database credentials, and Atlas network access. |
+| An old ad image is broken | Edit the ad and re-upload its image to replace the old stored URL. |
+| An upload is rejected | Check the 5 MiB limit, supported type, and Cloudinary configuration. |
+| Render reports an unknown npm command | The start command is `npm start`. |
+| Refreshing a nested page returns 404 | Confirm Vercel uses the `frontend` root and its SPA rewrite file. |
 
-## 🧭 Development Roadmap
+If cross-site cookies are blocked between separate hosting domains, use a suitable same-origin API proxy or frontend/API subdomains under one custom domain.
 
-- [ ] Centralize API requests in a shared Axios client.
-- [ ] Complete server-side authorization across content modules.
-- [ ] Add automated API and authentication tests.
-- [ ] Add verified screenshots and a short product walkthrough GIF.
-- [ ] Improve loading, error, and empty states consistently.
-- [ ] Publish and verify the live demo.
+</details>
 
-The animated heading uses an external SVG service. GitHub does not run custom JavaScript or CSS from a README. The static title and description remain readable if that service is unavailable. For a product animation, record the real application and add a repository-hosted GIF after verifying the deployment.
+## Next chapters
 
-## 👩‍💻 Author
+- [ ] Add a committed automated API and authentication test suite.
+- [ ] Centralize API configuration and request handling.
+- [ ] Expand admin analytics and improve loading and empty states.
+- [ ] Continue accessibility and performance improvements.
 
-**Eman Nazir** — MERN Stack Developer & BS Computer Science Student
+## Contributing
 
-[GitHub Profile](https://github.com/Eman-Nazir) · [Project Repository](https://github.com/Eman-Nazir/Storyious-Figma)
+Ideas, reproducible bug reports, and focused improvements are welcome.
 
-## 📄 License
+1. Fork the repository and create a feature branch.
+2. Keep changes focused and update relevant documentation.
+3. Run the frontend build and any checks relevant to your change.
+4. Open a pull request describing the problem and resulting behavior.
 
-The backend package declares `ISC`, but no root license file was present in the reviewed branch. Add a repository-wide license before making broader reuse claims. Third-party images, videos, and design assets may have separate usage terms.
+## Author
+
+**Eman Nazir**
+
+[GitHub](https://github.com/Eman-Nazir) · [Project repository](https://github.com/Eman-Nazir/Storyious-Figma) · [Visit Storyious](https://storyious-figma.vercel.app/)
+
+The backend package declares ISC; a repository-wide `LICENSE` file has not yet been added.
 
 ---
 
 <div align="center">
 
-**Stories bring people together. Code makes the connection possible.**
+**Every story starts somewhere. Yours can start here.**
 
-If you find this project interesting, consider giving it a ⭐.
+### [Explore Storyious →](https://storyious-figma.vercel.app/)
+
+If this project helped or inspired you, a ⭐ is always appreciated.
+
+[Back to top](#storyious)
 
 </div>
